@@ -72,7 +72,6 @@ export default function Lightbox({
         background: 'rgba(var(--ink-rgb),.97)',
         display: 'grid',
         gridTemplateRows: 'auto 1fr auto',
-        animation: 'fade .2s ease both',
       }}
     >
       <div
@@ -166,8 +165,6 @@ export default function Lightbox({
             borderRadius: 8,
             overflow: 'hidden',
             background: 'var(--panel)',
-            boxShadow: 'inset 0 0 0 1px rgba(var(--paper-rgb),.08)',
-            animation: 'settle .3s cubic-bezier(.2,.7,.2,1) both',
           }}
         >
           <div

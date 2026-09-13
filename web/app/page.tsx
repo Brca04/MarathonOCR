@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Nav from '@/components/Nav';
 import { useT } from '@/components/AppContext';
 import Hero from '@/components/Hero';
@@ -18,6 +19,15 @@ import type { FindRunnerResult, GalleryPhoto, Runner } from '@/lib/types';
  * runner's gallery takes over the whole page once a search lands.
  */
 export default function HomePage() {
+  // useSearchParams needs a boundary in a statically exported page.
+  return (
+    <Suspense fallback={null}>
+      <Home />
+    </Suspense>
+  );
+}
+
+function Home() {
   const t = useT();
   const [bib, setBib] = useState('');
   const [error, setError] = useState('');
@@ -77,30 +87,31 @@ export default function HomePage() {
   /**
    * The profile lives at ?bib=1042, which makes it linkable, survives a reload
    * and — the point of it — gives the browser's back button somewhere to go.
-   * A popstate is the single source of truth: it clears the runner on the way
-   * back and restores one on the way forward.
+   * The URL is the single source of truth for which screen is showing, which is
+   * what makes every route back to the search work: the back button, the mark
+   * in the header and the button on the profile all just change it. A popstate
+   * listener alone would miss the header link, since a client-side navigation
+   * does not fire one.
    */
+  const params = useSearchParams();
+  const wanted = params.get('bib');
   const runRef = useRef(run);
   runRef.current = run;
+  const shown = found?.runner.bib ?? null;
 
   useEffect(() => {
-    const sync = () => {
-      const wanted = new URLSearchParams(window.location.search).get('bib');
-      if (!wanted) {
-        setFound(null);
-        setBib('');
-        setError('');
-        setLb(-1);
-        window.scrollTo(0, 0);
-        return;
-      }
-      setBib(wanted);
-      void runRef.current(wanted, false);
-    };
-    sync();
-    window.addEventListener('popstate', sync);
-    return () => window.removeEventListener('popstate', sync);
-  }, []);
+    if (!wanted) {
+      setFound(null);
+      setBib('');
+      setError('');
+      setLb(-1);
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (wanted === shown) return;
+    setBib(wanted);
+    void runRef.current(wanted, false);
+  }, [wanted, shown]);
 
   const onDemo = useCallback(() => {
     setBib('1042');
@@ -208,7 +219,6 @@ export default function HomePage() {
             gridTemplateColumns: 'minmax(0,1.5fr) minmax(340px,520px)',
             minHeight: '100svh',
             width: '100%',
-            animation: 'fade .4s ease both',
           }}
         >
           <Hero />

@@ -40,7 +40,6 @@ export default function Nav() {
             // 336 × 400 — held so the header does not reflow while it loads.
             aspectRatio: '336 / 400',
             borderRadius: 6,
-            filter: 'drop-shadow(0 2px 12px rgba(0,0,0,.35))',
           }}
         />
       </Link>

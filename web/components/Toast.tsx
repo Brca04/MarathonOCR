@@ -20,7 +20,6 @@ export default function Toast({ message }: { message: string }) {
         fontSize: 14,
         fontWeight: 600,
         textAlign: 'center',
-        animation: 'rise .3s ease both',
       }}
     >
       {message}

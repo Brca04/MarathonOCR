@@ -15,13 +15,9 @@ const mono = (size = 11): React.CSSProperties => ({
 });
 
 /**
- * The runner screen. Two animations from the design are load-bearing for the
- * feel of it, so they are reproduced rather than approximated:
- *
- *  - a 3.4s run along the course track, with the clock counting up to the
- *    finish time, easing out;
- *  - finish time, then pace, then place, each rising in 550ms apart once the
- *    run lands.
+ * The runner screen. The only motion left is the one that carries meaning: the
+ * marker runs the course track while the clock counts up to the finish time.
+ * Nothing fades or rises in.
  */
 export default function RunnerView({
   runner,
@@ -40,45 +36,33 @@ export default function RunnerView({
 }) {
   const { lang, t } = useApp();
   const [prog, setProg] = useState(0);
-  const [stage, setStage] = useState(0);
   const raf = useRef<number>(0);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     const dur = 3400;
     const delay = 500;
     const t0 = performance.now();
     setProg(0);
-    setStage(0);
     const tick = (now: number) => {
       const x = Math.min(1, Math.max(0, (now - t0 - delay) / dur));
       setProg(easeOutCubic(x));
       if (x < 1) raf.current = requestAnimationFrame(tick);
     };
     raf.current = requestAnimationFrame(tick);
-    timers.current = [150, 700, 1150].map((extra, i) =>
-      setTimeout(() => setStage(i + 1), delay + dur + extra),
-    );
     return () => {
       cancelAnimationFrame(raf.current);
-      timers.current.forEach(clearTimeout);
     };
   }, [runner.bib]);
 
   const pct = `${(prog * 100).toFixed(2)}%`;
   const clock = fromSeconds(toSeconds(runner.time) * prog);
   const marks = trackMarks(String(runner.race_code), t);
-  const points = new Set(photos.map((p) => p.course_point)).size;
-  const fuzzy = photos.filter((p) => p.match_kind === 'fuzzy').length;
 
-  const reveal = (n: number, y: string) => ({
-    opacity: stage >= n ? 1 : 0,
-    transform: stage >= n ? 'none' : `translateY(${y})`,
-    transition: 'opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1)',
-  });
+  // No staged reveal: the numbers are simply there when the screen is.
+  const reveal = (_n: number, _y: string): React.CSSProperties | undefined => undefined;
 
   return (
-    <main data-screen-label="Runner" style={{ width: '100%', animation: 'fade .5s ease both' }}>
+    <main data-screen-label="Runner" style={{ width: '100%' }}>
       <div
         style={{
           position: 'relative',
@@ -106,7 +90,21 @@ export default function RunnerView({
             height: '100%',
             objectFit: 'cover',
             objectPosition: '48% 30%',
-            animation: 'settle 1.8s cubic-bezier(.2,.7,.2,1) both',
+          }}
+        />
+
+        {/* The photograph settles into the page over its last stretch, so
+            scrolling on into the gallery is a transition rather than a cut. */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 'clamp(90px,14svh,180px)',
+            background: 'linear-gradient(to bottom, transparent, var(--ink))',
+            pointerEvents: 'none',
           }}
         />
 
@@ -118,7 +116,6 @@ export default function RunnerView({
             position: 'relative',
             zIndex: 1,
             color: 'var(--on-media)',
-            textShadow: 'var(--media-shadow)',
           }}
         >
           <div
@@ -138,10 +135,46 @@ export default function RunnerView({
           >
             <div
               style={{
-                animation: 'rise .8s cubic-bezier(.2,.7,.2,1) both',
                 minWidth: 0,
               }}
             >
+              {/* The way back, where you are looking rather than down in the
+                  gallery header. */}
+              <button
+                type="button"
+                onClick={onSearchAgain}
+                className="btn-media"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 'clamp(12px,2cqh,20px)',
+                  padding: '9px 16px 9px 12px',
+                  borderRadius: 999,
+                  border: '1px solid var(--media-rule)',
+                  background: 'transparent',
+                  color: 'var(--on-media)',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  transition: 'background .2s, border-color .2s',
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M19 12H5m0 0 6-6m-6 6 6 6" />
+                </svg>
+                {t.backToSearch}
+              </button>
+
               <div
                 style={{
                   display: 'flex',
@@ -160,7 +193,6 @@ export default function RunnerView({
                     borderRadius: 6,
                     background: 'var(--on-media)',
                     color: '#0b1424',
-                    textShadow: 'none',
                     letterSpacing: '.02em',
                     fontVariantNumeric: 'tabular-nums',
                   }}
@@ -297,7 +329,6 @@ export default function RunnerView({
               maxWidth: 1440,
               width: '100%',
               margin: '0 auto',
-              animation: 'fade .5s .2s ease both',
             }}
           >
             <div style={{ position: 'relative', height: 70 }}>
@@ -308,7 +339,7 @@ export default function RunnerView({
                   right: 0,
                   top: 44,
                   height: 1,
-                  background: 'var(--media-rule)',
+                  background: 'var(--line-2)',
                 }}
               />
               <div
@@ -317,7 +348,7 @@ export default function RunnerView({
                   left: 0,
                   top: 44,
                   height: 2,
-                  background: 'var(--on-media-accent)',
+                  background: 'var(--blue)',
                   width: pct,
                 }}
               />
@@ -330,9 +361,8 @@ export default function RunnerView({
                     transform: `translateX(${(-prog * 100).toFixed(1)}%)`,
                     padding: '5px 10px',
                     borderRadius: 6,
-                    background: 'var(--on-media)',
-                    color: '#0b1424',
-                    textShadow: 'none',
+                    background: 'var(--paper)',
+                    color: 'var(--ink)',
                     fontFamily: 'var(--mono)',
                     fontSize: 13,
                     fontWeight: 500,
@@ -352,8 +382,7 @@ export default function RunnerView({
                     height: 10,
                     transform: 'translate(-50%,-50%)',
                     borderRadius: '50%',
-                    background: 'var(--on-media-accent)',
-                    boxShadow: '0 0 0 3px rgba(0,0,0,.45)',
+                    background: 'var(--blue)',
                   }}
                 />
               </div>
@@ -375,14 +404,14 @@ export default function RunnerView({
                     style={{
                       width: 1,
                       height: 6,
-                      background: 'var(--media-rule)',
+                      background: 'var(--line-2)',
                     }}
                   />
                   <span
                     style={{
                       ...mono(10),
                       letterSpacing: '.12em',
-                      color: 'var(--on-media-mute)',
+                      color: 'var(--mute)',
                       whiteSpace: 'nowrap',
                     }}
                   >
@@ -400,74 +429,31 @@ export default function RunnerView({
         style={{
           maxWidth: 1440,
           margin: '0 auto',
-          padding: '40px clamp(16px,4vw,48px) 120px',
+          padding: 'clamp(28px,4.5vh,52px) clamp(16px,4vw,48px) clamp(56px,9vh,104px)',
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'end',
-            gap: '16px 24px',
-            padding: '0 0 24px',
-            borderBottom: '1px solid var(--line)',
-            marginBottom: 24,
-          }}
-        >
-          <div>
-            <div style={{ ...mono(), color: 'var(--blue)', marginBottom: 10 }}>{t.yourPhotos}</div>
-            <h3
-              style={{
-                margin: 0,
-                fontWeight: 600,
-                fontSize: 'clamp(24px,3vw,36px)',
-                letterSpacing: '-.03em',
-                lineHeight: 1,
-              }}
-            >
-              {t.photoCount(photos.length, points)[0]}{' '}
-              <span style={{ color: 'var(--mute)', fontWeight: 500 }}>
-                {t.photoCount(photos.length, points)[1]}
-              </span>
-            </h3>
-            {fuzzy > 0 ? (
-              <div
-                style={{
-                  ...mono(10),
-                  letterSpacing: '.12em',
-                  color: 'var(--mute-3)',
-                  marginTop: 10,
-                }}
-              >
-                {t.fuzzyNote(fuzzy)}
-              </div>
-            ) : null}
-          </div>
-          <div
+        {/* One line, centred: how many photographs were found, and the one
+            action that belongs to all of them. */}
+        <div style={{ textAlign: 'center', padding: '0 0 clamp(20px,3.4vh,36px)' }}>
+          <h3
             style={{
-              display: 'flex',
-              gap: 10,
-              flexWrap: 'wrap',
-              alignItems: 'center',
+              margin: 0,
+              fontWeight: 600,
+              fontSize: 'clamp(20px,2.4vw,30px)',
+              letterSpacing: '-.02em',
+              lineHeight: 1.2,
+              textWrap: 'balance',
             }}
           >
-            <a
-              href="#"
-              className="link-mute"
-              onClick={(e) => {
-                e.preventDefault();
-                onSearchAgain();
-              }}
-              style={{ fontSize: 14, padding: '12px 6px' }}
-            >
-              {t.searchAgain}
-            </a>
+            {t.photosFound(photos.length)}
+          </h3>
+          {photos.length > 0 ? (
             <button
               onClick={onBuyAll}
               className="btn-ghost"
               style={{
-                border: '1px solid rgba(var(--paper-rgb),.18)',
+                marginTop: 18,
+                border: '1px solid var(--line-2)',
                 background: 'transparent',
                 color: 'var(--paper)',
                 borderRadius: 8,
@@ -480,7 +466,7 @@ export default function RunnerView({
             >
               {ownedAll ? t.downloadAll : t.unlockAll(PRICE_BUNDLE_EUR)}
             </button>
-          </div>
+          ) : null}
         </div>
 
         {photos.length === 0 ? (
@@ -495,13 +481,10 @@ export default function RunnerView({
             {t.noPhotos(runner.bib)}
           </p>
         ) : (
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill,minmax(min(100%,260px),1fr))',
-              gap: 10,
-            }}
-          >
+          <div data-gallery="">
+            {/* Masonry: every photograph keeps its own shape and the columns
+                just hold them. Nothing is printed over a photograph — the
+                course point, time and match quality are all in the viewer. */}
             {photos.map((p, i) => (
               <figure
                 key={p.id}
@@ -516,17 +499,9 @@ export default function RunnerView({
                   }
                 }}
                 aria-label={t.openPhoto(dataTerm(lang, p.course_point), p.clock)}
-                style={{
-                  margin: 0,
-                  position: 'relative',
-                  aspectRatio: '4/3',
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  background: 'var(--panel)',
-                  cursor: 'zoom-in',
-                  boxShadow: 'var(--tile-edge)',
-                  animation: 'fade .6s ease both',
-                }}
+                // No inline margin here: the row gap belongs to the gallery's
+                // stylesheet, and an inline `margin: 0` would silently win.
+                style={{ position: 'relative', cursor: 'zoom-in' }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
@@ -534,66 +509,15 @@ export default function RunnerView({
                   alt={p.hint}
                   loading="lazy"
                   style={{
-                    position: 'absolute',
-                    inset: 0,
+                    display: 'block',
                     width: '100%',
-                    height: '100%',
+                    height: 'auto',
+                    aspectRatio: p.ratio,
                     objectFit: 'cover',
-                    filter: WATERMARK && !ownedAll ? 'saturate(.92)' : undefined,
+                    borderRadius: 10,
+                    background: 'var(--panel)',
                   }}
                 />
-                {p.match_kind === 'fuzzy' ? (
-                  <span
-                    title={t.recognisedAs(p.read_as)}
-                    style={{
-                      position: 'absolute',
-                      top: 10,
-                      left: 10,
-                      padding: '4px 8px',
-                      borderRadius: 5,
-                      background: 'rgba(var(--ink-rgb),.78)',
-                      border: '1px solid rgba(var(--blue-soft-rgb),.35)',
-                      color: 'var(--blue-soft)',
-                      fontFamily: 'var(--mono)',
-                      fontSize: 9,
-                      letterSpacing: '.1em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {t.likely}
-                  </span>
-                ) : null}
-                <figcaption
-                  style={{
-                    position: 'absolute',
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    padding: '40px 14px 12px',
-                    background: 'var(--tile-scrim)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'end',
-                    gap: 8,
-                    fontSize: 11,
-                    fontFamily: 'var(--mono)',
-                    letterSpacing: '.08em',
-                    textTransform: 'uppercase',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  <span style={{ color: 'var(--blue-soft)' }}>
-                    {dataTerm(lang, p.course_point)}
-                  </span>
-                  <span
-                    style={{
-                      color: 'var(--mute-2)',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {p.clock}
-                  </span>
-                </figcaption>
               </figure>
             ))}
           </div>

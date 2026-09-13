@@ -106,6 +106,21 @@ function isoAt(minutes: number): string {
   return new Date(start + minutes * 60_000).toISOString();
 }
 
+/** Landscape, portrait, square — the shapes a photographer actually comes back with. */
+const SHAPES: [number, number][] = [
+  [6000, 4000],
+  [4000, 6000],
+  [6000, 4000],
+  [4000, 5000],
+  [6000, 4000],
+  [4000, 6000],
+  [5000, 5000],
+  [6000, 4000],
+  [4000, 6000],
+  [6000, 4000],
+  [4000, 5000],
+];
+
 export function demoPhotos(bib: string): PhotoMatch[] {
   const seed = parseInt(bib, 10) || 0;
   return POINTS.map((p, i) => ({
@@ -113,8 +128,11 @@ export function demoPhotos(bib: string): PhotoMatch[] {
     file_name: `ZG26_${String(1000 + seed + i)}.jpg`,
     preview_path: DEMO_FILES[(seed + i) % DEMO_FILES.length],
     original_path: null,
-    width: 6000,
-    height: 4000,
+    // Real race sets mix orientations — a portrait of one runner next to a wide
+    // shot of the pack — and the gallery lays out by shape, so the demo carries
+    // the same mix rather than eleven identical rectangles.
+    width: SHAPES[i % SHAPES.length][0],
+    height: SHAPES[i % SHAPES.length][1],
     captured_at: isoAt(p.minutes),
     photographer: PHOTOGRAPHERS[(seed + i) % PHOTOGRAPHERS.length],
     course_point: p.point,

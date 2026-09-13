@@ -87,17 +87,14 @@ export type Strings = {
   finishTime: string;
   pace: string;
   place: string;
-  yourPhotos: string;
   /** ["11 fotografija", "s 7 točaka na stazi"] — the second half is set muted. */
-  photoCount: (photos: number, points: number) => [string, string];
-  fuzzyNote: (n: number) => string;
-  searchAgain: string;
+  /** "Pronađeno je 11 vaših fotografija" — the gallery's only heading. */
+  photosFound: (n: number) => string;
+  backToSearch: string;
   downloadAll: string;
   unlockAll: (price: number) => string;
   noPhotos: (bib: string) => string;
   openPhoto: (point: string, clock: string) => string;
-  recognisedAs: (read: string) => string;
-  likely: string;
   viewer: string;
   close: string;
   prevPhoto: string;
@@ -155,25 +152,21 @@ const hr: Strings = {
   finishTime: 'Ciljno vrijeme',
   pace: 'Tempo',
   place: 'Plasman',
-  yourPhotos: 'Vaše fotografije',
-  photoCount: (photos, points) => [
-    `${photos} ${hrPlural(photos, ['fotografija', 'fotografije', 'fotografija'])}`,
-    `s ${points} ${hrPlural(points, ['točke', 'točke', 'točaka'])} na stazi`,
-  ],
-  fuzzyNote: (n) =>
-    `${n} ${hrPlural(n, [
-      'vjerojatno podudaranje',
-      'vjerojatna podudaranja',
-      'vjerojatnih podudaranja',
-    ])} · broj je bio djelomično nečitljiv`,
-  searchAgain: 'Niste to vi? Nova pretraga',
+  photosFound: (n) => {
+    // The verb agrees with the number, the way it does when spoken.
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return `Pronađena je ${n} vaša fotografija`;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14))
+      return `Pronađene su ${n} vaše fotografije`;
+    return `Pronađeno je ${n} vaših fotografija`;
+  },
+  backToSearch: 'Nova pretraga',
   downloadAll: 'Preuzmi sve originale',
   unlockAll: (price) => `Otključaj sve · ${price} €`,
   noPhotos: (bib) =>
     `Zasad nema fotografija označenih startnim brojem ${bib}. Fotografije se dodaju kako ih fotografi učitavaju i kako se brojevi očitavaju — provjerite ponovno kasnije tijekom dana.`,
   openPhoto: (point, clock) => `Otvori fotografiju ${point} ${clock}`,
-  recognisedAs: (read) => `Očitano kao ${read}`,
-  likely: 'Vjerojatno',
   viewer: 'Pregled fotografija',
   close: 'Zatvori',
   prevPhoto: 'Prethodna fotografija',
@@ -236,21 +229,13 @@ const en: Strings = {
   finishTime: 'Finish time',
   pace: 'Pace',
   place: 'Place',
-  yourPhotos: 'Your photos',
-  photoCount: (photos, points) => [
-    `${photos} photo${photos === 1 ? '' : 's'}`,
-    `from ${points} point${points === 1 ? '' : 's'} on the course`,
-  ],
-  fuzzyNote: (n) =>
-    `${n} likely match${n === 1 ? '' : 'es'} · the number was partly unreadable`,
-  searchAgain: 'Not you? Search again',
+  photosFound: (n) => `Found ${n} photo${n === 1 ? '' : 's'} of you`,
+  backToSearch: 'New search',
   downloadAll: 'Download all originals',
   unlockAll: (price) => `Unlock all · €${price}`,
   noPhotos: (bib) =>
     `No photos are tagged with bib ${bib} yet. Photos are added as the photographers upload and the numbers are read — check back later in the day.`,
   openPhoto: (point, clock) => `Open photo ${point} ${clock}`,
-  recognisedAs: (read) => `Recognised as ${read}`,
-  likely: 'Likely',
   viewer: 'Photo viewer',
   close: 'Close',
   prevPhoto: 'Previous photo',

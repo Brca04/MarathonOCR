@@ -145,7 +145,6 @@ export default function SearchForm({
             color: '#fff',
             borderRadius: 4,
             padding: '8px 28px 8px 32px',
-            transition: 'box-shadow .2s',
           }}
         >
           <span

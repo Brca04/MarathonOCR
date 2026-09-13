@@ -1,0 +1,44 @@
+# Cloudflare Pages security headers for the Zagreb Marathon photo site.
+# This is a fully static export, so headers cannot be set from Next.js — they
+# are applied by Cloudflare Pages from this file at the edge.
+#
+# CSP notes:
+#  - script-src needs 'unsafe-inline'. Next's App Router ships its hydration
+#    payload as inline <script>self.__next_f.push(...)</script> blocks whose
+#    contents change with every build, so they cannot be pinned by hash, and a
+#    static export has no server to mint per-request nonces. Hashing only our
+#    own theme-boot script blocks React from hydrating and the site renders as
+#    dead HTML — verified, not theoretical. Note also that a hash or nonce in
+#    this directive would make browsers IGNORE 'unsafe-inline' (CSP3), so the
+#    two cannot be combined as a belt-and-braces.
+#    The exposure is bounded: this app renders no user-supplied HTML, the only
+#    input is a bib number, and everything else below stays strict. If a
+#    nonce-based policy is wanted later it needs a Pages Function in front of
+#    the export.
+#  - connect-src / img-src include the Supabase project origin. Replace
+#    https://*.supabase.co with your exact project URL for a tighter policy.
+#  - img-src also allows the marathon emblem host until you self-host the brand
+#    assets (npm run fetch:brand → set NEXT_PUBLIC_BRAND_MARK=/brand/...), after
+#    which you can drop www.zagreb-marathon.com from this line.
+
+/*
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://www.zagreb-marathon.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# Immutable build output: every filename under /_next/static is content-hashed,
+# so it can be cached forever. Everything else stays revalidated by default.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Race photographs change only when they are replaced, and previews are served
+# from Supabase in production — this covers the bundled demo set.
+/photos/*
+  Cache-Control: public, max-age=604800
+
+/brand/*
+  Cache-Control: public, max-age=604800

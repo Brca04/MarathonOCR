@@ -104,11 +104,61 @@ Cloudflare dashboard → Workers & Pages → Create → Pages → connect the re
 | Build output directory | `out` |
 | Root directory | `web` |
 
-Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and
-`NEXT_PUBLIC_EVENT_SLUG` as build-time environment variables. **Do not add the
-service role key** — nothing in the build needs it.
+Node comes from `web/.node-version` (22). Next 16 does not build on Pages' older
+default.
 
-`wrangler pages deploy out` does the same thing from the command line.
+### Environment variables
+
+Set these under Settings → Environment variables, **for both Production and
+Preview** — a preview branch without them builds the demo event.
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | your project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the anon key |
+| `NEXT_PUBLIC_EVENT_SLUG` | e.g. `zagreb-2026` |
+| `NEXT_PUBLIC_BRAND_MARK` | `/brand/znak.jpg` once self-hosted (see below) |
+| `NEXT_PUBLIC_BRAND_ICON` | `/brand/znak-150.jpg` |
+| `NEXT_PUBLIC_EVENT_TZ`, `NEXT_PUBLIC_PRICE_*`, `NEXT_PUBLIC_WATERMARK` | optional, see `.env.example` |
+
+**Do not add the service role key** — nothing in the build needs it, and every
+`NEXT_PUBLIC_` value is visible in the browser.
+
+The build refuses to run on Pages without the first three
+(`scripts/check-deploy-env.mjs`). That is deliberate: the app falls back to the
+bundled demo event when Supabase is unconfigured, and a live site serving three
+invented runners as real results is worse than a red build. For a throwaway test
+site before Supabase exists, set `ALLOW_DEMO_BUILD=1` and the build proceeds with
+a warning.
+
+### Before the first deploy
+
+```bash
+npm run fetch:brand    # saves the race emblem into public/brand/
+```
+
+then set `NEXT_PUBLIC_BRAND_MARK` / `NEXT_PUBLIC_BRAND_ICON` to the local paths.
+Without it the header mark and favicon are hotlinked from
+`www.zagreb-marathon.com`, which makes the site depend on someone else's server
+staying up — and it needs that host in the `img-src` of `public/_headers`.
+
+### Headers
+
+`public/_headers` ships with the export and Cloudflare applies it at the edge:
+CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, plus
+immutable caching for `/_next/static/*`. Read the comments at the top before
+tightening it — in particular, `script-src` needs `'unsafe-inline'` for Next's
+hydration payload, and adding a hash there would silently disable it.
+
+### Checking a build the way Pages serves it
+
+```bash
+npm run build
+npx serve out          # or any static server
+```
+
+`wrangler pages deploy out --project-name=<project>` deploys the same folder
+from the command line.
 
 ---
 

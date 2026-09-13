@@ -90,8 +90,8 @@ export default function Hero() {
       }}
     >
       {/* The photograph is the panel: it runs the full height and the copy sits
-          straight on it — no deck, no blur, no fade. Anything over the picture
-          takes the fixed on-media colours and a shadow to stay legible. */}
+          straight on it — no deck, no blur, no fade, no shadow. Anything over
+          the picture takes the fixed on-media colours. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/photos/zg-hero.jpg"
@@ -103,7 +103,6 @@ export default function Hero() {
           height: '100%',
           objectFit: 'cover',
           objectPosition: 'center 30%',
-          animation: 'settle 1.6s cubic-bezier(.2,.7,.2,1) both',
         }}
       />
 
@@ -115,14 +114,12 @@ export default function Hero() {
         style={{
           position: 'relative',
           color: 'var(--on-media)',
-          textShadow: 'var(--media-shadow)',
         }}
       >
         <div
           data-hero-copy=""
           style={{
             padding: 'clamp(20px,3.4vh,40px) clamp(16px,4vw,48px) clamp(16px,2.6vh,28px)',
-            animation: 'rise .9s cubic-bezier(.2,.7,.2,1) both',
           }}
         >
           <h1
