@@ -3,6 +3,8 @@
 import { useEffect } from 'react';
 import { PRICE_SINGLE_EUR } from '@/lib/config';
 import type { GalleryPhoto } from '@/lib/types';
+import { dataTerm } from '@/lib/i18n';
+import { useApp } from '@/components/AppContext';
 
 export default function Lightbox({
   photos,
@@ -23,6 +25,7 @@ export default function Lightbox({
   onDownloadPreview: () => void;
   onDownloadOriginal: () => void;
 }) {
+  const { lang, t } = useApp();
   const photo = photos[index];
 
   useEffect(() => {
@@ -47,9 +50,9 @@ export default function Lightbox({
   const iconBtn: React.CSSProperties = {
     display: 'grid',
     placeItems: 'center',
-    border: '1px solid #1c2a45',
+    border: '1px solid var(--line)',
     background: 'transparent',
-    color: '#f2f5fb',
+    color: 'var(--paper)',
     borderRadius: '50%',
     width: 44,
     height: 44,
@@ -61,12 +64,12 @@ export default function Lightbox({
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Photo viewer"
+      aria-label={t.viewer}
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 100,
-        background: 'rgba(7,14,28,.97)',
+        background: 'rgba(var(--ink-rgb),.97)',
         display: 'grid',
         gridTemplateRows: 'auto 1fr auto',
         animation: 'fade .2s ease both',
@@ -79,7 +82,7 @@ export default function Lightbox({
           alignItems: 'center',
           padding: '16px clamp(16px,4vw,48px)',
           fontSize: 13,
-          color: '#8b9bba',
+          color: 'var(--mute)',
         }}
       >
         <span
@@ -89,11 +92,11 @@ export default function Lightbox({
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          <span style={{ color: '#f2f5fb' }}>{index + 1}</span> / {photos.length}{' '}
-          <span style={{ color: '#4c5c7c' }}>·</span> {photo.course_point}{' '}
-          <span style={{ color: '#4c5c7c' }}>·</span> {photo.clock}
+          <span style={{ color: 'var(--paper)' }}>{index + 1}</span> / {photos.length}{' '}
+          <span style={{ color: 'var(--mute-3)' }}>·</span> {dataTerm(lang, photo.course_point)}{' '}
+          <span style={{ color: 'var(--mute-3)' }}>·</span> {photo.clock}
         </span>
-        <button onClick={onClose} aria-label="Close" className="btn-outline" style={iconBtn}>
+        <button onClick={onClose} aria-label={t.close} className="btn-outline" style={iconBtn}>
           <svg
             width="18"
             height="18"
@@ -111,6 +114,7 @@ export default function Lightbox({
       </div>
 
       <div
+        data-lightbox-stage=""
         style={{
           position: 'relative',
           display: 'grid',
@@ -124,7 +128,7 @@ export default function Lightbox({
             e.stopPropagation();
             onStep(-1);
           }}
-          aria-label="Previous photo"
+          aria-label={t.prevPhoto}
           className="btn-outline"
           style={{
             ...iconBtn,
@@ -132,7 +136,7 @@ export default function Lightbox({
             left: 'clamp(8px,2vw,32px)',
             top: '50%',
             transform: 'translateY(-50%)',
-            background: '#070e1c',
+            background: 'var(--ink)',
             width: 48,
             height: 48,
           }}
@@ -157,12 +161,12 @@ export default function Lightbox({
           style={{
             margin: 0,
             position: 'relative',
-            width: `min(100%, 1200px, calc((100vh - 200px) * ${ratioNum}))`,
+            width: `min(100%, 1200px, calc((100svh - 190px) * ${ratioNum}))`,
             aspectRatio: photo.ratio,
             borderRadius: 8,
             overflow: 'hidden',
-            background: '#0e192e',
-            boxShadow: 'inset 0 0 0 1px rgba(242,245,251,.08)',
+            background: 'var(--panel)',
+            boxShadow: 'inset 0 0 0 1px rgba(var(--paper-rgb),.08)',
             animation: 'settle .3s cubic-bezier(.2,.7,.2,1) both',
           }}
         >
@@ -184,7 +188,7 @@ export default function Lightbox({
             e.stopPropagation();
             onStep(1);
           }}
-          aria-label="Next photo"
+          aria-label={t.nextPhoto}
           className="btn-outline"
           style={{
             ...iconBtn,
@@ -192,7 +196,7 @@ export default function Lightbox({
             right: 'clamp(8px,2vw,32px)',
             top: '50%',
             transform: 'translateY(-50%)',
-            background: '#070e1c',
+            background: 'var(--ink)',
             width: 48,
             height: 48,
           }}
@@ -224,13 +228,14 @@ export default function Lightbox({
           padding: '16px clamp(16px,4vw,48px) 24px',
         }}
       >
-        <div style={{ fontSize: 13, color: '#8b9bba' }}>
-          Photo by <span style={{ color: '#f2f5fb' }}>{photo.photographer ?? 'Unknown'}</span> ·{' '}
+        <div style={{ fontSize: 13, color: 'var(--mute)' }}>
+          {t.photoBy}{' '}
+          <span style={{ color: 'var(--paper)' }}>{photo.photographer ?? t.unknown}</span> ·{' '}
           {photo.dims}
           {photo.match_kind === 'fuzzy' ? (
             <>
               {' '}
-              · <span style={{ color: '#8fb6ff' }}>read as {photo.read_as}</span>
+              · <span style={{ color: 'var(--blue-soft)' }}>{t.readAs(photo.read_as)}</span>
             </>
           ) : null}
         </div>
@@ -241,8 +246,8 @@ export default function Lightbox({
               className="btn-white"
               style={{
                 border: 0,
-                background: '#f2f5fb',
-                color: '#070e1c',
+                background: 'var(--paper)',
+                color: 'var(--ink)',
                 borderRadius: 8,
                 padding: '0 20px',
                 height: 44,
@@ -267,7 +272,7 @@ export default function Lightbox({
               >
                 <path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16" />
               </svg>
-              Download original
+              {t.downloadOriginal}
             </button>
           ) : (
             <>
@@ -275,9 +280,9 @@ export default function Lightbox({
                 onClick={onDownloadPreview}
                 className="btn-outline"
                 style={{
-                  border: '1px solid #1c2a45',
+                  border: '1px solid var(--line)',
                   background: 'transparent',
-                  color: '#f2f5fb',
+                  color: 'var(--paper)',
                   borderRadius: 8,
                   padding: '0 18px',
                   height: 44,
@@ -285,15 +290,15 @@ export default function Lightbox({
                   transition: 'border-color .2s',
                 }}
               >
-                Download preview
+                {t.downloadPreview}
               </button>
               <button
                 onClick={onBuy}
                 className="btn-blue"
                 style={{
                   border: 0,
-                  background: '#3f82ff',
-                  color: '#070e1c',
+                  background: 'var(--blue)',
+                  color: 'var(--ink)',
                   borderRadius: 8,
                   padding: '0 20px',
                   height: 44,
@@ -302,7 +307,7 @@ export default function Lightbox({
                   transition: 'background .2s',
                 }}
               >
-                Buy original · €{PRICE_SINGLE_EUR}
+                {t.buyOriginal(PRICE_SINGLE_EUR)}
               </button>
             </>
           )}

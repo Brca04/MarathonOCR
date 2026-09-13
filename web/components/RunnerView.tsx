@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { PRICE_BUNDLE_EUR, WATERMARK } from '@/lib/config';
 import { easeOutCubic, fromSeconds, toSeconds, trackMarks } from '@/lib/format';
+import { dataTerm } from '@/lib/i18n';
+import { useApp } from '@/components/AppContext';
 import type { GalleryPhoto, Runner } from '@/lib/types';
 
 const mono = (size = 11): React.CSSProperties => ({
@@ -36,6 +38,7 @@ export default function RunnerView({
   onBuyAll: () => void;
   onSearchAgain: () => void;
 }) {
+  const { lang, t } = useApp();
   const [prog, setProg] = useState(0);
   const [stage, setStage] = useState(0);
   const raf = useRef<number>(0);
@@ -64,15 +67,14 @@ export default function RunnerView({
 
   const pct = `${(prog * 100).toFixed(2)}%`;
   const clock = fromSeconds(toSeconds(runner.time) * prog);
-  const marks = trackMarks(String(runner.race_code));
+  const marks = trackMarks(String(runner.race_code), t);
   const points = new Set(photos.map((p) => p.course_point)).size;
   const fuzzy = photos.filter((p) => p.match_kind === 'fuzzy').length;
 
   const reveal = (n: number, y: string) => ({
     opacity: stage >= n ? 1 : 0,
     transform: stage >= n ? 'none' : `translateY(${y})`,
-    transition:
-      'opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1)',
+    transition: 'opacity .8s cubic-bezier(.2,.7,.2,1), transform .8s cubic-bezier(.2,.7,.2,1)',
   });
 
   return (
@@ -84,12 +86,15 @@ export default function RunnerView({
           minHeight: '100svh',
           containerType: 'size',
           overflow: 'hidden',
-          background: '#0e192e',
+          background: 'var(--ink)',
           display: 'grid',
-          gridTemplateRows: '1fr auto',
+          gridTemplateRows: 'minmax(0,1fr) auto auto',
           isolation: 'isolate',
         }}
       >
+        {/* The photograph is the screen: it runs the full height and the
+            runner's numbers and the course track sit straight on it — no deck,
+            no blur — in the fixed on-media colours. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photos[0]?.src ?? '/photos/zg-runner.jpg'}
@@ -104,263 +109,300 @@ export default function RunnerView({
             animation: 'settle 1.8s cubic-bezier(.2,.7,.2,1) both',
           }}
         />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg,rgba(7,14,28,.5) 0%,rgba(7,14,28,.15) 35%,rgba(7,14,28,.78) 70%,#070e1c 100%)',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(90deg,rgba(7,14,28,.55),transparent 60%)',
-          }}
-        />
+
+        <div aria-hidden="true" />
 
         <div
-          data-hero-grid=""
+          data-on-media=""
           style={{
             position: 'relative',
             zIndex: 1,
-            alignSelf: 'end',
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0,1fr) auto',
-            gap: 'clamp(24px,4vw,64px)',
-            alignItems: 'end',
-            padding: '140px clamp(16px,4vw,48px) clamp(24px,4cqh,48px)',
-            maxWidth: 1440,
-            width: '100%',
-            margin: '0 auto',
+            color: 'var(--on-media)',
+            textShadow: 'var(--media-shadow)',
           }}
         >
-          <div style={{ animation: 'rise .8s cubic-bezier(.2,.7,.2,1) both', minWidth: 0 }}>
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: 10,
-                marginBottom: 'clamp(14px,2.5cqh,24px)',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'var(--mono)',
-                  fontSize: 'clamp(13px,1.4cqw,18px)',
-                  fontWeight: 500,
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  background: '#f2f5fb',
-                  color: '#070e1c',
-                  letterSpacing: '.02em',
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {runner.bib}
-              </span>
-              <span style={{ ...mono(11), letterSpacing: '.14em', color: '#c4cee2' }}>
-                {[runner.race, runner.category, runner.club].filter(Boolean).join(' · ')}
-              </span>
-            </div>
-            <h2
-              style={{
-                margin: 0,
-                fontWeight: 700,
-                fontSize: 'clamp(44px,min(7cqw,12cqh),120px)',
-                letterSpacing: '-.035em',
-                lineHeight: 0.88,
-                textWrap: 'balance',
-              }}
-            >
-              {runner.name}
-            </h2>
-          </div>
-
           <div
+            data-hero-grid=""
             style={{
+              position: 'relative',
+              zIndex: 1,
               display: 'grid',
-              gap: 'clamp(16px,3cqh,32px)',
-              justifyItems: 'end',
-              textAlign: 'right',
-              minWidth: 0,
+              gridTemplateColumns: 'minmax(0,1fr) auto',
+              gap: 'clamp(24px,4vw,64px)',
+              alignItems: 'end',
+              padding: 'clamp(20px,3.2cqh,40px) clamp(16px,4vw,48px) clamp(16px,2.4cqh,32px)',
+              maxWidth: 1440,
+              width: '100%',
+              margin: '0 auto',
             }}
           >
-            <div style={reveal(1, '24px')}>
-              <div style={{ ...mono(), color: '#3f82ff', marginBottom: 8 }}>Finish time</div>
+            <div
+              style={{
+                animation: 'rise .8s cubic-bezier(.2,.7,.2,1) both',
+                minWidth: 0,
+              }}
+            >
               <div
                 style={{
-                  fontSize: 'clamp(72px,min(13cqw,24cqh),240px)',
-                  fontWeight: 800,
-                  letterSpacing: '-.045em',
-                  lineHeight: 0.85,
-                  whiteSpace: 'nowrap',
-                  fontVariantNumeric: 'tabular-nums',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: 10,
+                  marginBottom: 'clamp(14px,2.5cqh,24px)',
                 }}
               >
-                {runner.time ?? '—'}
+                <span
+                  style={{
+                    fontFamily: 'var(--mono)',
+                    fontSize: 'clamp(13px,1.4cqw,18px)',
+                    fontWeight: 500,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    background: 'var(--on-media)',
+                    color: '#0b1424',
+                    textShadow: 'none',
+                    letterSpacing: '.02em',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {runner.bib}
+                </span>
+                <span
+                  style={{
+                    ...mono(11),
+                    letterSpacing: '.14em',
+                    color: 'var(--on-media-mute)',
+                  }}
+                >
+                  {[dataTerm(lang, runner.race), runner.category, runner.club]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </span>
               </div>
+              <h2
+                style={{
+                  margin: 0,
+                  fontWeight: 700,
+                  fontSize: 'clamp(44px,min(7cqw,12cqh),120px)',
+                  letterSpacing: '-.035em',
+                  lineHeight: 0.88,
+                  textWrap: 'balance',
+                }}
+              >
+                {runner.name}
+              </h2>
             </div>
 
             <div
               style={{
-                display: 'flex',
-                gap: 'clamp(24px,4cqw,56px)',
-                justifyContent: 'flex-end',
-                flexWrap: 'wrap',
+                display: 'grid',
+                gap: 'clamp(16px,3cqh,32px)',
+                justifyItems: 'end',
+                textAlign: 'right',
+                minWidth: 0,
               }}
             >
-              <div style={reveal(2, '18px')}>
-                <div style={{ ...mono(), color: '#8b9bba', marginBottom: 6 }}>Pace</div>
+              <div style={reveal(1, '24px')}>
+                <div style={{ ...mono(), color: 'var(--on-media-accent)', marginBottom: 8 }}>
+                  {t.finishTime}
+                </div>
                 <div
                   style={{
-                    fontSize: 'clamp(36px,min(5.5cqw,9cqh),88px)',
-                    fontWeight: 700,
-                    letterSpacing: '-.04em',
-                    lineHeight: 1,
+                    fontSize: 'clamp(72px,min(13cqw,24cqh),240px)',
+                    fontWeight: 800,
+                    letterSpacing: '-.045em',
+                    lineHeight: 0.85,
                     whiteSpace: 'nowrap',
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  {runner.pace ?? '—'}
-                  <span
-                    style={{
-                      fontSize: '.4em',
-                      fontWeight: 500,
-                      color: '#c4cee2',
-                      letterSpacing: 0,
-                      marginLeft: '.2em',
-                    }}
-                  >
-                    /km
-                  </span>
+                  {runner.time ?? '—'}
                 </div>
               </div>
-              <div style={reveal(3, '18px')}>
-                <div style={{ ...mono(), color: '#8b9bba', marginBottom: 6 }}>Place</div>
-                <div
-                  style={{
-                    fontSize: 'clamp(36px,min(5.5cqw,9cqh),88px)',
-                    fontWeight: 700,
-                    letterSpacing: '-.04em',
-                    lineHeight: 1,
-                    whiteSpace: 'nowrap',
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
-                  {runner.place_overall ?? '—'}
-                  <span
+
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 'clamp(24px,4cqw,56px)',
+                  justifyContent: 'flex-end',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <div style={reveal(2, '18px')}>
+                  <div style={{ ...mono(), color: 'var(--on-media-mute)', marginBottom: 6 }}>
+                    {t.pace}
+                  </div>
+                  <div
                     style={{
-                      fontSize: '.4em',
-                      fontWeight: 500,
-                      color: '#c4cee2',
-                      letterSpacing: 0,
-                      marginLeft: '.25em',
+                      fontSize: 'clamp(36px,min(5.5cqw,9cqh),88px)',
+                      fontWeight: 700,
+                      letterSpacing: '-.04em',
+                      lineHeight: 1,
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
                     }}
                   >
-                    · {runner.place_category ?? '—'} {runner.category ?? ''}
-                  </span>
+                    {runner.pace ?? '—'}
+                    <span
+                      style={{
+                        fontSize: '.4em',
+                        fontWeight: 500,
+                        color: 'var(--on-media-mute)',
+                        letterSpacing: 0,
+                        marginLeft: '.2em',
+                      }}
+                    >
+                      /km
+                    </span>
+                  </div>
+                </div>
+                <div style={reveal(3, '18px')}>
+                  <div style={{ ...mono(), color: 'var(--on-media-mute)', marginBottom: 6 }}>
+                    {t.place}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 'clamp(36px,min(5.5cqw,9cqh),88px)',
+                      fontWeight: 700,
+                      letterSpacing: '-.04em',
+                      lineHeight: 1,
+                      whiteSpace: 'nowrap',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {runner.place_overall ?? '—'}
+                    <span
+                      style={{
+                        fontSize: '.4em',
+                        fontWeight: 500,
+                        color: 'var(--on-media-mute)',
+                        letterSpacing: 0,
+                        marginLeft: '.25em',
+                      }}
+                    >
+                      · {runner.place_category ?? '—'} {runner.category ?? ''}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* --- course track ------------------------------------------------- */}
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 1,
-            padding: '0 clamp(16px,4vw,48px) clamp(20px,3cqh,36px)',
-            maxWidth: 1440,
-            width: '100%',
-            margin: '0 auto',
-            animation: 'fade .5s .2s ease both',
-          }}
-        >
-          <div style={{ position: 'relative', height: 70 }}>
-            <div
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: 44,
-                height: 1,
-                background: 'rgba(242,245,251,.2)',
-              }}
-            />
-            <div
-              style={{ position: 'absolute', left: 0, top: 44, height: 2, background: '#3f82ff', width: pct }}
-            />
-            <div style={{ position: 'absolute', top: 0, left: pct, width: 0 }}>
-              <span
+          {/* --- course track ------------------------------------------------- */}
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              padding: '0 clamp(16px,4vw,48px) clamp(20px,3cqh,36px)',
+              maxWidth: 1440,
+              width: '100%',
+              margin: '0 auto',
+              animation: 'fade .5s .2s ease both',
+            }}
+          >
+            <div style={{ position: 'relative', height: 70 }}>
+              <div
                 style={{
                   position: 'absolute',
                   left: 0,
-                  top: 2,
-                  transform: `translateX(${(-prog * 100).toFixed(1)}%)`,
-                  padding: '5px 10px',
-                  borderRadius: 6,
-                  background: '#f2f5fb',
-                  color: '#070e1c',
-                  fontFamily: 'var(--mono)',
-                  fontSize: 13,
-                  fontWeight: 500,
-                  whiteSpace: 'nowrap',
-                  letterSpacing: '.02em',
-                  fontVariantNumeric: 'tabular-nums',
+                  right: 0,
+                  top: 44,
+                  height: 1,
+                  background: 'var(--media-rule)',
                 }}
-              >
-                {clock}
-              </span>
-              <span
+              />
+              <div
                 style={{
                   position: 'absolute',
                   left: 0,
                   top: 44,
-                  width: 10,
-                  height: 10,
-                  transform: 'translate(-50%,-50%)',
-                  borderRadius: '50%',
-                  background: '#3f82ff',
-                  boxShadow: '0 0 0 3px #070e1c',
+                  height: 2,
+                  background: 'var(--on-media-accent)',
+                  width: pct,
                 }}
               />
-            </div>
-            {marks.map((m) => (
-              <div
-                key={m.label}
-                style={{
-                  position: 'absolute',
-                  top: 50,
-                  left: m.left,
-                  transform: `translateX(${m.shift})`,
-                  display: 'grid',
-                  gap: 5,
-                  justifyItems: m.align,
-                }}
-              >
-                <span style={{ width: 1, height: 6, background: 'rgba(242,245,251,.4)' }} />
+              <div style={{ position: 'absolute', top: 0, left: pct, width: 0 }}>
                 <span
                   style={{
-                    ...mono(10),
-                    letterSpacing: '.12em',
-                    color: '#8b9bba',
+                    position: 'absolute',
+                    left: 0,
+                    top: 2,
+                    transform: `translateX(${(-prog * 100).toFixed(1)}%)`,
+                    padding: '5px 10px',
+                    borderRadius: 6,
+                    background: 'var(--on-media)',
+                    color: '#0b1424',
+                    textShadow: 'none',
+                    fontFamily: 'var(--mono)',
+                    fontSize: 13,
+                    fontWeight: 500,
                     whiteSpace: 'nowrap',
+                    letterSpacing: '.02em',
+                    fontVariantNumeric: 'tabular-nums',
                   }}
                 >
-                  {m.label}
+                  {clock}
                 </span>
+                <span
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 44,
+                    width: 10,
+                    height: 10,
+                    transform: 'translate(-50%,-50%)',
+                    borderRadius: '50%',
+                    background: 'var(--on-media-accent)',
+                    boxShadow: '0 0 0 3px rgba(0,0,0,.45)',
+                  }}
+                />
               </div>
-            ))}
+              {marks.map((m, i) => (
+                <div
+                  key={m.label}
+                  data-mark-index={i}
+                  style={{
+                    position: 'absolute',
+                    top: 50,
+                    left: m.left,
+                    transform: `translateX(${m.shift})`,
+                    display: 'grid',
+                    gap: 5,
+                    justifyItems: m.align,
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 1,
+                      height: 6,
+                      background: 'var(--media-rule)',
+                    }}
+                  />
+                  <span
+                    style={{
+                      ...mono(10),
+                      letterSpacing: '.12em',
+                      color: 'var(--on-media-mute)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {m.label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       {/* --- gallery ------------------------------------------------------- */}
-      <section style={{ maxWidth: 1440, margin: '0 auto', padding: '40px clamp(16px,4vw,48px) 120px' }}>
+      <section
+        style={{
+          maxWidth: 1440,
+          margin: '0 auto',
+          padding: '40px clamp(16px,4vw,48px) 120px',
+        }}
+      >
         <div
           style={{
             display: 'flex',
@@ -369,12 +411,12 @@ export default function RunnerView({
             alignItems: 'end',
             gap: '16px 24px',
             padding: '0 0 24px',
-            borderBottom: '1px solid #1c2a45',
+            borderBottom: '1px solid var(--line)',
             marginBottom: 24,
           }}
         >
           <div>
-            <div style={{ ...mono(), color: '#3f82ff', marginBottom: 10 }}>Your photos</div>
+            <div style={{ ...mono(), color: 'var(--blue)', marginBottom: 10 }}>{t.yourPhotos}</div>
             <h3
               style={{
                 margin: 0,
@@ -384,18 +426,32 @@ export default function RunnerView({
                 lineHeight: 1,
               }}
             >
-              {photos.length} photos{' '}
-              <span style={{ color: '#8b9bba', fontWeight: 500 }}>
-                from {points} point{points === 1 ? '' : 's'} on the course
+              {t.photoCount(photos.length, points)[0]}{' '}
+              <span style={{ color: 'var(--mute)', fontWeight: 500 }}>
+                {t.photoCount(photos.length, points)[1]}
               </span>
             </h3>
             {fuzzy > 0 ? (
-              <div style={{ ...mono(10), letterSpacing: '.12em', color: '#4c5c7c', marginTop: 10 }}>
-                {fuzzy} likely match{fuzzy === 1 ? '' : 'es'} · the number was partly unreadable
+              <div
+                style={{
+                  ...mono(10),
+                  letterSpacing: '.12em',
+                  color: 'var(--mute-3)',
+                  marginTop: 10,
+                }}
+              >
+                {t.fuzzyNote(fuzzy)}
               </div>
             ) : null}
           </div>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
             <a
               href="#"
               className="link-mute"
@@ -405,15 +461,15 @@ export default function RunnerView({
               }}
               style={{ fontSize: 14, padding: '12px 6px' }}
             >
-              Not you? Search again
+              {t.searchAgain}
             </a>
             <button
               onClick={onBuyAll}
               className="btn-ghost"
               style={{
-                border: '1px solid rgba(242,245,251,.18)',
+                border: '1px solid rgba(var(--paper-rgb),.18)',
                 background: 'transparent',
-                color: '#f2f5fb',
+                color: 'var(--paper)',
                 borderRadius: 8,
                 padding: '0 20px',
                 height: 44,
@@ -422,15 +478,21 @@ export default function RunnerView({
                 transition: 'border-color .2s,color .2s',
               }}
             >
-              {ownedAll ? 'Download all originals' : `Unlock all · €${PRICE_BUNDLE_EUR}`}
+              {ownedAll ? t.downloadAll : t.unlockAll(PRICE_BUNDLE_EUR)}
             </button>
           </div>
         </div>
 
         {photos.length === 0 ? (
-          <p style={{ color: '#8b9bba', fontSize: 15, lineHeight: 1.6, maxWidth: 560 }}>
-            No photos are tagged with bib {runner.bib} yet. Photos are added as the photographers
-            upload and the numbers are read — check back later in the day.
+          <p
+            style={{
+              color: 'var(--mute)',
+              fontSize: 15,
+              lineHeight: 1.6,
+              maxWidth: 560,
+            }}
+          >
+            {t.noPhotos(runner.bib)}
           </p>
         ) : (
           <div
@@ -453,16 +515,16 @@ export default function RunnerView({
                     onOpen(i);
                   }
                 }}
-                aria-label={`Open photo ${p.course_point ?? ''} ${p.clock}`}
+                aria-label={t.openPhoto(dataTerm(lang, p.course_point), p.clock)}
                 style={{
                   margin: 0,
                   position: 'relative',
                   aspectRatio: '4/3',
                   borderRadius: 8,
                   overflow: 'hidden',
-                  background: '#0e192e',
+                  background: 'var(--panel)',
                   cursor: 'zoom-in',
-                  boxShadow: 'inset 0 0 0 1px rgba(242,245,251,.06)',
+                  boxShadow: 'var(--tile-edge)',
                   animation: 'fade .6s ease both',
                 }}
               >
@@ -482,23 +544,23 @@ export default function RunnerView({
                 />
                 {p.match_kind === 'fuzzy' ? (
                   <span
-                    title={`Recognised as ${p.read_as}`}
+                    title={t.recognisedAs(p.read_as)}
                     style={{
                       position: 'absolute',
                       top: 10,
                       left: 10,
                       padding: '4px 8px',
                       borderRadius: 5,
-                      background: 'rgba(7,14,28,.78)',
-                      border: '1px solid rgba(143,182,255,.35)',
-                      color: '#8fb6ff',
+                      background: 'rgba(var(--ink-rgb),.78)',
+                      border: '1px solid rgba(var(--blue-soft-rgb),.35)',
+                      color: 'var(--blue-soft)',
                       fontFamily: 'var(--mono)',
                       fontSize: 9,
                       letterSpacing: '.1em',
                       textTransform: 'uppercase',
                     }}
                   >
-                    Likely
+                    {t.likely}
                   </span>
                 ) : null}
                 <figcaption
@@ -508,7 +570,7 @@ export default function RunnerView({
                     right: 0,
                     bottom: 0,
                     padding: '40px 14px 12px',
-                    background: 'linear-gradient(transparent,rgba(7,14,28,.9))',
+                    background: 'var(--tile-scrim)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'end',
@@ -520,8 +582,15 @@ export default function RunnerView({
                     pointerEvents: 'none',
                   }}
                 >
-                  <span style={{ color: '#8fb6ff' }}>{p.course_point}</span>
-                  <span style={{ color: '#c4cee2', fontVariantNumeric: 'tabular-nums' }}>
+                  <span style={{ color: 'var(--blue-soft)' }}>
+                    {dataTerm(lang, p.course_point)}
+                  </span>
+                  <span
+                    style={{
+                      color: 'var(--mute-2)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
                     {p.clock}
                   </span>
                 </figcaption>

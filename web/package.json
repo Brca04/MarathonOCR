@@ -12,7 +12,8 @@
     "import:results": "node scripts/import-results.mjs",
     "import:bibs": "node scripts/import-bibs.mjs",
     "upload:photos": "node scripts/upload-photos.mjs",
-    "seed:demo": "node scripts/seed-demo.mjs"
+    "seed:demo": "node scripts/seed-demo.mjs",
+    "fetch:brand": "node scripts/fetch-brand.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

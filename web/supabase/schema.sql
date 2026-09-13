@@ -14,8 +14,10 @@
 --
 --  2. Birthdates never leave Postgres. `runners` is unreadable to the anon
 --     key; the only way in is find_runner(), a SECURITY DEFINER function that
---     takes bib + dob and returns a runner *only* if both match. That is what
---     lets the site be a static export with no server of its own.
+--     still holds the dob check but currently runs with it switched off — the
+--     app passes a null p_dob, so a bib alone opens a gallery. Pass a date
+--     again to turn verification back on. That is what lets the site be a
+--     static export with no server of its own.
 -- ===========================================================================
 
 create extension if not exists pg_trgm;        -- trigram similarity + GIN index
@@ -184,7 +186,9 @@ create policy "detections readable when published" on public.detections
 -- ===========================================================================
 -- find_runner — the only door into runner data
 --
--- Returns null unless the bib exists in the event AND the birthdate matches.
+-- Returns null unless the bib exists in the event. Birthdate verification is
+-- off for now: p_dob defaults to null and the check is skipped when it is,
+-- so passing a date again is all it takes to bring it back.
 -- On success returns the runner plus every photo whose detections point at
 -- that bib, ranked by confidence × trigram similarity.
 --
@@ -196,7 +200,7 @@ create policy "detections readable when published" on public.detections
 create or replace function public.find_runner(
   p_event_slug text,
   p_bib        text,
-  p_dob        date
+  p_dob        date default null
 )
 returns jsonb
 language plpgsql
@@ -210,7 +214,7 @@ declare
   v_bib    text := regexp_replace(coalesce(p_bib, ''), '\D', '', 'g');
   v_photos jsonb;
 begin
-  if v_bib = '' or p_dob is null then
+  if v_bib = '' then
     return jsonb_build_object('ok', false, 'reason', 'missing_input');
   end if;
 
@@ -226,10 +230,11 @@ begin
     return jsonb_build_object('ok', false, 'reason', 'no_bib');
   end if;
 
-  -- Same generic answer whether the bib is unknown or the date is wrong would
-  -- be more private, but the design shows two distinct messages, so we keep
-  -- them. The date itself is never echoed back either way.
-  if v_runner.dob is distinct from p_dob then
+  -- Only enforced when a date is supplied. Same generic answer whether the bib
+  -- is unknown or the date is wrong would be more private, but the design shows
+  -- two distinct messages, so we keep them. The date itself is never echoed
+  -- back either way.
+  if p_dob is not null and v_runner.dob is distinct from p_dob then
     return jsonb_build_object('ok', false, 'reason', 'dob_mismatch');
   end if;
 

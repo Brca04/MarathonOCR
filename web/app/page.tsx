@@ -1,213 +1,245 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Nav from '@/components/Nav';
-import { getEventStats } from '@/lib/data';
-import { easeOutQuart, fromSeconds, toSeconds } from '@/lib/format';
-import { DEMO_STATS } from '@/lib/demo';
-import type { EventStats } from '@/lib/types';
+import { useT } from '@/components/AppContext';
+import Hero from '@/components/Hero';
+import SearchForm, { type SearchSubmit } from '@/components/SearchForm';
+import RunnerView from '@/components/RunnerView';
+import Lightbox from '@/components/Lightbox';
+import Toast from '@/components/Toast';
+import { findRunner, recordOrder, toGallery } from '@/lib/data';
+import { PRICE_BUNDLE_EUR, PRICE_SINGLE_EUR, WATERMARK } from '@/lib/config';
+import { signedOriginalUrl } from '@/lib/supabase';
+import type { FindRunnerResult, GalleryPhoto, Runner } from '@/lib/types';
 
-const mono: React.CSSProperties = {
-  fontFamily: 'var(--mono)',
-  fontSize: 10,
-  letterSpacing: '.12em',
-  textTransform: 'uppercase',
-  color: '#8b9bba',
-};
+/**
+ * One screen: the landing hero and the bib search live side by side, and the
+ * runner's gallery takes over the whole page once a search lands.
+ */
+export default function HomePage() {
+  const t = useT();
+  const [bib, setBib] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [found, setFound] = useState<{ runner: Runner; photos: GalleryPhoto[] } | null>(null);
+  const [lb, setLb] = useState(-1);
+  const [owned, setOwned] = useState<Record<string, true>>({});
+  const [toast, setToast] = useState('');
 
-const bigNum: React.CSSProperties = {
-  fontSize: 'clamp(26px,min(4vw,5vh),56px)',
-  fontWeight: 600,
-  letterSpacing: '-.04em',
-  lineHeight: 1,
-  fontVariantNumeric: 'tabular-nums',
-};
-
-export default function LandingPage() {
-  const [stats, setStats] = useState<EventStats>(DEMO_STATS);
-  const [p, setP] = useState(0);
-  const raf = useRef<number>(0);
-
-  useEffect(() => {
-    let live = true;
-    getEventStats().then((s) => {
-      if (live) setStats(s);
-    });
-    return () => {
-      live = false;
-    };
+  const say = useCallback((message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast((t) => (t === message ? '' : t)), 2400);
   }, []);
 
-  // Counters roll up once on mount, easing out over 1.5s after a 300ms beat.
-  useEffect(() => {
-    const t0 = performance.now();
-    const dur = 1500;
-    const delay = 300;
-    const tick = (now: number) => {
-      const x = easeOutQuart(Math.min(1, Math.max(0, (now - t0 - delay) / dur)));
-      setP(x);
-      if (x < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, []);
+  /**
+   * `push` is false when the search was triggered by the URL itself — a shared
+   * link or the back button — so the entry that caused it is not duplicated.
+   */
+  const run = useCallback(
+    async (nextBib: string, push = true) => {
+      const digits = nextBib.replace(/\D/g, '');
+      if (!digits) return setError(t.errNoBib);
 
-  const recordSec = toSeconds(stats.course_record);
-  const cells: { value: string; label: string; accent?: boolean }[] = [
-    {
-      value: Math.round((stats.finishers || 0) * p).toLocaleString('en-US'),
-      label: `Finishers ${stats.race_date ? new Date(stats.race_date).getFullYear() - 1 : 2025}`,
+      setBusy(true);
+      setError('');
+      let res: FindRunnerResult;
+      try {
+        res = await findRunner(digits);
+      } catch (e) {
+        setBusy(false);
+        return setError(t.errOffline);
+      }
+      setBusy(false);
+
+      if (!res.ok) {
+        if (res.reason === 'no_bib') {
+          return setError(t.errUnknownBib(digits));
+        }
+        return setError(res.reason === 'no_event' ? t.errNoEvent : t.errGeneric);
+      }
+
+      setFound({ runner: res.runner, photos: toGallery(res.photos) });
+      setLb(-1);
+      if (push) window.history.pushState({ bib: digits }, '', `?bib=${digits}`);
+      window.scrollTo(0, 0);
     },
-    { value: String(stats.first_year ?? 1992), label: 'First edition' },
-    { value: ((stats.distance_km ?? 42.195) * p).toFixed(3), label: 'Kilometres' },
-    { value: fromSeconds(recordSec * p), label: 'Course record', accent: true },
-  ];
+    [t],
+  );
+
+  const onSubmit = useCallback(
+    ({ bib: b }: SearchSubmit) => {
+      void run(b);
+    },
+    [run],
+  );
+
+  /**
+   * The profile lives at ?bib=1042, which makes it linkable, survives a reload
+   * and — the point of it — gives the browser's back button somewhere to go.
+   * A popstate is the single source of truth: it clears the runner on the way
+   * back and restores one on the way forward.
+   */
+  const runRef = useRef(run);
+  runRef.current = run;
+
+  useEffect(() => {
+    const sync = () => {
+      const wanted = new URLSearchParams(window.location.search).get('bib');
+      if (!wanted) {
+        setFound(null);
+        setBib('');
+        setError('');
+        setLb(-1);
+        window.scrollTo(0, 0);
+        return;
+      }
+      setBib(wanted);
+      void runRef.current(wanted, false);
+    };
+    sync();
+    window.addEventListener('popstate', sync);
+    return () => window.removeEventListener('popstate', sync);
+  }, []);
+
+  const onDemo = useCallback(() => {
+    setBib('1042');
+    void run('1042');
+  }, [run]);
+
+  const searchAgain = useCallback(() => {
+    // Walk back when this profile is an entry we pushed, so the link and the
+    // back button leave the history in the same state. Someone who arrived
+    // straight on a shared ?bib= link has nothing behind them, so that entry is
+    // replaced instead — going "back" must never leave the site.
+    if (window.history.state?.bib) {
+      window.history.back();
+      return;
+    }
+    window.history.replaceState(null, '', window.location.pathname);
+    setFound(null);
+    setBib('');
+    setError('');
+    setLb(-1);
+    window.scrollTo(0, 0);
+  }, []);
+
+  const photos = found?.photos ?? [];
+  const isOwned = useCallback(
+    (photoId: string) => {
+      if (!WATERMARK) return true;
+      if (!found) return false;
+      return Boolean(owned[`${found.runner.bib}:all`] || owned[`${found.runner.bib}:${photoId}`]);
+    },
+    [found, owned],
+  );
+  const ownedAll = useMemo(
+    () => (!WATERMARK ? true : Boolean(found && owned[`${found.runner.bib}:all`])),
+    [found, owned],
+  );
+
+  const step = useCallback(
+    (delta: number) => {
+      const n = photos.length;
+      if (!n) return;
+      setLb((i) => (i + delta + n) % n);
+    },
+    [photos.length],
+  );
+
+  const buyAll = useCallback(() => {
+    if (!found) return;
+    if (ownedAll) return say(t.toastZip);
+    setOwned((o) => ({ ...o, [`${found.runner.bib}:all`]: true }));
+    void recordOrder(found.runner.bib, 'bundle', null, PRICE_BUNDLE_EUR);
+    say(t.toastUnlockedAll);
+  }, [found, ownedAll, say, t]);
+
+  const buyOne = useCallback(() => {
+    if (!found || lb < 0) return;
+    const p = photos[lb];
+    setOwned((o) => ({ ...o, [`${found.runner.bib}:${p.id}`]: true }));
+    void recordOrder(found.runner.bib, 'single', p.id, PRICE_SINGLE_EUR);
+    say(t.toastPurchased);
+  }, [found, lb, photos, say, t]);
+
+  const downloadOriginal = useCallback(async () => {
+    const p = photos[lb];
+    if (!p) return;
+    if (p.original_path) {
+      const url = await signedOriginalUrl(p.original_path);
+      if (url) {
+        window.open(url, '_blank', 'noopener');
+        return;
+      }
+    }
+    say(t.toastOriginal(p.dims));
+  }, [lb, photos, say, t]);
 
   return (
     <div
       style={{
         position: 'relative',
         minHeight: '100svh',
-        background: '#070e1c',
-        color: '#f2f5fb',
+        background: 'var(--ink)',
+        color: 'var(--paper)',
         overflowX: 'clip',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <Nav active="home" />
+      <Nav />
 
-      <main
-        data-screen-label="Landing"
-        style={{
-          flex: '1 1 auto',
-          minHeight: '100svh',
-          display: 'grid',
-          gridTemplateRows: 'minmax(0,1fr) auto auto',
-        }}
-      >
-        <section
+      {found ? (
+        <RunnerView
+          runner={found.runner}
+          photos={photos}
+          ownedAll={ownedAll}
+          onOpen={setLb}
+          onBuyAll={buyAll}
+          onSearchAgain={searchAgain}
+        />
+      ) : (
+        <main
+          data-screen-label="Home"
+          data-search-grid=""
           style={{
-            position: 'relative',
-            minHeight: '62svh',
             display: 'grid',
-            alignItems: 'end',
-            padding: 'clamp(24px,5vh,64px) clamp(16px,4vw,48px)',
-            overflow: 'hidden',
+            gridTemplateColumns: 'minmax(0,1.5fr) minmax(340px,520px)',
+            minHeight: '100svh',
+            width: '100%',
+            animation: 'fade .4s ease both',
           }}
         >
-          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/photos/zg-hero.jpg"
-              alt="Runners cheering on the Zagreb marathon course"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center 30%',
-                animation: 'settle 1.6s cubic-bezier(.2,.7,.2,1) both',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'linear-gradient(180deg,rgba(7,14,28,.3) 0%,rgba(7,14,28,.15) 40%,rgba(7,14,28,.82) 78%,#070e1c 100%)',
-              }}
-            />
-          </div>
-
-          <div
-            data-hero-copy=""
-            style={{
-              position: 'relative',
-              display: 'grid',
-              gridTemplateColumns: 'minmax(0,1fr) auto',
-              alignItems: 'end',
-              gap: 'clamp(20px,4vw,64px)',
-              maxWidth: 1240,
-              width: '100%',
-              margin: '0 auto',
-              animation: 'rise .9s cubic-bezier(.2,.7,.2,1) both',
+          <Hero />
+          <SearchForm
+            bib={bib}
+            setBib={(v) => {
+              setBib(v);
+              setError('');
             }}
-          >
-            <h1
-              style={{
-                margin: 0,
-                fontWeight: 700,
-                fontSize: 'clamp(36px,min(6.4vw,12vh),110px)',
-                lineHeight: 0.9,
-                letterSpacing: '-.045em',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {stats.edition ?? 34}. <span style={{ color: '#3f82ff' }}>Zagrebački</span> maraton
-            </h1>
-          </div>
-        </section>
+            error={error}
+            busy={busy}
+            onSubmit={onSubmit}
+            onDemo={onDemo}
+          />
+        </main>
+      )}
 
-        <section style={{ padding: '0 clamp(16px,4vw,48px)' }}>
-          <div
-            style={{
-              maxWidth: 1240,
-              margin: '0 auto',
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
-              gap: 1,
-              background: '#1c2a45',
-              borderTop: '1px solid #1c2a45',
-              borderBottom: '1px solid #1c2a45',
-            }}
-          >
-            {cells.map((c, i) => (
-              <div
-                key={c.label}
-                style={{
-                  background: '#070e1c',
-                  padding:
-                    i === 0
-                      ? 'clamp(14px,2.4vh,28px) 24px clamp(14px,2.4vh,28px) 0'
-                      : i === cells.length - 1
-                        ? 'clamp(14px,2.4vh,28px) 0 clamp(14px,2.4vh,28px) 24px'
-                        : 'clamp(14px,2.4vh,28px) 24px',
-                }}
-              >
-                <div style={{ ...bigNum, color: c.accent ? '#3f82ff' : undefined }}>{c.value}</div>
-                <div style={{ ...mono, marginTop: 8 }}>{c.label}</div>
-              </div>
-            ))}
-          </div>
-        </section>
+      {lb >= 0 && photos[lb] ? (
+        <Lightbox
+          photos={photos}
+          index={lb}
+          owned={isOwned(photos[lb].id)}
+          onClose={() => setLb(-1)}
+          onStep={step}
+          onBuy={buyOne}
+          onDownloadPreview={() => say(t.toastPreview)}
+          onDownloadOriginal={() => void downloadOriginal()}
+        />
+      ) : null}
 
-        <footer
-          style={{
-            padding: 'clamp(14px,2vh,24px) clamp(16px,4vw,48px)',
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            gap: '12px 24px',
-            fontSize: 12,
-            color: '#8b9bba',
-          }}
-        >
-          <span>© 2026 Zagrebački maraton · Official race photography</span>
-          <div style={{ display: 'flex', gap: 20 }}>
-            <a href="#" className="link-mute">
-              Privacy
-            </a>
-            <a href="#" className="link-mute">
-              Photographers
-            </a>
-            <a href="#" className="link-mute">
-              Contact
-            </a>
-          </div>
-        </footer>
-      </main>
+      <Toast message={toast} />
     </div>
   );
 }

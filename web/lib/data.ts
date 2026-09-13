@@ -15,15 +15,15 @@ export async function getEventStats(): Promise<EventStats> {
 }
 
 /**
- * The bib + birthdate lookup. Note that nothing here can enumerate runners:
- * find_runner() is the only reachable entry point and it needs both halves.
+ * The bib lookup. Birthdate verification is switched off for now, so the bib
+ * alone opens a gallery; find_runner() treats a null p_dob as "skip the check".
  */
-export async function findRunner(bib: string, dobIso: string): Promise<FindRunnerResult> {
-  if (!supabase) return demoFind(bib, dobIso);
+export async function findRunner(bib: string): Promise<FindRunnerResult> {
+  if (!supabase) return demoFind(bib);
   const { data, error } = await supabase.rpc('find_runner', {
     p_event_slug: EVENT_SLUG,
     p_bib: bib,
-    p_dob: dobIso,
+    p_dob: null,
   });
   if (error) {
     console.warn('[find_runner]', error.message);

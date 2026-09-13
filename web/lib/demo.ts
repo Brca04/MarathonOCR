@@ -33,7 +33,7 @@ export const DEMO_RUNNERS: DemoRunner[] = [
     category: 'W35',
     club: 'AK Maraton 2000',
     nationality: 'HRV',
-    race: 'Marathon',
+    race: 'Maraton',
     race_code: 'marathon',
     distance_km: 42.195,
     status: 'finished',
@@ -49,7 +49,7 @@ export const DEMO_RUNNERS: DemoRunner[] = [
     category: 'M30',
     club: 'Zagreb Runners',
     nationality: 'HRV',
-    race: 'Half marathon',
+    race: 'Polumaraton',
     race_code: 'half',
     distance_km: 21.0975,
     status: 'finished',
@@ -65,7 +65,7 @@ export const DEMO_RUNNERS: DemoRunner[] = [
     category: 'M45',
     club: 'LG Graz',
     nationality: 'AUT',
-    race: 'Marathon',
+    race: 'Maraton',
     race_code: 'marathon',
     distance_km: 42.195,
     status: 'finished',
@@ -88,17 +88,17 @@ const DEMO_FILES = [
 const PHOTOGRAPHERS = ['Ana Perić', 'Dario Šimić', 'Mia Novak', 'Petar Jurić'];
 
 const POINTS: { point: string; km: number; minutes: number; hint: string }[] = [
-  { point: 'Start', km: 0, minutes: 0, hint: 'Start on Trg bana Jelačića' },
-  { point: '5K', km: 5, minutes: 24, hint: 'Lead pack on Ilica' },
-  { point: '10K', km: 10, minutes: 49, hint: 'Runner mid-stride' },
-  { point: '10K', km: 10.2, minutes: 51, hint: 'Cheering zone' },
-  { point: 'Half', km: 21.1, minutes: 103, hint: 'Maksimirska' },
-  { point: 'Half', km: 21.4, minutes: 104, hint: 'Water station' },
+  { point: 'Start', km: 0, minutes: 0, hint: 'Start na Trgu bana Jelačića' },
+  { point: '5K', km: 5, minutes: 24, hint: 'Vodeća skupina u Ilici' },
+  { point: '10K', km: 10, minutes: 49, hint: 'Trkač u punom koraku' },
+  { point: '10K', km: 10.2, minutes: 51, hint: 'Navijačka zona' },
+  { point: 'Polovica', km: 21.1, minutes: 103, hint: 'Maksimirska' },
+  { point: 'Polovica', km: 21.4, minutes: 104, hint: 'Osvježenje na stazi' },
   { point: '30K', km: 30, minutes: 148, hint: 'Vlaška' },
-  { point: '35K', km: 35, minutes: 173, hint: 'Km 35' },
-  { point: 'Finish', km: 42.1, minutes: 204, hint: 'Sprint to the finish' },
-  { point: 'Finish', km: 42.195, minutes: 204, hint: 'Finish line, arms up' },
-  { point: 'Finish', km: 42.2, minutes: 210, hint: 'Medal portrait' },
+  { point: '35K', km: 35, minutes: 173, hint: '35. kilometar' },
+  { point: 'Cilj', km: 42.1, minutes: 204, hint: 'Sprint prema cilju' },
+  { point: 'Cilj', km: 42.195, minutes: 204, hint: 'Ciljna linija, ruke u zrak' },
+  { point: 'Cilj', km: 42.2, minutes: 210, hint: 'Portret s medaljom' },
 ];
 
 function isoAt(minutes: number): string {
@@ -127,12 +127,11 @@ export function demoPhotos(bib: string): PhotoMatch[] {
   }));
 }
 
-export function demoFind(bib: string, dobIso: string): FindRunnerResult {
+export function demoFind(bib: string): FindRunnerResult {
   const digits = bib.replace(/\D/g, '');
-  if (!digits || !dobIso) return { ok: false, reason: 'missing_input' };
+  if (!digits) return { ok: false, reason: 'missing_input' };
   const r = DEMO_RUNNERS.find((x) => x.bib === digits);
   if (!r) return { ok: false, reason: 'no_bib' };
-  if (r.dob !== dobIso) return { ok: false, reason: 'dob_mismatch' };
   const { dob: _dob, ...runner } = r;
   return { ok: true, runner, photos: demoPhotos(r.bib) };
 }
