@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="utf-8"?>
+<annotations>
+  <version>1.1</version>
+  <meta>
+    <task>
+      <segments>
+        <segment>
+          <id>34362</id>
+          <start>0</start>
+          <stop>29</stop>
+          <url>https://cvat2.trainingdata.solutions/api/jobs/34362</url>
+        </segment>
+      </segments>
+      <owner>
+        <username>TrainingData</username>
+        <email/>
+      </owner>
+      
+      <labels>
+        <label>
+          <name>number</name>
+          <color>#33c1be</color>
+          <type>rectangle</type>
+          <attributes>
+            <attribute>
+              <name>text</name>
+              <mutable>False</mutable>
+              <input_type>text</input_type>
+              <default_value/>
+              <values/>
+            </attribute>
+          </attributes>
+        </label>
+      </labels>
+    </task>
+    <dumped>2023-09-04 06:26:42.695828+00:00</dumped>
+  </meta>
+  <image id="0" name="images/0.png" width="1080" height="856">
+    <box label="number" source="manual" occluded="0" xtl="766.66" ytl="491.26" xbr="813.76" ybr="511.28" rotation="5.50" z_order="0">
+      <attribute name="text">349</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="261.86" ytl="504.54" xbr="281.40" ybr="518.10" z_order="0">
+      <attribute name="text">50</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="414.71" ytl="523.03" xbr="456.62" ybr="544.24" z_order="0">
+      <attribute name="text">389</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="122.93" ytl="479.19" xbr="163.70" ybr="497.22" rotation="10.80" z_order="0">
+      <attribute name="text">100</attribute>
+    </box>
+  </image>
+  <image id="1" name="images/1.png" width="3504" height="2336">
+    <box label="number" source="manual" occluded="0" xtl="2692.87" ytl="1453.80" xbr="2971.57" ybr="1584.97" z_order="0">
+      <attribute name="text">1651</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1627.39" ytl="2023.90" xbr="1879.10" ybr="2173.62" rotation="10.30" z_order="0">
+      <attribute name="text">279</attribute>
+    </box>
+  </image>
+  <image id="10" name="images/10.png" width="1280" height="720">
+    <box label="number" source="manual" occluded="0" xtl="584.70" ytl="397.95" xbr="642.02" ybr="435.70" z_order="0">
+      <attribute name="text">45</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1061.90" ytl="299.07" xbr="1136.30" ybr="327.18" rotation="355.30" z_order="0">
+      <attribute name="text">2561</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="847.30" ytl="274.40" xbr="897.88" ybr="293.70" z_order="0">
+      <attribute name="text">2237</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="460.52" ytl="263.06" xbr="486.32" ybr="275.90" rotation="355.80" z_order="0">
+      <attribute name="text">137</attribute>
+    </box>
+  </image>
+  <image id="11" name="images/11.png" width="1600" height="1200">
+    <box label="number" source="manual" occluded="0" xtl="1366.93" ytl="505.87" xbr="1421.70" ybr="535.12" rotation="349.50" z_order="0">
+      <attribute name="text">3885</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1478.15" ytl="414.10" xbr="1525.37" ybr="435.10" rotation="357.50" z_order="0">
+      <attribute name="text">3419</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="784.60" ytl="740.83" xbr="923.60" ybr="805.66" rotation="355.00" z_order="0">
+      <attribute name="text">3352</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="435.90" ytl="555.09" xbr="504.30" ybr="589.79" rotation="357.80" z_order="0">
+      <attribute name="text">3706</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="291.10" ytl="467.70" xbr="320.70" ybr="481.80" z_order="0">
+      <attribute name="text">4855</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1150.31" ytl="464.57" xbr="1255.79" ybr="513.40" rotation="348.20" z_order="0">
+      <attribute name="text">3411</attribute>
+    </box>
+  </image>
+  <image id="12" name="images/12.png" width="1280" height="720">
+    <box label="number" source="manual" occluded="0" xtl="68.24" ytl="448.10" xbr="103.58" ybr="463.40" rotation="4.30" z_order="0">
+      <attribute name="text">2650</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="287.39" ytl="509.04" xbr="317.10" ybr="522.74" rotation="8.20" z_order="0">
+      <attribute name="text">2761</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="416.40" ytl="466.02" xbr="451.88" ybr="481.50" rotation="355.10" z_order="0">
+      <attribute name="text">2860</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="601.80" ytl="486.20" xbr="635.09" ybr="501.28" rotation="2.20" z_order="0">
+      <attribute name="text">1199</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="729.50" ytl="463.20" xbr="761.60" ybr="477.60" z_order="0">
+      <attribute name="text">2843</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="926.32" ytl="461.58" xbr="961.70" ybr="476.68" rotation="355.40" z_order="0">
+      <attribute name="text">2474</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1057.40" ytl="466.66" xbr="1089.50" ybr="480.92" rotation="356.30" z_order="0">
+      <attribute name="text">1265</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1163.42" ytl="466.90" xbr="1193.22" ybr="481.40" z_order="0">
+      <attribute name="text">2024</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1236.48" ytl="527.32" xbr="1253.58" ybr="538.12" z_order="0">
+      <attribute name="text">121</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="149.97" ytl="452.65" xbr="181.87" ybr="465.90" rotation="5.50" z_order="0">
+      <attribute name="text">2862</attribute>
+    </box>
+  </image>
+  <image id="13" name="images/13.png" width="1080" height="720">
+    <box label="number" source="manual" occluded="0" xtl="606.30" ytl="448.69" xbr="656.20" ybr="470.78" rotation="353.90" z_order="0">
+      <attribute name="text">3261</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="864.30" ytl="415.10" xbr="920.80" ybr="439.60" z_order="0">
+      <attribute name="text">2578</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="354.60" ytl="419.53" xbr="408.02" ybr="442.83" rotation="327.40" z_order="0">
+      <attribute name="text">3268</attribute>
+    </box>
+  </image>
+  <image id="14" name="images/14.png" width="1280" height="960">
+    <box label="number" source="manual" occluded="0" xtl="99.58" ytl="522.22" xbr="179.58" ybr="551.30" rotation="356.70" z_order="0">
+      <attribute name="text">25753</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="620.02" ytl="534.37" xbr="734.40" ybr="575.67" rotation="2.10" z_order="0">
+      <attribute name="text">30091</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1031.14" ytl="488.30" xbr="1140.78" ybr="523.56" rotation="2.30" z_order="0">
+      <attribute name="text">17512</attribute>
+    </box>
+  </image>
+  <image id="15" name="images/15.png" width="3000" height="2000">
+    <box label="number" source="manual" occluded="0" xtl="2267.19" ytl="1186.42" xbr="2392.96" ybr="1239.71" rotation="348.90" z_order="0">
+      <attribute name="text">365</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1374.96" ytl="1214.80" xbr="1516.40" ybr="1261.40" z_order="0">
+      <attribute name="text">2013</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1719.61" ytl="1245.96" xbr="1878.48" ybr="1298.53" rotation="352.30" z_order="0">
+      <attribute name="text">2357</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="2725.38" ytl="1341.85" xbr="2818.81" ybr="1387.00" rotation="355.60" z_order="0">
+      <attribute name="text">366</attribute>
+    </box>
+  </image>
+  <image id="16" name="images/16.png" width="1600" height="637">
+    <box label="number" source="manual" occluded="0" xtl="872.32" ytl="330.20" xbr="902.92" ybr="340.70" z_order="0">
+      <attribute name="text">6216</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="124.11" ytl="301.03" xbr="145.02" ybr="311.03" rotation="347.60" z_order="0">
+      <attribute name="text">659</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1474.11" ytl="276.00" xbr="1500.51" ybr="285.80" rotation="355.10" z_order="0">
+      <attribute name="text">6293</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="604.23" ytl="318.00" xbr="627.83" ybr="327.80" rotation="351.70" z_order="0">
+      <attribute name="text">6582</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="191.41" ytl="374.12" xbr="220.07" ybr="384.70" rotation="355.40" z_order="0">
+      <attribute name="text">6251</attribute>
+    </box>
+  </image>
+  <image id="17" name="images/17.png" width="1024" height="683">
+    <box label="number" source="manual" occluded="0" xtl="370.67" ytl="349.40" xbr="398.24" ybr="363.81" z_order="0">
+      <attribute name="text">200</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="782.78" ytl="393.43" xbr="819.01" ybr="413.75" rotation="9.20" z_order="0">
+      <attribute name="text">2224</attribute>
+    </box>
+  </image>
+  <image id="18" name="images/18.png" width="2560" height="1701">
+    <box label="number" source="manual" occluded="0" xtl="1199.81" ytl="862.11" xbr="1257.72" ybr="884.57" rotation="352.60" z_order="0">
+      <attribute name="text">62233</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1400.50" ytl="913.70" xbr="1437.80" ybr="932.20" z_order="0">
+      <attribute name="text">163</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1553.31" ytl="844.60" xbr="1598.71" ybr="860.62" rotation="357.40" z_order="0">
+      <attribute name="text">28732</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="2283.02" ytl="967.30" xbr="2445.41" ybr="1013.90" rotation="359.10" z_order="0">
+      <attribute name="text">57643</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1851.06" ytl="891.78" xbr="1936.69" ybr="919.10" rotation="10.90" z_order="0">
+      <attribute name="text">15704</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="170.04" ytl="887.83" xbr="295.15" ybr="930.30" rotation="25.10" z_order="0">
+      <attribute name="text">23950</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="577.54" ytl="872.77" xbr="625.22" ybr="888.10" z_order="0">
+      <attribute name="text">35964</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="722.48" ytl="850.47" xbr="758.71" ybr="863.08" rotation="346.20" z_order="0">
+      <attribute name="text">15554</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="863.50" ytl="830.10" xbr="909.02" ybr="846.95" z_order="0">
+      <attribute name="text">64327</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="999.45" ytl="778.23" xbr="1027.96" ybr="789.61" z_order="0">
+      <attribute name="text">63716</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1109.51" ytl="758.26" xbr="1156.10" ybr="773.42" rotation="352.80" z_order="0">
+      <attribute name="text">36676</attribute>
+    </box>
+  </image>
+  <image id="19" name="images/19.png" width="1600" height="1066">
+    <box label="number" source="manual" occluded="0" xtl="292.27" ytl="600.19" xbr="339.70" ybr="616.40" z_order="0">
+      <attribute name="text">3723</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="457.22" ytl="835.27" xbr="548.30" ybr="868.20" rotation="357.40" z_order="0">
+      <attribute name="text">8218</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="889.32" ytl="691.28" xbr="961.73" ybr="718.70" rotation="353.70" z_order="0">
+      <attribute name="text">8219</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1107.37" ytl="648.03" xbr="1163.67" ybr="667.30" rotation="358.90" z_order="0">
+      <attribute name="text">5385</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1032.80" ytl="427.80" xbr="1059.30" ybr="438.10" z_order="0">
+      <attribute name="text">4277</attribute>
+    </box>
+  </image>
+  <image id="2" name="images/2.png" width="1280" height="569">
+    <box label="number" source="manual" occluded="0" xtl="368.62" ytl="331.89" xbr="417.33" ybr="348.59" z_order="0">
+      <attribute name="text">2333</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="72.81" ytl="407.52" xbr="128.09" ybr="426.74" rotation="336.60" z_order="0">
+      <attribute name="text">2492</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="222.00" ytl="240.28" xbr="276.21" ybr="258.76" z_order="0">
+      <attribute name="text">2106</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="787.40" ytl="249.75" xbr="816.90" ybr="260.10" z_order="0">
+      <attribute name="text">2384</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1141.45" ytl="295.18" xbr="1187.80" ybr="311.67" z_order="0">
+      <attribute name="text">2129</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="940.02" ytl="362.90" xbr="999.82" ybr="381.40" rotation="5.10" z_order="0">
+      <attribute name="text">2340</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="666.50" ytl="364.38" xbr="706.80" ybr="380.48" rotation="3.30" z_order="0">
+      <attribute name="text">2131</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="511.16" ytl="366.03" xbr="567.50" ybr="385.13" rotation="3.70" z_order="0">
+      <attribute name="text">2297</attribute>
+    </box>
+  </image>
+  <image id="20" name="images/20.png" width="1280" height="720">
+    <box label="number" source="manual" occluded="0" xtl="539.10" ytl="349.03" xbr="589.00" ybr="366.23" rotation="355.90" z_order="0">
+      <attribute name="text">3529</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="127.40" ytl="377.80" xbr="181.80" ybr="396.60" z_order="0">
+      <attribute name="text">3067</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="402.20" ytl="360.51" xbr="449.80" ybr="378.62" rotation="355.80" z_order="0">
+      <attribute name="text">3113</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="651.91" ytl="386.33" xbr="701.11" ybr="404.53" rotation="357.20" z_order="0">
+      <attribute name="text">3486</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="797.15" ytl="336.09" xbr="834.80" ybr="354.00" z_order="0">
+      <attribute name="text">354</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="900.80" ytl="371.33" xbr="954.00" ybr="390.86" rotation="355.20" z_order="0">
+      <attribute name="text">3009</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1093.19" ytl="294.92" xbr="1143.00" ybr="312.55" rotation="351.80" z_order="0">
+      <attribute name="text">3038</attribute>
+    </box>
+  </image>
+  <image id="21" name="images/21.png" width="1000" height="666">
+    <box label="number" source="manual" occluded="0" xtl="859.74" ytl="451.78" xbr="931.72" ybr="483.56" rotation="354.30" z_order="0">
+      <attribute name="text">18372</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="611.92" ytl="477.93" xbr="704.10" ybr="510.81" rotation="355.90" z_order="0">
+      <attribute name="text">17607</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="216.61" ytl="357.90" xbr="282.90" ybr="378.60" rotation="355.60" z_order="0">
+      <attribute name="text">16204</attribute>
+    </box>
+  </image>
+  <image id="22" name="images/22.png" width="766" height="1080">
+    <box label="number" source="manual" occluded="0" xtl="703.48" ytl="480.33" xbr="740.26" ybr="500.24" rotation="355.90" z_order="0">
+      <attribute name="text">973</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="472.38" ytl="479.80" xbr="526.30" ybr="499.00" z_order="0">
+      <attribute name="text">2429</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="320.72" ytl="410.46" xbr="404.22" ybr="444.10" rotation="3.40" z_order="0">
+      <attribute name="text">1908</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="162.88" ytl="516.98" xbr="209.91" ybr="537.40" rotation="1.30" z_order="0">
+      <attribute name="text">1621</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="599.88" ytl="478.12" xbr="656.54" ybr="501.90" rotation="357.90" z_order="0">
+      <attribute name="text">2178</attribute>
+    </box>
+  </image>
+  <image id="23" name="images/23.png" width="1296" height="864">
+    <box label="number" source="manual" occluded="0" xtl="1009.50" ytl="506.71" xbr="1055.07" ybr="523.50" rotation="353.90" z_order="0">
+      <attribute name="text">1514</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1144.46" ytl="465.68" xbr="1185.79" ybr="482.38" rotation="3.00" z_order="0">
+      <attribute name="text">1568</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="509.00" ytl="507.30" xbr="547.30" ybr="522.50" z_order="0">
+      <attribute name="text">1507</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="261.66" ytl="487.97" xbr="305.29" ybr="507.27" z_order="0">
+      <attribute name="text">1549</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="602.33" ytl="513.71" xbr="642.67" ybr="532.90" rotation="13.10" z_order="0">
+      <attribute name="text">1541</attribute>
+    </box>
+  </image>
+  <image id="24" name="images/24.png" width="1000" height="665">
+    <box label="number" source="manual" occluded="0" xtl="475.10" ytl="508.57" xbr="545.50" ybr="532.70" z_order="0">
+      <attribute name="text">11499</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="318.06" ytl="460.20" xbr="370.50" ybr="480.90" z_order="0">
+      <attribute name="text">5638</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="147.40" ytl="505.26" xbr="210.30" ybr="525.66" rotation="356.50" z_order="0">
+      <attribute name="text">12839</attribute>
+    </box>
+  </image>
+  <image id="25" name="images/25.png" width="940" height="627">
+    <box label="number" source="manual" occluded="0" xtl="23.37" ytl="575.20" xbr="133.21" ybr="621.80" z_order="0">
+      <attribute name="text">8622</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="410.00" ytl="438.29" xbr="451.30" ybr="456.11" rotation="356.60" z_order="0">
+      <attribute name="text">1291</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="657.00" ytl="507.86" xbr="698.20" ybr="523.46" z_order="0">
+      <attribute name="text">7671</attribute>
+    </box>
+  </image>
+  <image id="26" name="images/26.png" width="1080" height="1080">
+    <box label="number" source="manual" occluded="0" xtl="234.51" ytl="711.77" xbr="312.78" ybr="740.30" rotation="3.70" z_order="0">
+      <attribute name="text">1897</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="583.30" ytl="519.70" xbr="626.90" ybr="543.60" z_order="0">
+      <attribute name="text">971</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1001.54" ytl="581.05" xbr="1069.90" ybr="609.81" rotation="356.70" z_order="0">
+      <attribute name="text">1480</attribute>
+    </box>
+  </image>
+  <image id="27" name="images/27.png" width="960" height="639">
+    <box label="number" source="manual" occluded="0" xtl="196.08" ytl="318.90" xbr="222.52" ybr="328.24" rotation="1.20" z_order="0">
+      <attribute name="text">4759</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="597.78" ytl="374.21" xbr="626.60" ybr="385.50" rotation="15.10" z_order="0">
+      <attribute name="text">6306</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="812.20" ytl="359.79" xbr="839.70" ybr="371.79" rotation="3.70" z_order="0">
+      <attribute name="text">1261</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="132.50" ytl="370.25" xbr="162.81" ybr="383.50" z_order="0">
+      <attribute name="text">1111</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="501.13" ytl="306.10" xbr="522.75" ybr="315.76" rotation="3.20" z_order="0">
+      <attribute name="text">5437</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="363.70" ytl="378.80" xbr="397.90" ybr="392.40" z_order="0">
+      <attribute name="text">1145</attribute>
+    </box>
+  </image>
+  <image id="28" name="images/28.png" width="1499" height="1000">
+    <box label="number" source="manual" occluded="0" xtl="1142.60" ytl="478.86" xbr="1223.15" ybr="508.37" rotation="6.60" z_order="0">
+      <attribute name="text">3799</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1389.90" ytl="431.80" xbr="1424.60" ybr="446.60" z_order="0">
+      <attribute name="text">2851</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="517.70" ytl="479.38" xbr="594.70" ybr="511.18" rotation="359.20" z_order="0">
+      <attribute name="text">0535</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="349.19" ytl="415.21" xbr="387.00" ybr="430.53" rotation="357.90" z_order="0">
+      <attribute name="text">0205</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="46.47" ytl="415.83" xbr="120.96" ybr="444.70" rotation="2.00" z_order="0">
+      <attribute name="text">3653</attribute>
+    </box>
+  </image>
+  <image id="29" name="images/29.png" width="1280" height="720">
+    <box label="number" source="manual" occluded="0" xtl="1100.08" ytl="660.00" xbr="1186.22" ybr="687.50" rotation="2.00" z_order="0">
+      <attribute name="text">12214</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="220.48" ytl="424.76" xbr="278.99" ybr="441.55" rotation="7.80" z_order="0">
+      <attribute name="text">12168</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="460.50" ytl="421.12" xbr="534.64" ybr="442.30" rotation="356.10" z_order="0">
+      <attribute name="text">12065</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="657.76" ytl="478.30" xbr="708.50" ybr="492.60" z_order="0">
+      <attribute name="text">12329</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="801.07" ytl="417.50" xbr="838.30" ybr="429.80" z_order="0">
+      <attribute name="text">12400</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="881.80" ytl="359.25" xbr="931.00" ybr="374.70" rotation="358.40" z_order="0">
+      <attribute name="text">12222</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="98.80" ytl="369.10" xbr="134.86" ybr="380.90" z_order="0">
+      <attribute name="text">12167</attribute>
+    </box>
+  </image>
+  <image id="3" name="images/3.png" width="900" height="600">
+    <box label="number" source="manual" occluded="0" xtl="777.00" ytl="225.99" xbr="858.20" ybr="256.37" rotation="1.10" z_order="0">
+      <attribute name="text">5505</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="384.73" ytl="181.90" xbr="420.17" ybr="195.30" rotation="355.00" z_order="0">
+      <attribute name="text">5801</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="467.79" ytl="217.76" xbr="510.30" ybr="235.87" rotation="6.00" z_order="0">
+      <attribute name="text">1308</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="155.20" ytl="268.10" xbr="220.26" ybr="301.40" z_order="0">
+      <attribute name="text">473</attribute>
+    </box>
+  </image>
+  <image id="4" name="images/4.png" width="2560" height="1707">
+    <box label="number" source="manual" occluded="0" xtl="398.94" ytl="896.80" xbr="728.01" ybr="1002.12" rotation="5.10" z_order="0">
+      <attribute name="text">26251</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1149.69" ytl="825.08" xbr="1370.77" ybr="900.49" rotation="6.00" z_order="0">
+      <attribute name="text">21431</attribute>
+    </box>
+  </image>
+  <image id="5" name="images/5.png" width="1080" height="719">
+    <box label="number" source="manual" occluded="0" xtl="666.87" ytl="398.60" xbr="685.77" ybr="407.70" rotation="2.80" z_order="0">
+      <attribute name="text">866</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="752.90" ytl="385.30" xbr="778.50" ybr="394.48" z_order="0">
+      <attribute name="text">4218</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="822.00" ytl="379.20" xbr="839.70" ybr="388.40" z_order="0">
+      <attribute name="text">736</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="574.80" ytl="397.90" xbr="600.60" ybr="407.46" z_order="0">
+      <attribute name="text">4203</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="247.10" ytl="398.50" xbr="267.50" ybr="408.10" z_order="0">
+      <attribute name="text">908</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="455.30" ytl="356.85" xbr="480.41" ybr="366.56" rotation="349.90" z_order="0">
+      <attribute name="text">4234</attribute>
+    </box>
+  </image>
+  <image id="6" name="images/6.png" width="2560" height="1707">
+    <box label="number" source="manual" occluded="0" xtl="1471.12" ytl="1237.70" xbr="1577.17" ybr="1283.11" rotation="11.60" z_order="0">
+      <attribute name="text">54233</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1627.36" ytl="442.88" xbr="1663.70" ybr="456.12" rotation="3.50" z_order="0">
+      <attribute name="text">25376</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1043.67" ytl="480.80" xbr="1082.24" ybr="493.80" rotation="353.90" z_order="0">
+      <attribute name="text">49798</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="488.82" ytl="568.88" xbr="532.40" ybr="582.68" rotation="2.70" z_order="0">
+      <attribute name="text">50052</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="652.50" ytl="910.68" xbr="750.38" ybr="944.66" rotation="358.50" z_order="0">
+      <attribute name="text">49413</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="303.77" ytl="872.08" xbr="387.70" ybr="902.51" rotation="9.10" z_order="0">
+      <attribute name="text">48770</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="916.52" ytl="895.50" xbr="997.22" ybr="923.28" rotation="357.30" z_order="0">
+      <attribute name="text">49333</attribute>
+    </box>
+  </image>
+  <image id="7" name="images/7.png" width="1160" height="770">
+    <box label="number" source="manual" occluded="0" xtl="592.26" ytl="554.17" xbr="637.60" ybr="569.87" rotation="7.90" z_order="0">
+      <attribute name="text">40637</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="775.70" ytl="598.51" xbr="859.60" ybr="624.61" rotation="355.90" z_order="0">
+      <attribute name="text">40685</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="934.60" ytl="566.00" xbr="983.75" ybr="583.50" rotation="2.90" z_order="0">
+      <attribute name="text">40014</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="34.27" ytl="652.30" xbr="120.39" ybr="685.10" rotation="3.80" z_order="0">
+      <attribute name="text">40019</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="337.55" ytl="588.14" xbr="385.39" ybr="605.30" rotation="6.70" z_order="0">
+      <attribute name="text">40258</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="427.97" ytl="621.57" xbr="485.80" ybr="641.87" rotation="355.90" z_order="0">
+      <attribute name="text">40011</attribute>
+    </box>
+  </image>
+  <image id="8" name="images/8.png" width="1080" height="1350">
+    <box label="number" source="manual" occluded="0" xtl="-1.51" ytl="610.67" xbr="69.40" ybr="650.67" rotation="2.30" z_order="0">
+      <attribute name="text">821</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="305.05" ytl="588.00" xbr="393.26" ybr="630.50" rotation="356.90" z_order="0">
+      <attribute name="text">944</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="571.04" ytl="508.60" xbr="641.70" ybr="545.30" z_order="0">
+      <attribute name="text">893</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="971.42" ytl="532.79" xbr="1044.33" ybr="570.20" rotation="6.90" z_order="0">
+      <attribute name="text">690</attribute>
+    </box>
+  </image>
+  <image id="9" name="images/9.png" width="1280" height="615">
+    <box label="number" source="manual" occluded="0" xtl="386.38" ytl="516.89" xbr="437.28" ybr="544.34" z_order="0">
+      <attribute name="text">849</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="623.36" ytl="551.47" xbr="688.10" ybr="578.80" rotation="353.90" z_order="0">
+      <attribute name="text">245</attribute>
+    </box>
+    <box label="number" source="manual" occluded="0" xtl="1013.08" ytl="498.60" xbr="1081.11" ybr="523.65" rotation="2.60" z_order="0">
+      <attribute name="text">1057</attribute>
+    </box>
+  </image>
+</annotations>
+

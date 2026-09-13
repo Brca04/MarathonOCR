@@ -1,0 +1,97 @@
+# ===========================================================================
+# MarathonOCR
+#
+# Rule of thumb: if it can be re-downloaded, re-trained or re-generated, it
+# does not go in git. Git keeps every version of a binary forever, and this
+# project has three things that would each blow the repo past GitHub's limits:
+#
+#   .venv/                              ~4 GB   torch 2.11.0+cu128 et al
+#   src/bib number labeling.*.yolov11/  ~1 GB   Roboflow training export
+#   archive/ + demo_gallery/            ~180 MB the same 30 frames, three times
+#
+# What is kept: source, configs, the CVAT annotations (31 KB) and the six demo
+# frames the web prototype renders (1.2 MB). A clone should be a few MB.
+# ===========================================================================
+
+# --- Training datasets -----------------------------------------------------
+# Roboflow exports. Re-download from the project rather than versioning them.
+**/*.yolov11/
+**/*.yolov8/
+**/*.yolov5*/
+"src/bib number labeling.v14i.yolov11"/
+datasets/
+
+# --- Evaluation set and local photo sets -----------------------------------
+# archive/annotations.xml and archive/runners.csv are the part worth keeping:
+# 31 KB of hand-drawn boxes that scripts/extract_crops.py turns back into
+# crops, given the source photos.
+archive/*
+!archive/annotations.xml
+!archive/runners.csv
+demo_gallery/
+demo_csv/
+/photos/
+*.NEF
+*.CR2
+*.CR3
+*.ARW
+*.RAF
+*.dng
+
+# --- Model weights and training output -------------------------------------
+*.pt
+*.pth
+*.onnx
+*.engine
+*.tflite
+models/
+weights/
+runs/
+
+# --- Generated benchmark artefacts -----------------------------------------
+# scripts/extract_crops.py and scripts/eval_recognizers.py rebuild all of this.
+benchmark/
+
+# --- Review-app working files ----------------------------------------------
+**/.marathon_ocr_review.json
+bib_export*.csv
+/Claude outputs/
+
+# --- Python ----------------------------------------------------------------
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Node / Next.js --------------------------------------------------------
+node_modules/
+web/.next/
+web/out/
+web/next-env.d.ts
+web/*.tsbuildinfo
+.wrangler/
+.vercel/
+
+# --- Secrets. Nothing here should ever reach a remote. ---------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Editors and OS --------------------------------------------------------
+.idea/
+.vscode/
+.kiro/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

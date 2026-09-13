@@ -1,0 +1,31 @@
+{
+  "name": "zagreb-marathon-photos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bib-number photo search for the Zagreb Marathon. Next.js + Supabase, static-exported for Cloudflare Pages.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "npx serve out",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "import:results": "node scripts/import-results.mjs",
+    "import:bibs": "node scripts/import-bibs.mjs",
+    "upload:photos": "node scripts/upload-photos.mjs",
+    "seed:demo": "node scripts/seed-demo.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "next": "^16.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "csv-parse": "^5.6.0",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,21 @@
+# Core - always needed
+pillow>=10.0
+numpy>=1.26
+
+# --- GPU stack -------------------------------------------------------------
+# The RTX 5070 is Blackwell / sm_120 and REQUIRES the cu128 wheels.
+# Install these FIRST, separately, or pip will pull a build that cannot run:
+#
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#
+# Then verify with:  python scripts/check_env.py
+# ---------------------------------------------------------------------------
+
+# Detection
+ultralytics>=8.3
+
+# Recognizers (install the ones you want to benchmark)
+easyocr>=1.7
+# paddleocr>=2.7          # also needs paddlepaddle-gpu built for CUDA 12
+# transformers>=4.44      # for TrOCR
+# anthropic>=0.40         # for the VLM baseline

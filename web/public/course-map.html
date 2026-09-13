@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<style>
+html,body,#map{margin:0;height:100%;background:#070e1c}
+.leaflet-tile-pane{filter:invert(1) hue-rotate(190deg) saturate(.5) brightness(.75) contrast(1.05)}
+.leaflet-control-attribution{background:rgba(7,14,28,.8)!important;color:#8b9bba!important;font:10px -apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif}
+.leaflet-control-attribution a{color:#c4cee2!important}
+.leaflet-control-zoom a{background:#0e192e!important;color:#f2f5fb!important;border-color:#1c2a45!important}
+.leaflet-bar{border:0!important;box-shadow:none!important}.leaflet-bottom.leaflet-right{margin-bottom:0}
+.pin{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#3f82ff;color:#070e1c;font:600 10px 'SF Mono',ui-monospace,Menlo,monospace;box-shadow:0 0 0 4px rgba(63,130,255,.25)}
+.pin.sf{background:#f2f5fb}
+.leaflet-tooltip{background:#0e192e;color:#f2f5fb;border:1px solid #1c2a45;border-radius:6px;font:500 11px 'SF Mono',ui-monospace,Menlo,monospace;letter-spacing:.08em;text-transform:uppercase}
+.leaflet-tooltip-top:before{border-top-color:#1c2a45}
+</style></head>
+<body><div id="map"></div>
+<script>
+const map = L.map('map', { zoomControl: false, scrollWheelZoom: false, attributionControl: true }).setView([45.800, 15.985], 13);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
+const pin = (txt, cls) => L.divIcon({ className: '', html: `<div class="pin ${cls||''}">${txt}</div>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+// Start & finish: Trg bana Jelačića. Course points are indicative until a GPX is supplied.
+const pts = [
+  [[45.8131, 15.9772], 'S/F', 'Start · Finish — Trg bana Jelačića', 'sf'],
+  [[45.8385, 15.9760], 'M', 'Mihaljevac — turnaround', ''],
+  [[45.8183, 16.0085], 'INA', 'Maksimirska — turnaround', ''],
+  [[45.8120, 15.9482], 'W', 'Prilaz baruna Filipovića', ''],
+];
+// Official 33. Zagrebački maraton course (police traffic notice, 11.10.2025): Trg bana Jelačića → Jurišićeva → Draškovićeva → Ribnjak → Medveščak → Ksaverska (turn at Mihaljevac) → back → Vlaška → Maksimirska (turn at INA / Jordanovac) → Sermageova → Rakovčeva → Martićeva → Smičiklasova → Đorđićeva → Palmotićeva → Amruševa → Zrinjevac → Teslina → Masarykova → Prilaz Gj. Deželića → Republike Austrije → Talovčeva → Trg Francuske Republike → Grada Mainza → Prilaz b. Filipovića → Vukovićeva → Ilica → Trg bana Jelačića. Marathon repeats the 10K loop twice.
+const route = [
+  [45.8131,15.9772],[45.8129,15.9790],[45.8128,15.9805],           // Jurišićeva → Draškovićeva
+  [45.8142,15.9802],[45.8158,15.9796],[45.8176,15.9793],           // Draškovićeva → Ribnjak
+  [45.8200,15.9780],[45.8225,15.9772],[45.8248,15.9770],           // Medveščak → Gupčeva zvijezda
+  [45.8285,15.9760],[45.8325,15.9752],[45.8360,15.9755],[45.8385,15.9760], // Ksaverska → Mihaljevac (turn)
+  [45.8360,15.9757],[45.8325,15.9754],[45.8285,15.9762],[45.8248,15.9772],
+  [45.8225,15.9774],[45.8200,15.9782],[45.8176,15.9795],[45.8158,15.9798],[45.8142,15.9804],
+  [45.8143,15.9840],[45.8144,15.9880],[45.8146,15.9905],           // Vlaška → Kvaternikov trg
+  [45.8155,15.9950],[45.8165,15.9995],[45.8175,16.0040],[45.8183,16.0085], // Maksimirska → INA (turn)
+  [45.8175,16.0042],[45.8165,15.9997],[45.8155,15.9952],[45.8147,15.9925], // back to Sermageova
+  [45.8128,15.9927],[45.8115,15.9925],                              // Sermageova → Rakovčeva
+  [45.8112,15.9895],[45.8108,15.9860],[45.8105,15.9840],           // Martićeva
+  [45.8096,15.9840],[45.8096,15.9812],                              // Smičiklasova → Đorđićeva
+  [45.8082,15.9812],[45.8082,15.9790],                              // Palmotićeva → Amruševa
+  [45.8083,15.9777],[45.8092,15.9775],                              // Zrinjevac
+  [45.8094,15.9750],[45.8095,15.9722],[45.8095,15.9700],           // Teslina → Masarykova → Trg RH
+  [45.8096,15.9660],[45.8098,15.9605],                              // Prilaz Gj. Deželića
+  [45.8115,15.9603],[45.8116,15.9580],                              // Republike Austrije → Talovčeva → Trg Francuske Republike
+  [45.8118,15.9530],[45.8120,15.9482],                              // Grada Mainza → Prilaz b. Filipovića
+  [45.8136,15.9482],                                                // Vukovićeva
+  [45.8135,15.9550],[45.8133,15.9640],[45.8131,15.9720],[45.8131,15.9772] // Ilica → Trg bana Jelačića
+];
+L.polyline(route, { color: '#070e1c', weight: 9, opacity: .6, lineJoin: 'round' }).addTo(map);
+L.polyline(route, { color: '#3f82ff', weight: 4, opacity: 1, lineJoin: 'round' }).addTo(map);
+map.fitBounds(L.latLngBounds(route), { padding: [40, 40] });
+pts.forEach(([ll, t, tip, cls]) => L.marker(ll, { icon: pin(t, cls) }).addTo(map).bindTooltip(tip, { direction: 'top', offset: [0, -14] }));
+map.on('focus', () => map.scrollWheelZoom.enable());
+map.on('blur', () => map.scrollWheelZoom.disable());
+</script></body></html>

@@ -1,0 +1,211 @@
+/* ===========================================================================
+   Ported verbatim from the design file's <helmet> block, plus the :hover rules
+   that were expressed there as style-hover attributes. Component styles stay
+   inline in the JSX exactly as the design had them, so the two can be diffed.
+   =========================================================================== */
+
+:root {
+  --ink: #070e1c;
+  --paper: #f2f5fb;
+  --blue: #3f82ff;
+  --blue-soft: #8fb6ff;
+  --mute: #8b9bba;
+  --mute-2: #c4cee2;
+  --mute-3: #4c5c7c;
+  --panel: #0e192e;
+  --line: #1c2a45;
+  --line-2: #2b3d60;
+  --mono: 'SF Mono', ui-monospace, Menlo, monospace;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #070e1c;
+  color: #f2f5fb;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #f2f5fb;
+  text-decoration: none;
+}
+a:hover {
+  color: #3f82ff;
+}
+
+input,
+button {
+  font-family: inherit;
+}
+button,
+a,
+label,
+[role='button'] {
+  cursor: pointer;
+}
+
+input::placeholder {
+  color: #8b9bba;
+}
+[data-bib-input]::placeholder {
+  color: rgba(255, 255, 255, 0.28);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #3f82ff;
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+input:focus-visible {
+  outline: none;
+}
+[data-field]:focus-within {
+  border-color: #3f82ff !important;
+}
+[data-bib-band]:focus-within {
+  box-shadow: 0 0 0 2px #3f82ff;
+}
+
+@media (max-width: 860px) {
+  [data-search-grid] {
+    grid-template-columns: 1fr !important;
+    min-height: 0 !important;
+  }
+  [data-search-grid] > div:first-child {
+    min-height: 0 !important;
+    height: 44svh;
+    border-right: 0 !important;
+    border-bottom: 1px solid #1c2a45;
+  }
+  [data-search-grid] > form {
+    padding: 28px 20px 48px !important;
+    align-content: start !important;
+  }
+}
+@media (max-width: 520px) {
+  [data-logo-text] {
+    display: none !important;
+  }
+}
+@media (max-width: 760px) {
+  [data-hero-copy] {
+    grid-template-columns: 1fr !important;
+  }
+  [data-hero-copy] > div {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  [data-hero-grid] {
+    grid-template-columns: 1fr !important;
+  }
+  [data-hero-grid] > div:last-child {
+    justify-items: start !important;
+    text-align: left !important;
+  }
+  [data-hero-grid] > div:last-child > div:last-child {
+    justify-content: flex-start !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2a45;
+  border-radius: 3px;
+}
+::selection {
+  background: #3f82ff;
+  color: #070e1c;
+}
+
+/* --- hover states (were style-hover="…" in the design) ------------------- */
+
+.nav-link {
+  color: var(--nav-idle);
+}
+.nav-link:hover {
+  color: var(--nav-hover);
+}
+
+.btn-solid:hover {
+  background: #3f82ff;
+}
+.btn-blue:hover {
+  background: #5e97ff;
+}
+.btn-ghost:hover {
+  border-color: #3f82ff;
+  color: #3f82ff;
+}
+.btn-outline:hover {
+  border-color: #f2f5fb;
+}
+.btn-white:hover {
+  background: #3f82ff;
+}
+
+.link-mute {
+  color: #8b9bba;
+  transition: color 0.2s;
+}
+.link-mute:hover {
+  color: #f2f5fb;
+}
+
+.field:hover {
+  border-color: #2b3d60;
+}
+
+.tile img {
+  transition: transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.tile:hover img {
+  transform: scale(1.03);
+}
