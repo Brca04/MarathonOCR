@@ -1,0 +1,15 @@
+{
+  // Cloudflare Workers with static assets. The site is a Next.js static export,
+  // so there is no Worker script at all — Cloudflare just serves ./out from the
+  // edge, applying public/_headers (copied into out/ by the build).
+  //
+  // `name` MUST match the Worker in the dashboard, or `wrangler deploy` creates
+  // a second Worker under a different *.workers.dev URL.
+  "name": "marathonocr",
+  "compatibility_date": "2026-09-13",
+  "assets": {
+    "directory": "./out",
+    // Unknown paths get the exported 404 page instead of a bare Worker error.
+    "not_found_handling": "404-page"
+  }
+}
