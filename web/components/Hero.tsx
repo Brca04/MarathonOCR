@@ -170,30 +170,6 @@ export default function Hero() {
           </div>
         </div>
 
-        <footer
-          style={{
-            padding: 'clamp(14px,2vh,24px) clamp(16px,4vw,48px)',
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            gap: '12px 24px',
-            fontSize: 12,
-            color: 'var(--on-media-mute)',
-          }}
-        >
-          <span>{t.footerRights}</span>
-          <div style={{ display: 'flex', gap: 20 }}>
-            <a href="#" className="link-media">
-              {t.footerPrivacy}
-            </a>
-            <a href="#" className="link-media">
-              {t.footerPhotographers}
-            </a>
-            <a href="#" className="link-media">
-              {t.footerContact}
-            </a>
-          </div>
-        </footer>
       </div>
     </div>
   );

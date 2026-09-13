@@ -1,16 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import { raceFromBib } from '@/lib/format';
-import { isLive } from '@/lib/supabase';
 import { useT } from '@/components/AppContext';
-
-const mono = (size = 10): React.CSSProperties => ({
-  fontFamily: 'var(--mono)',
-  fontSize: size,
-  letterSpacing: '.14em',
-  textTransform: 'uppercase',
-  color: 'var(--mute)',
-});
 
 export type SearchSubmit = { bib: string };
 
@@ -20,17 +12,16 @@ export default function SearchForm({
   error,
   busy,
   onSubmit,
-  onDemo,
 }: {
   bib: string;
   setBib: (v: string) => void;
   error: string;
   busy: boolean;
   onSubmit: (v: SearchSubmit) => void;
-  onDemo: () => void;
 }) {
   const t = useT();
   const race = raceFromBib(bib, t);
+  const [agreed, setAgreed] = useState(false);
 
   return (
     <form
@@ -48,8 +39,7 @@ export default function SearchForm({
         background: 'var(--ink)',
       }}
     >
-      <div style={{ display: 'grid', gap: 8, marginBottom: 10 }}>
-        <span style={{ ...mono(11), color: 'var(--blue)' }}>{t.searchEyebrow}</span>
+      <div style={{ display: 'grid', gap: 8, marginBottom: 10, textAlign: 'center' }}>
         <h2
           style={{
             margin: 0,
@@ -248,10 +238,47 @@ export default function SearchForm({
         </p>
       ) : null}
 
+      {/* --- privacy consent ------------------------------------------------ */}
+      <label
+        style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 10,
+          padding: '2px 4px',
+          cursor: 'pointer',
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          style={{
+            marginTop: 2,
+            width: 18,
+            height: 18,
+            flexShrink: 0,
+            accentColor: 'var(--blue)',
+            cursor: 'pointer',
+          }}
+        />
+        <span style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--mute)' }}>
+          {t.consentPrefix}
+          <a
+            href="#"
+            className="link-mute"
+            onClick={(e) => e.stopPropagation()}
+            style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}
+          >
+            {t.consentLinkText}
+          </a>
+          {t.consentSuffix}
+        </span>
+      </label>
+
       <button
         type="submit"
         className="btn-solid"
-        disabled={busy}
+        disabled={busy || !agreed}
         style={{
           border: 0,
           borderRadius: 8,
@@ -262,32 +289,23 @@ export default function SearchForm({
           padding: '0 24px',
           height: 52,
           transition: 'background .2s',
-          opacity: busy ? 0.7 : 1,
+          opacity: busy || !agreed ? 0.6 : 1,
         }}
       >
         {busy ? t.searchBusy : t.searchSubmit}
       </button>
 
-      {!isLive ? (
-        <a
-          href="#"
-          className="link-mute"
-          onClick={(e) => {
-            e.preventDefault();
-            onDemo();
-          }}
-          style={{
-            justifySelf: 'center',
-            padding: '8px 4px',
-            fontSize: 13,
-            textDecoration: 'underline',
-            textUnderlineOffset: 4,
-            textDecorationColor: 'rgba(var(--mute-rgb),.4)',
-          }}
-        >
-          {t.searchDemo}
-        </a>
-      ) : null}
+      <p
+        style={{
+          margin: 0,
+          padding: '4px 4px 0',
+          textAlign: 'center',
+          fontSize: 12,
+          color: 'var(--mute)',
+        }}
+      >
+        {t.credits}
+      </p>
     </form>
   );
 }

@@ -171,12 +171,9 @@ input:focus-visible {
     min-height: 0 !important;
   }
   [data-hero-panel] {
-    min-height: 0 !important;
+    min-height: 100svh !important;
     border-right: 0 !important;
     border-bottom: 1px solid var(--line);
-  }
-  [data-hero-space] {
-    min-height: clamp(240px, 42svh, 420px) !important;
   }
   /* Stacked, the form would otherwise stretch the bib across a tablet. */
   [data-search-grid] > form {
@@ -199,11 +196,11 @@ input:focus-visible {
   [data-hero-grid] {
     grid-template-columns: 1fr !important;
   }
-  [data-hero-grid] > div:last-child {
+  [data-runner-stats] {
     justify-items: start !important;
     text-align: left !important;
   }
-  [data-hero-grid] > div:last-child > div:last-child {
+  [data-runner-stats] > div:last-child {
     justify-content: flex-start !important;
   }
 }
@@ -320,22 +317,65 @@ input:focus-visible {
 
 /* --- theme / language switches ------------------------------------------ */
 
+/* Glass, in the Apple sense: a translucent capsule that samples and brightens
+   whatever is behind it, with a lens that slides between the two options. The
+   lens moves on `transform` (not `left`) with a little overshoot, and squashes
+   while the control is pressed — that deformation is most of what makes it read
+   as a physical object rather than a rectangle teleporting. */
 .switch {
   position: relative;
   display: grid;
   padding: 3px;
   border-radius: 999px;
-  background: var(--ink);
-  border: 1px solid var(--line);
+  /* The tint is the page colour, not the text colour: it keeps a stable
+     ground under the glyphs whatever the photograph behind is doing. */
+  background: rgba(var(--ink-rgb), 0.34);
+  border: 1px solid rgba(var(--paper-rgb), 0.18);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 1px 4px rgba(0, 0, 0, 0.16);
+  isolation: isolate;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease;
 }
+.switch:hover {
+  background: rgba(var(--ink-rgb), 0.44);
+  border-color: rgba(var(--paper-rgb), 0.26);
+}
+
+/* Where the browser cannot sample the backdrop, fall back to a plain capsule
+   rather than a washed-out transparent one. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .switch {
+    background: rgba(var(--ink-rgb), 0.85);
+  }
+}
+
 .switch-knob {
   position: absolute;
   top: 3px;
   bottom: 3px;
+  left: 3px;
+  width: calc(50% - 4.5px);
   border-radius: 999px;
-  background: var(--paper);
-  transition: left 0.32s cubic-bezier(0.3, 0.7, 0.2, 1);
+  background: rgba(var(--paper-rgb), 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  /* --knob-x is set per state in Switches.tsx; the squash is pressure. */
+  transform: translateX(var(--knob-x, 0px)) scaleX(var(--knob-squash, 1));
+  transition: transform 0.46s cubic-bezier(0.32, 1.42, 0.54, 1);
+  will-change: transform;
 }
+.switch:active .switch-knob {
+  --knob-squash: 1.07;
+}
+
 .switch button {
   position: relative;
   z-index: 1;
@@ -344,14 +384,49 @@ input:focus-visible {
   border: 0;
   background: transparent;
   border-radius: 999px;
-  transition: color 0.25s;
+  transition:
+    color 0.35s ease,
+    opacity 0.25s ease,
+    transform 0.35s cubic-bezier(0.32, 1.42, 0.54, 1);
 }
 .switch button[aria-pressed='true'] {
   color: var(--ink);
 }
 .switch button[aria-pressed='false'] {
-  color: var(--mute-2);
+  color: var(--paper);
+  opacity: 0.66;
 }
 .switch button[aria-pressed='false']:hover {
-  color: var(--paper);
+  opacity: 1;
+}
+.switch button:active {
+  transform: scale(0.94);
+}
+
+/* A single-state pill in the same glass — for controls that toggle nothing
+   but still want to read as the same kind of object as the switches. */
+.pill-glass {
+  background: rgba(var(--ink-rgb), 0.34);
+  border: 1px solid rgba(var(--paper-rgb), 0.18);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 1px 4px rgba(0, 0, 0, 0.16);
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s cubic-bezier(0.32, 1.42, 0.54, 1);
+}
+.pill-glass:hover {
+  background: rgba(var(--ink-rgb), 0.44);
+  border-color: rgba(var(--paper-rgb), 0.26);
+}
+.pill-glass:active {
+  transform: scale(0.96);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .pill-glass {
+    background: rgba(var(--ink-rgb), 0.85);
+  }
 }

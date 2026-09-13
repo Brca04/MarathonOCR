@@ -113,11 +113,6 @@ function Home() {
     void runRef.current(wanted, false);
   }, [wanted, shown]);
 
-  const onDemo = useCallback(() => {
-    setBib('1042');
-    void run('1042');
-  }, [run]);
-
   const searchAgain = useCallback(() => {
     // Walk back when this profile is an entry we pushed, so the link and the
     // back button leave the history in the same state. Someone who arrived
@@ -158,13 +153,50 @@ function Home() {
     [photos.length],
   );
 
-  const buyAll = useCallback(() => {
+  /**
+   * Unlocked the first time, this actually delivers the files the second:
+   * one fetch-and-save per photo, since a static export has nothing to zip
+   * them with server-side. Falls back to opening the photo in a new tab if a
+   * fetch is blocked (a cross-origin host without permissive CORS).
+   */
+  const buyAll = useCallback(async () => {
     if (!found) return;
-    if (ownedAll) return say(t.toastZip);
-    setOwned((o) => ({ ...o, [`${found.runner.bib}:all`]: true }));
-    void recordOrder(found.runner.bib, 'bundle', null, PRICE_BUNDLE_EUR);
-    say(t.toastUnlockedAll);
-  }, [found, ownedAll, say, t]);
+
+    if (!ownedAll) {
+      setOwned((o) => ({ ...o, [`${found.runner.bib}:all`]: true }));
+      void recordOrder(found.runner.bib, 'bundle', null, PRICE_BUNDLE_EUR);
+      say(t.toastUnlockedAll);
+      return;
+    }
+
+    if (photos.length === 0) return;
+    say(t.toastZip);
+    for (let i = 0; i < photos.length; i++) {
+      const p = photos[i];
+      let url = p.src;
+      if (p.original_path) {
+        const signed = await signedOriginalUrl(p.original_path);
+        if (signed) url = signed;
+      }
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(String(res.status));
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const ext = url.split(/[?#]/)[0].split('.').pop() || 'jpg';
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `${found.runner.bib}-${i + 1}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(blobUrl);
+      } catch {
+        window.open(url, '_blank', 'noopener');
+      }
+      if (i < photos.length - 1) await new Promise((r) => setTimeout(r, 200));
+    }
+  }, [found, ownedAll, photos, say, t]);
 
   const buyOne = useCallback(() => {
     if (!found || lb < 0) return;
@@ -199,7 +231,7 @@ function Home() {
         flexDirection: 'column',
       }}
     >
-      <Nav />
+      <Nav onSearchAgain={found ? searchAgain : undefined} />
 
       {found ? (
         <RunnerView
@@ -208,7 +240,6 @@ function Home() {
           ownedAll={ownedAll}
           onOpen={setLb}
           onBuyAll={buyAll}
-          onSearchAgain={searchAgain}
         />
       ) : (
         <main
@@ -231,10 +262,40 @@ function Home() {
             error={error}
             busy={busy}
             onSubmit={onSubmit}
-            onDemo={onDemo}
           />
         </main>
       )}
+
+      {!found ? (
+        <footer
+          style={{
+            maxWidth: 1440,
+            margin: '0 auto',
+            padding: 'clamp(14px,2.2vh,20px) clamp(16px,4vw,48px) clamp(24px,4vh,40px)',
+            borderTop: '1px solid var(--line)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            gap: '10px 24px',
+            fontSize: 12,
+            color: 'var(--mute)',
+            width: '100%',
+          }}
+        >
+          <span>{t.footerRights}</span>
+          <div style={{ display: 'flex', gap: 20 }}>
+            <a href="#" className="link-mute">
+              {t.footerPrivacy}
+            </a>
+            <a href="#" className="link-mute">
+              {t.footerPhotographers}
+            </a>
+            <a href="#" className="link-mute">
+              {t.footerContact}
+            </a>
+          </div>
+        </footer>
+      ) : null}
 
       {lb >= 0 && photos[lb] ? (
         <Lightbox

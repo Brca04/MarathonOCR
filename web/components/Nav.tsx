@@ -6,11 +6,13 @@ import { useT } from '@/components/AppContext';
 import { BRAND_MARK } from '@/lib/config';
 
 /**
- * With the landing hero and the photo search merged onto one screen there is
- * nowhere else to navigate, so the header is just the race's emblem — which
- * still returns you to the top — and the two switches.
+ * The emblem stays on the left and the language switch on the right. On a
+ * runner's profile the way home sits by itself, centred on the header
+ * regardless of how wide the logo or the switch are — passing
+ * `onSearchAgain` is what turns that pill on, since the home screen has
+ * nowhere else to go.
  */
-export default function Nav() {
+export default function Nav({ onSearchAgain }: { onSearchAgain?: () => void }) {
   const t = useT();
   return (
     <header
@@ -43,6 +45,43 @@ export default function Nav() {
           }}
         />
       </Link>
+
+      {onSearchAgain ? (
+        <button
+          type="button"
+          onClick={onSearchAgain}
+          className="pill-glass"
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%,-50%)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '9px 16px 9px 12px',
+            borderRadius: 999,
+            color: 'var(--on-media)',
+            fontSize: 14,
+            fontWeight: 600,
+          }}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V9.5Z" />
+          </svg>
+          {t.backToSearch}
+        </button>
+      ) : null}
 
       <Switches />
     </header>

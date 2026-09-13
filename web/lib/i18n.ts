@@ -60,17 +60,17 @@ export type Strings = {
   footerPrivacy: string;
   footerPhotographers: string;
   footerContact: string;
-  themeLabel: string;
-  themeLight: string;
-  themeDark: string;
   langLabel: string;
   searchEyebrow: string;
   searchTitle: string;
   searchSub: string;
   bibLabel: string;
+  consentPrefix: string;
+  consentLinkText: string;
+  consentSuffix: string;
   searchSubmit: string;
   searchBusy: string;
-  searchDemo: string;
+  credits: string;
   raceMarathon: string;
   raceHalf: string;
   race10k: string;
@@ -125,17 +125,17 @@ const hr: Strings = {
   footerPrivacy: 'Privatnost',
   footerPhotographers: 'Fotografi',
   footerContact: 'Kontakt',
-  themeLabel: 'Svijetla ili tamna tema',
-  themeLight: 'Svijetla tema',
-  themeDark: 'Tamna tema',
   langLabel: 'Jezik',
   searchEyebrow: 'Pretraga fotografija',
   searchTitle: 'Unesite svoj startni broj',
   searchSub: 'Broj koji ste nosili na utrci.',
   bibLabel: 'Startni broj',
+  consentPrefix: 'Slažem se s ',
+  consentLinkText: 'pravilima privatnosti',
+  consentSuffix: '.',
   searchSubmit: 'Pronađi moje fotografije',
   searchBusy: 'Tražim…',
-  searchDemo: 'Pogledaj demo trkačicu (broj 1042)',
+  credits: 'Izradili SklopIT i FramePaceMedia',
   raceMarathon: 'Maraton · 42,195 km',
   raceHalf: 'Polumaraton · 21,1 km',
   race10k: 'Utrka · 10 km',
@@ -144,7 +144,7 @@ const hr: Strings = {
   errUnknownBib: (bib) => `Nema trkača sa startnim brojem ${bib} u ovom izdanju.`,
   errNoEvent: 'Fotografije za ovu utrku još nisu objavljene.',
   errGeneric: 'Nešto je pošlo po zlu. Pokušajte ponovno.',
-  toastZip: 'Pripremam ZIP sa svim originalima…',
+  toastZip: 'Preuzimanje fotografija je počelo…',
   toastUnlockedAll: 'Sve fotografije otključane',
   toastPurchased: 'Kupljeno — original otključan',
   toastOriginal: (dims) => `Preuzimam original (${dims})…`,
@@ -161,7 +161,7 @@ const hr: Strings = {
       return `Pronađene su ${n} vaše fotografije`;
     return `Pronađeno je ${n} vaših fotografija`;
   },
-  backToSearch: 'Nova pretraga',
+  backToSearch: 'Početna',
   downloadAll: 'Preuzmi sve originale',
   unlockAll: (price) => `Otključaj sve · ${price} €`,
   noPhotos: (bib) =>
@@ -202,17 +202,17 @@ const en: Strings = {
   footerPrivacy: 'Privacy',
   footerPhotographers: 'Photographers',
   footerContact: 'Contact',
-  themeLabel: 'Light or dark theme',
-  themeLight: 'Light theme',
-  themeDark: 'Dark theme',
   langLabel: 'Language',
   searchEyebrow: 'Photo search',
   searchTitle: 'Enter your bib number',
   searchSub: 'The number printed on your race bib.',
   bibLabel: 'Bib number',
+  consentPrefix: 'I agree to the ',
+  consentLinkText: 'Privacy Policy',
+  consentSuffix: '.',
   searchSubmit: 'Find my photos',
   searchBusy: 'Searching…',
-  searchDemo: 'View a demo runner (bib 1042)',
+  credits: 'Made by SklopIT and FramePaceMedia',
   raceMarathon: 'Marathon · 42.195 km',
   raceHalf: 'Half marathon · 21.1 km',
   race10k: 'Run · 10 km',
@@ -221,7 +221,7 @@ const en: Strings = {
   errUnknownBib: (bib) => `No runner with bib ${bib} in this edition.`,
   errNoEvent: 'Photos for this event are not published yet.',
   errGeneric: 'Something went wrong. Try again.',
-  toastZip: 'Preparing a ZIP of all originals…',
+  toastZip: 'Downloading your photos…',
   toastUnlockedAll: 'All photos unlocked',
   toastPurchased: 'Purchased — original unlocked',
   toastOriginal: (dims) => `Downloading original (${dims})…`,
@@ -230,7 +230,7 @@ const en: Strings = {
   pace: 'Pace',
   place: 'Place',
   photosFound: (n) => `Found ${n} photo${n === 1 ? '' : 's'} of you`,
-  backToSearch: 'New search',
+  backToSearch: 'Home',
   downloadAll: 'Download all originals',
   unlockAll: (price) => `Unlock all · €${price}`,
   noPhotos: (bib) =>

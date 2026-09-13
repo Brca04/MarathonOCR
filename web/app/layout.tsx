@@ -19,22 +19,18 @@ export const viewport: Viewport = {
 };
 
 /**
- * Runs before the first paint: applies the remembered theme and language to
- * <html> so a light-mode reader never sees a dark flash, and an English reader
- * never sees Croatian. Falls back to the system colour scheme, then to dark.
+ * Runs before the first paint: applies the remembered language to <html> so
+ * an English reader never sees Croatian flash past. The theme is fixed to
+ * light — there is no dark mode to restore.
  */
 const BOOT = `(function(){try{
-var d=document.documentElement;
-var t=localStorage.getItem('zgm.theme');
-if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';}
-d.setAttribute('data-theme',t);
 var l=localStorage.getItem('zgm.lang');
-if(l==='en'||l==='hr'){d.setAttribute('lang',l);}
+if(l==='en'||l==='hr'){document.documentElement.setAttribute('lang',l);}
 }catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="hr" data-theme="dark" suppressHydrationWarning>
+    <html lang="hr" data-theme="light" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>
