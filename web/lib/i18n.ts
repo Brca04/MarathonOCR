@@ -56,6 +56,7 @@ export type Strings = {
   statFirstEdition: string;
   statKm: string;
   statRecord: string;
+  scrollHint: string;
   footerRights: string;
   footerPrivacy: string;
   footerPhotographers: string;
@@ -122,6 +123,7 @@ const hr: Strings = {
   statFirstEdition: 'Prvo izdanje',
   statKm: 'Kilometara',
   statRecord: 'Rekord staze',
+  scrollHint: 'Pomaknite se dolje',
   footerRights: '© 2026. Zagrebački maraton · Službena fotografija utrke',
   footerPrivacy: 'Privatnost',
   footerPhotographers: 'Fotografi',
@@ -134,7 +136,7 @@ const hr: Strings = {
   consentPrefix: 'Slažem se s ',
   consentLinkText: 'pravilima privatnosti',
   consentSuffix: '.',
-  searchSubmit: 'Pronađi moje fotografije',
+  searchSubmit: 'Pronađi svoje fotografije',
   searchBusy: 'Tražim…',
   credits: 'Omogućili SklopIT i FramePaceMedia',
   raceMarathon: 'Maraton · 42,195 km',
@@ -200,6 +202,7 @@ const en: Strings = {
   statFirstEdition: 'First edition',
   statKm: 'Kilometres',
   statRecord: 'Course record',
+  scrollHint: 'Scroll down',
   footerRights: '© 2026 Zagrebački maraton · Official race photography',
   footerPrivacy: 'Privacy',
   footerPhotographers: 'Photographers',

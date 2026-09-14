@@ -206,18 +206,39 @@ function Home() {
     say(t.toastPurchased);
   }, [found, lb, photos, say, t]);
 
+  /**
+   * Same fetch-and-save approach as buyAll: signedOriginalUrl only resolves
+   * once Supabase is actually configured (it's null in the demo event), so
+   * without it this fell straight through to a "here's the size" toast and
+   * never saved anything. Falling back to the preview (p.src) — which is
+   * always a real, reachable image — means the button actually downloads
+   * something in every case, demo included.
+   */
   const downloadOriginal = useCallback(async () => {
     const p = photos[lb];
-    if (!p) return;
+    if (!p || !found) return;
+    let url = p.src;
     if (p.original_path) {
-      const url = await signedOriginalUrl(p.original_path);
-      if (url) {
-        window.open(url, '_blank', 'noopener');
-        return;
-      }
+      const signed = await signedOriginalUrl(p.original_path);
+      if (signed) url = signed;
     }
-    say(t.toastOriginal(p.dims));
-  }, [lb, photos, say, t]);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(String(res.status));
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const ext = url.split(/[?#]/)[0].split('.').pop() || 'jpg';
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `${found.runner.bib}-${lb + 1}.${ext}`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(url, '_blank', 'noopener');
+    }
+  }, [lb, photos, found]);
 
   return (
     <div

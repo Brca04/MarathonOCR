@@ -121,8 +121,10 @@ input:focus-visible {
   border-color: var(--blue) !important;
 }
 [data-bib-band]:focus-within {
-  outline: 2px solid var(--blue);
-  outline-offset: 0;
+  /* box-shadow, not outline: iOS Safari doesn't clip an outline to a
+     rounded corner, so it drew as a hard square edge over this rounded
+     card. box-shadow always follows border-radius, in every browser. */
+  box-shadow: 0 0 0 2px var(--blue);
 }
 
 /* ---------------------------------------------------------------------------
@@ -196,6 +198,21 @@ input:focus-visible {
     padding: clamp(28px, 6dvh, 56px) 20px clamp(24px, 5dvh, 40px) !important;
     gap: clamp(10px, 1.6dvh, 14px) !important;
   }
+  [data-scroll-hint] {
+    display: flex !important;
+  }
+  [data-scroll-hint] svg {
+    animation: scroll-hint-bounce 1.6s ease-in-out infinite;
+  }
+}
+@keyframes scroll-hint-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
 }
 /* On a short phone the giant bib digits are the single biggest line item —
    shrinking them (rather than the surrounding chrome) buys back enough
@@ -213,6 +230,14 @@ input:focus-visible {
 @media (max-width: 760px) {
   [data-hero-copy] {
     grid-template-columns: 1fr !important;
+  }
+  /* The rotated date is taller (once you count its length sideways) than
+     the black bib band is on a phone, so it spills out past the box onto
+     the card behind it. Shrinking the type and tightening the tracking
+     brings its sideways length back down to the band's height. */
+  [data-bib-date] {
+    font-size: 6px !important;
+    letter-spacing: .06em !important;
   }
   /* The bib/name group and the stats group stack instead of squeezing onto
      one line — the flex-wrap on data-hero-toprow would otherwise let the
@@ -292,11 +317,12 @@ input:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* Fixed, not themed: the label is plain white, so the surface behind it
-     has to stay dark in both themes rather than flip with --paper. A dark
-     navy rather than near-black, too — the lightbox backdrop is already
-     near-black, and #0a0a0a on top of it read as barely-there. */
-  background: #16213b;
+  /* The same fixed black used everywhere else on the site — the bib chip,
+     the course-clock marker, the bib card's own labels. The label is plain
+     white, so this stays a solid, un-themed black rather than following
+     --paper (the site is fixed to the light theme, but this keeps the
+     button consistent even if that ever changes). */
+  background: #0a0a0a;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.24);
   position: relative;

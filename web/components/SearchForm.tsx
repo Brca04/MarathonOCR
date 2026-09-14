@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { raceFromBib } from '@/lib/format';
 import { useT } from '@/components/AppContext';
 
@@ -22,6 +22,17 @@ export default function SearchForm({
   const t = useT();
   const race = raceFromBib(bib, t);
   const [agreed, setAgreed] = useState(false);
+  const bibInputRef = useRef<HTMLInputElement>(null);
+
+  // Autofocus on load, but not on a touch device: focusing this giant
+  // numeric input immediately pops the keyboard and, on iOS Safari
+  // specifically, can trigger a jarring auto-zoom that crops the bib card
+  // to a sliver of itself before the page has even settled.
+  useEffect(() => {
+    if (window.matchMedia('(pointer: fine)').matches) {
+      bibInputRef.current?.focus();
+    }
+  }, []);
 
   return (
     <form
@@ -138,6 +149,7 @@ export default function SearchForm({
           }}
         >
           <span
+            data-bib-date=""
             aria-hidden="true"
             style={{
               position: 'absolute',
@@ -167,12 +179,12 @@ export default function SearchForm({
             {t.bibLabel}
           </span>
           <input
+            ref={bibInputRef}
             data-bib-input=""
             value={bib}
             onChange={(e) => setBib(e.target.value.replace(/\D/g, '').slice(0, 6))}
             inputMode="numeric"
             autoComplete="off"
-            autoFocus
             placeholder="0000"
             style={{
               display: 'block',

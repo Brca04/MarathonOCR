@@ -171,6 +171,43 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
           </div>
         </div>
 
+        {/* Mobile only (see globals.css): once the hero runs the full
+            display, nothing on screen hints that the form is one scroll
+            away, so a small bouncing cue does that job. */}
+        <button
+          type="button"
+          data-scroll-hint=""
+          aria-label={t.scrollHint}
+          onClick={() => {
+            document
+              .querySelector('[data-search-grid] > form')
+              ?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          style={{
+            display: 'none',
+            width: '100%',
+            border: 0,
+            background: 'transparent',
+            color: 'var(--on-media-mute)',
+            padding: '4px 0 clamp(10px,2dvh,18px)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
       </div>
     </div>
   );

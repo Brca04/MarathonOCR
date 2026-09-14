@@ -167,6 +167,10 @@ export default function Lightbox({
         <figure
           onClick={(e) => {
             e.stopPropagation();
+            // Click-to-zoom is a desktop convenience only — on a phone the
+            // same tap is how people pan the page and step through photos,
+            // so it stays off there rather than fighting touch scrolling.
+            if (window.innerWidth <= 760) return;
             const rect = e.currentTarget.getBoundingClientRect();
             setZoomOrigin(
               `${((e.clientX - rect.left) / rect.width) * 100}% ${((e.clientY - rect.top) / rect.height) * 100}%`,
