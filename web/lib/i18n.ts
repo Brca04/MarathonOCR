@@ -91,6 +91,7 @@ export type Strings = {
   /** "Pronađeno je 11 vaših fotografija" — the gallery's only heading. */
   photosFound: (n: number) => string;
   backToSearch: string;
+  backToTop: string;
   downloadAll: string;
   unlockAll: (price: number) => string;
   noPhotos: (bib: string) => string;
@@ -135,7 +136,7 @@ const hr: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Pronađi moje fotografije',
   searchBusy: 'Tražim…',
-  credits: 'Izradili SklopIT i FramePaceMedia',
+  credits: 'Omogućili SklopIT i FramePaceMedia',
   raceMarathon: 'Maraton · 42,195 km',
   raceHalf: 'Polumaraton · 21,1 km',
   race10k: 'Utrka · 10 km',
@@ -162,7 +163,8 @@ const hr: Strings = {
     return `Pronađeno je ${n} vaših fotografija`;
   },
   backToSearch: 'Početna',
-  downloadAll: 'Preuzmi sve originale',
+  backToTop: 'Na vrh',
+  downloadAll: 'Preuzmi sve',
   unlockAll: (price) => `Otključaj sve · ${price} €`,
   noPhotos: (bib) =>
     `Zasad nema fotografija označenih startnim brojem ${bib}. Fotografije se dodaju kako ih fotografi učitavaju i kako se brojevi očitavaju — provjerite ponovno kasnije tijekom dana.`,
@@ -174,7 +176,7 @@ const hr: Strings = {
   photoBy: 'Foto:',
   unknown: 'Nepoznato',
   readAs: (read) => `očitano kao ${read}`,
-  downloadOriginal: 'Preuzmi original',
+  downloadOriginal: 'Preuzmi',
   downloadPreview: 'Preuzmi pregled',
   buyOriginal: (price) => `Kupi original · ${price} €`,
   redirectLink: 'Nastavi na pretragu fotografija',
@@ -183,10 +185,10 @@ const hr: Strings = {
     'Pronađite svoje fotografije s utrke prema startnom broju. Službena fotografija 34. Zagrebačkog maratona.',
   trackMarks: (raceCode) =>
     raceCode === 'marathon'
-      ? ['Start', '10K', 'Polovica', '30K', 'Cilj 42,195']
+      ? ['Start', '10K', 'Polovica', '30K', 'Cilj']
       : raceCode === 'half'
-        ? ['Start', '5K', '10K', '15K', 'Cilj 21,1']
-        : ['Start', '2,5K', '5K', '7,5K', 'Cilj 10'],
+        ? ['Start', '5K', '10K', '15K', 'Cilj']
+        : ['Start', '2,5K', '5K', '7,5K', 'Cilj'],
 };
 
 const en: Strings = {
@@ -231,6 +233,7 @@ const en: Strings = {
   place: 'Place',
   photosFound: (n) => `Found ${n} photo${n === 1 ? '' : 's'} of you`,
   backToSearch: 'Home',
+  backToTop: 'Back to top',
   downloadAll: 'Download all originals',
   unlockAll: (price) => `Unlock all · €${price}`,
   noPhotos: (bib) =>

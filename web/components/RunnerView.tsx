@@ -25,12 +25,14 @@ export default function RunnerView({
   ownedAll,
   onOpen,
   onBuyAll,
+  onHome,
 }: {
   runner: Runner;
   photos: GalleryPhoto[];
   ownedAll: boolean;
   onOpen: (index: number) => void;
   onBuyAll: () => void;
+  onHome: () => void;
 }) {
   const { lang, t } = useApp();
   const [prog, setProg] = useState(0);
@@ -56,8 +58,6 @@ export default function RunnerView({
   const clock = fromSeconds(toSeconds(runner.time) * prog);
   const marks = trackMarks(String(runner.race_code), t);
 
-  // No staged reveal: the numbers are simply there when the screen is.
-  const reveal = (_n: number, _y: string): React.CSSProperties | undefined => undefined;
 
   return (
     <main data-screen-label="Runner" style={{ width: '100%' }}>
@@ -121,25 +121,34 @@ export default function RunnerView({
                 background: '#f7f8fb',
                 color: '#0a0a0a',
                 borderRadius: 14,
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0,1fr) auto',
-                gap: 'clamp(24px,4vw,64px)',
-                alignItems: 'end',
-                padding: 'clamp(20px,3cqh,36px) clamp(20px,3vw,40px)',
+                padding: 'clamp(16px,2.4cqh,26px) clamp(20px,3vw,40px)',
               }}
             >
-              <div style={{ minWidth: 0 }}>
+              {/* Bib, name and the finish stats now share one line — the
+                  slimmer the row, the more of the photograph shows above it.
+                  Only when the two groups don't fit side by side does the
+                  stats group drop to its own line (data-hero-toprow below). */}
+              <div
+                data-hero-toprow=""
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 'clamp(14px,2.4vw,32px)',
+                }}
+              >
                 <div
                   style={{
                     display: 'flex',
-                    flexWrap: 'wrap',
                     alignItems: 'center',
-                    gap: 10,
-                    marginBottom: 'clamp(14px,2.5cqh,24px)',
+                    gap: 'clamp(12px,1.6vw,18px)',
+                    minWidth: 0,
                   }}
                 >
                   <span
                     style={{
+                      flex: 'none',
                       fontFamily: 'var(--mono)',
                       fontSize: 'clamp(13px,1.4cqw,18px)',
                       fontWeight: 500,
@@ -153,77 +162,56 @@ export default function RunnerView({
                   >
                     {runner.bib}
                   </span>
-                  <span
+                  <h2
                     style={{
-                      ...mono(11),
-                      letterSpacing: '.14em',
-                      color: '#4c5c7c',
+                      margin: 0,
+                      minWidth: 0,
+                      fontWeight: 700,
+                      fontSize: 'clamp(22px,min(3.2cqw,5.6cqh),40px)',
+                      letterSpacing: '-.03em',
+                      lineHeight: 1,
+                      textWrap: 'balance',
+                      overflowWrap: 'anywhere',
                     }}
                   >
-                    {[dataTerm(lang, runner.race), runner.category, runner.club]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                </div>
-                <h2
-                  style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    fontSize: 'clamp(36px,min(6.4cqw,11cqh),108px)',
-                    letterSpacing: '-.035em',
-                    lineHeight: 0.9,
-                    textWrap: 'balance',
-                  }}
-                >
-                  {runner.name}
-                </h2>
-              </div>
-
-              <div
-                data-runner-stats=""
-                style={{
-                  display: 'grid',
-                  gap: 'clamp(14px,2.2cqh,26px)',
-                  justifyItems: 'end',
-                  textAlign: 'right',
-                  minWidth: 0,
-                }}
-              >
-                <div style={reveal(1, '24px')}>
-                  <div style={{ ...mono(), color: 'var(--blue)', marginBottom: 8 }}>
-                    {t.finishTime}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 'clamp(40px,min(8cqw,14cqh),120px)',
-                      fontWeight: 800,
-                      letterSpacing: '-.045em',
-                      lineHeight: 0.85,
-                      whiteSpace: 'nowrap',
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {runner.time ?? '—'}
-                  </div>
+                    {runner.name}
+                  </h2>
                 </div>
 
                 <div
+                  data-runner-stats=""
                   style={{
                     display: 'flex',
-                    gap: 'clamp(20px,3.2cqw,44px)',
+                    alignItems: 'flex-end',
                     justifyContent: 'flex-end',
+                    gap: 'clamp(18px,2.8vw,40px)',
                     flexWrap: 'wrap',
                   }}
                 >
-                  <div style={reveal(2, '18px')}>
-                    <div style={{ ...mono(), color: '#4c5c7c', marginBottom: 6 }}>
-                      {t.pace}
+                  <div>
+                    <div style={{ ...mono(), color: 'var(--blue)', marginBottom: 4 }}>
+                      {t.finishTime}
                     </div>
                     <div
                       style={{
-                        fontSize: 'clamp(26px,min(4.2cqw,7cqh),52px)',
-                        fontWeight: 700,
-                        letterSpacing: '-.04em',
+                        fontSize: 'clamp(22px,min(2.9cqw,5.2cqh),34px)',
+                        fontWeight: 800,
+                        letterSpacing: '-.03em',
+                        lineHeight: 1,
+                        whiteSpace: 'nowrap',
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {runner.time ?? '—'}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ ...mono(), color: '#4c5c7c', marginBottom: 4 }}>{t.pace}</div>
+                    <div
+                      style={{
+                        fontSize: 'clamp(22px,min(2.9cqw,5.2cqh),34px)',
+                        fontWeight: 800,
+                        letterSpacing: '-.03em',
                         lineHeight: 1,
                         whiteSpace: 'nowrap',
                         fontVariantNumeric: 'tabular-nums',
@@ -232,7 +220,7 @@ export default function RunnerView({
                       {runner.pace ?? '—'}
                       <span
                         style={{
-                          fontSize: '.4em',
+                          fontSize: '.5em',
                           fontWeight: 500,
                           color: '#4c5c7c',
                           letterSpacing: 0,
@@ -243,43 +231,29 @@ export default function RunnerView({
                       </span>
                     </div>
                   </div>
-                  <div style={reveal(3, '18px')}>
-                    <div style={{ ...mono(), color: '#4c5c7c', marginBottom: 6 }}>
-                      {t.place}
-                    </div>
+                  <div>
+                    <div style={{ ...mono(), color: '#4c5c7c', marginBottom: 4 }}>{t.place}</div>
                     <div
                       style={{
-                        fontSize: 'clamp(26px,min(4.2cqw,7cqh),52px)',
-                        fontWeight: 700,
-                        letterSpacing: '-.04em',
+                        fontSize: 'clamp(22px,min(2.9cqw,5.2cqh),34px)',
+                        fontWeight: 800,
+                        letterSpacing: '-.03em',
                         lineHeight: 1,
                         whiteSpace: 'nowrap',
                         fontVariantNumeric: 'tabular-nums',
                       }}
                     >
                       {runner.place_overall ?? '—'}
-                      <span
-                        style={{
-                          fontSize: '.4em',
-                          fontWeight: 500,
-                          color: '#4c5c7c',
-                          letterSpacing: 0,
-                          marginLeft: '.25em',
-                        }}
-                      >
-                        · {runner.place_category ?? '—'} {runner.category ?? ''}
-                      </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* --- course track, folded into the same tab ------------------ */}
+              {/* --- course track --------------------------------------------- */}
               <div
                 style={{
-                  gridColumn: '1 / -1',
-                  marginTop: 'clamp(6px,1.4cqh,14px)',
-                  paddingTop: 'clamp(20px,3cqh,32px)',
+                  marginTop: 'clamp(12px,1.8cqh,20px)',
+                  paddingTop: 'clamp(12px,1.8cqh,20px)',
                   borderTop: '1px solid #dfe3ec',
                 }}
               >
@@ -383,7 +357,7 @@ export default function RunnerView({
         style={{
           maxWidth: 1440,
           margin: '0 auto',
-          padding: 'clamp(28px,4.5vh,52px) clamp(16px,4vw,48px) clamp(56px,9vh,104px)',
+          padding: 'clamp(28px,4.5vh,52px) clamp(16px,4vw,48px) clamp(20px,3vh,32px)',
         }}
       >
         {/* One line, centred: how many photographs were found, and the one
@@ -417,9 +391,12 @@ export default function RunnerView({
         ) : (
           <>
             <div data-gallery="">
-              {/* Masonry: every photograph keeps its own shape and the columns
-                  just hold them. Nothing is printed over a photograph — the
-                  course point, time and match quality are all in the viewer. */}
+              {/* A grid, every tile the same shape — the actual photo keeps
+                  its own proportions in the viewer (Lightbox uses p.ratio),
+                  but here a fixed ratio is what keeps every row flush instead
+                  of the columns drifting out of line as they fill. Nothing is
+                  printed over a photograph — the course point, time and
+                  match quality are all in the viewer. */}
               {photos.map((p, i) => (
                 <figure
                   key={p.id}
@@ -434,9 +411,7 @@ export default function RunnerView({
                     }
                   }}
                   aria-label={t.openPhoto(dataTerm(lang, p.course_point), p.clock)}
-                  // No inline margin here: the row gap belongs to the gallery's
-                  // stylesheet, and an inline `margin: 0` would silently win.
-                  style={{ position: 'relative', cursor: 'zoom-in' }}
+                  style={{ position: 'relative', cursor: 'zoom-in', margin: 0 }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -446,8 +421,8 @@ export default function RunnerView({
                     style={{
                       display: 'block',
                       width: '100%',
-                      height: 'auto',
-                      aspectRatio: p.ratio,
+                      height: '100%',
+                      aspectRatio: '1 / 1',
                       objectFit: 'cover',
                       borderRadius: 10,
                       background: 'var(--panel)',
@@ -456,32 +431,34 @@ export default function RunnerView({
                 </figure>
               ))}
             </div>
-
-            {/* The one action that belongs to all of them, now after the
-                photographs rather than before — a decision made looking at
-                what you are buying. */}
-            <div style={{ textAlign: 'center', padding: 'clamp(28px,4.5vh,52px) 0 0' }}>
-              <button
-                onClick={onBuyAll}
-                className="btn-ghost"
-                style={{
-                  border: '1px solid var(--line-2)',
-                  background: 'transparent',
-                  color: 'var(--paper)',
-                  borderRadius: 8,
-                  padding: '0 20px',
-                  height: 44,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  transition: 'border-color .2s,color .2s',
-                }}
-              >
-                {ownedAll ? t.downloadAll : t.unlockAll(PRICE_BUNDLE_EUR)}
-              </button>
-            </div>
           </>
         )}
       </section>
+
+      {/* --- bottom actions: everything left to do once the photos are in
+          view, in one row instead of scattered down the page --------------- */}
+      {photos.length > 0 ? (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            gap: 12,
+            padding: '0 clamp(16px,4vw,48px) clamp(28px,4.5vh,52px)',
+          }}
+        >
+          <button
+            type="button"
+            onClick={onBuyAll}
+            className="btn-skew"
+            style={{ padding: '0 18px', height: 40 }}
+          >
+            <span className="btn-skew-label" style={{ fontSize: 13 }}>
+              {ownedAll ? t.downloadAll : t.unlockAll(PRICE_BUNDLE_EUR)}
+            </span>
+          </button>
+        </div>
+      ) : null}
 
       {/* --- footer ---------------------------------------------------------- */}
       <footer
@@ -499,12 +476,9 @@ export default function RunnerView({
         }}
       >
         <span>{t.footerRights}</span>
-        <div style={{ display: 'flex', gap: 20 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
           <a href="#" className="link-mute">
             {t.footerPrivacy}
-          </a>
-          <a href="#" className="link-mute">
-            {t.footerPhotographers}
           </a>
           <a href="#" className="link-mute">
             {t.footerContact}

@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { PRICE_SINGLE_EUR } from '@/lib/config';
 import type { GalleryPhoto } from '@/lib/types';
-import { dataTerm } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 
 export default function Lightbox({
@@ -25,8 +24,17 @@ export default function Lightbox({
   onDownloadPreview: () => void;
   onDownloadOriginal: () => void;
 }) {
-  const { lang, t } = useApp();
+  const { t } = useApp();
   const photo = photos[index];
+
+  // Click the photo to zoom in on the spot you clicked; click again (or
+  // switch photos) to zoom back out.
+  const [zoomed, setZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState('center center');
+
+  useEffect(() => {
+    setZoomed(false);
+  }, [index]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -92,7 +100,6 @@ export default function Lightbox({
           }}
         >
           <span style={{ color: 'var(--paper)' }}>{index + 1}</span> / {photos.length}{' '}
-          <span style={{ color: 'var(--mute-3)' }}>·</span> {dataTerm(lang, photo.course_point)}{' '}
           <span style={{ color: 'var(--mute-3)' }}>·</span> {photo.clock}
         </span>
         <button onClick={onClose} aria-label={t.close} className="btn-outline" style={iconBtn}>
@@ -120,6 +127,7 @@ export default function Lightbox({
           placeItems: 'center',
           padding: '0 clamp(56px,8vw,120px)',
           minHeight: 0,
+          overflow: zoomed ? 'auto' : 'hidden',
         }}
       >
         <button
@@ -138,6 +146,7 @@ export default function Lightbox({
             background: 'var(--ink)',
             width: 48,
             height: 48,
+            zIndex: 2,
           }}
         >
           <svg
@@ -156,15 +165,27 @@ export default function Lightbox({
         </button>
 
         <figure
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            const rect = e.currentTarget.getBoundingClientRect();
+            setZoomOrigin(
+              `${((e.clientX - rect.left) / rect.width) * 100}% ${((e.clientY - rect.top) / rect.height) * 100}%`,
+            );
+            setZoomed((z) => !z);
+          }}
           style={{
             margin: 0,
             position: 'relative',
+            flex: 'none',
             width: `min(100%, 1200px, calc((100svh - 190px) * ${ratioNum}))`,
             aspectRatio: photo.ratio,
             borderRadius: 8,
             overflow: 'hidden',
             background: 'var(--panel)',
+            cursor: zoomed ? 'zoom-out' : 'zoom-in',
+            transform: zoomed ? 'scale(2)' : 'scale(1)',
+            transformOrigin: zoomOrigin,
+            transition: 'transform .3s ease',
           }}
         >
           <div
@@ -196,6 +217,7 @@ export default function Lightbox({
             background: 'var(--ink)',
             width: 48,
             height: 48,
+            zIndex: 2,
           }}
         >
           <svg
@@ -227,8 +249,7 @@ export default function Lightbox({
       >
         <div style={{ fontSize: 13, color: 'var(--mute)' }}>
           {t.photoBy}{' '}
-          <span style={{ color: 'var(--paper)' }}>{photo.photographer ?? t.unknown}</span> ·{' '}
-          {photo.dims}
+          <span style={{ color: 'var(--paper)' }}>{photo.photographer ?? t.unknown}</span>
           {photo.match_kind === 'fuzzy' ? (
             <>
               {' '}
@@ -240,36 +261,12 @@ export default function Lightbox({
           {owned ? (
             <button
               onClick={onDownloadOriginal}
-              className="btn-white"
-              style={{
-                border: 0,
-                background: 'var(--paper)',
-                color: 'var(--ink)',
-                borderRadius: 8,
-                padding: '0 20px',
-                height: 44,
-                fontSize: 14,
-                fontWeight: 600,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                transition: 'background .2s',
-              }}
+              className="btn-skew"
+              style={{ padding: '0 20px', height: 44 }}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16" />
-              </svg>
-              {t.downloadOriginal}
+              <span className="btn-skew-label" style={{ fontSize: 14 }}>
+                {t.downloadOriginal}
+              </span>
             </button>
           ) : (
             <>

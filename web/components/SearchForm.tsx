@@ -277,22 +277,16 @@ export default function SearchForm({
 
       <button
         type="submit"
-        className="btn-solid"
+        className="btn-skew"
         disabled={busy || !agreed}
         style={{
-          border: 0,
-          borderRadius: 8,
-          background: 'var(--paper)',
-          color: 'var(--ink)',
-          fontWeight: 600,
-          fontSize: 15,
+          width: '100%',
           padding: '0 24px',
           height: 52,
-          transition: 'background .2s',
           opacity: busy || !agreed ? 0.6 : 1,
         }}
       >
-        {busy ? t.searchBusy : t.searchSubmit}
+        <span className="btn-skew-label">{busy ? t.searchBusy : t.searchSubmit}</span>
       </button>
 
       <p

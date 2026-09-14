@@ -29,7 +29,7 @@ const bigNum: React.CSSProperties = {
  * photograph, the edition title over it, and the event counters rolling up
  * underneath. It replaces the course map iframe that used to sit here.
  */
-export default function Hero() {
+export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
   const { lang, t } = useApp();
   const [stats, setStats] = useState<EventStats>(DEMO_STATS);
   const [p, setP] = useState(0);
@@ -87,6 +87,7 @@ export default function Hero() {
         borderRight: '1px solid var(--line)',
         display: 'grid',
         gridTemplateRows: 'minmax(0,1fr) auto',
+        ...style,
       }}
     >
       {/* The photograph is the panel: it runs the full height and the copy sits

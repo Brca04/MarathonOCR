@@ -240,62 +240,80 @@ function Home() {
           ownedAll={ownedAll}
           onOpen={setLb}
           onBuyAll={buyAll}
+          onHome={searchAgain}
         />
       ) : (
-        <main
-          data-screen-label="Home"
-          data-search-grid=""
+        // The home screen is budgeted to exactly one viewport. The hero
+        // photograph now runs the full height of the screen on the left —
+        // the form and the footer share that same height stacked on the
+        // right, so the footer sits under the form rather than as a strip
+        // cutting across the photograph too.
+        <div
+          data-home-screen=""
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'minmax(0,1.5fr) minmax(340px,520px)',
-            minHeight: '100svh',
-            width: '100%',
-          }}
-        >
-          <Hero />
-          <SearchForm
-            bib={bib}
-            setBib={(v) => {
-              setBib(v);
-              setError('');
-            }}
-            error={error}
-            busy={busy}
-            onSubmit={onSubmit}
-          />
-        </main>
-      )}
-
-      {!found ? (
-        <footer
-          style={{
-            maxWidth: 1440,
-            margin: '0 auto',
-            padding: 'clamp(14px,2.2vh,20px) clamp(16px,4vw,48px) clamp(24px,4vh,40px)',
-            borderTop: '1px solid var(--line)',
             display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            gap: '10px 24px',
-            fontSize: 12,
-            color: 'var(--mute)',
+            flexDirection: 'column',
+            height: '100svh',
             width: '100%',
           }}
         >
-          <span>{t.footerRights}</span>
-          <div style={{ display: 'flex', gap: 20 }}>
-            <a href="#" className="link-mute">
-              {t.footerPrivacy}
-            </a>
-            <a href="#" className="link-mute">
-              {t.footerPhotographers}
-            </a>
-            <a href="#" className="link-mute">
-              {t.footerContact}
-            </a>
-          </div>
-        </footer>
-      ) : null}
+          <main
+            data-screen-label="Home"
+            data-search-grid=""
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'minmax(0,1.5fr) minmax(340px,520px)',
+              gridTemplateRows: 'minmax(0,1fr) auto',
+              flex: '1 1 auto',
+              minHeight: 0,
+              width: '100%',
+            }}
+          >
+            <Hero style={{ gridColumn: 1, gridRow: '1 / -1' }} />
+            <SearchForm
+              bib={bib}
+              setBib={(v) => {
+                setBib(v);
+                setError('');
+              }}
+              error={error}
+              busy={busy}
+              onSubmit={onSubmit}
+            />
+
+            {/* Stacked and centred rather than spread edge-to-edge — this
+                column is narrow, and a copyright line plus three links never
+                fit on one line here anyway, so they're arranged for that
+                instead of fighting it. */}
+            <footer
+              style={{
+                gridColumn: 2,
+                gridRow: 2,
+                padding: 'clamp(8px,1.6dvh,20px) clamp(16px,4vw,48px) clamp(10px,2dvh,24px)',
+                borderTop: '1px solid var(--line)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textAlign: 'center',
+                gap: 8,
+                fontSize: 12,
+                color: 'var(--mute)',
+                width: '100%',
+              }}
+            >
+              <span>{t.footerRights}</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 20 }}>
+                <a href="#" className="link-mute">
+                  {t.footerPrivacy}
+                </a>
+                <a href="#" className="link-mute">
+                  {t.footerContact}
+                </a>
+              </div>
+            </footer>
+          </main>
+        </div>
+      )}
 
       {lb >= 0 && photos[lb] ? (
         <Lightbox

@@ -166,22 +166,43 @@ input:focus-visible {
 }
 
 @media (max-width: 1024px) {
+  /* The hero now runs the full display on a phone or tablet too, the same
+     as it does on desktop — the form and footer follow it down the page in
+     normal scroll instead of the three squeezing into one screen. */
+  [data-home-screen] {
+    height: auto !important;
+    min-height: 100svh !important;
+  }
   [data-search-grid] {
     grid-template-columns: 1fr !important;
+    grid-template-rows: 100svh auto auto !important;
     min-height: 0 !important;
   }
   [data-hero-panel] {
-    min-height: 100svh !important;
+    grid-row: 1 !important;
+    min-height: 0 !important;
     border-right: 0 !important;
     border-bottom: 1px solid var(--line);
   }
-  /* Stacked, the form would otherwise stretch the bib across a tablet. */
+  /* Full width again below the hero, its own row above the footer. */
+  [data-search-grid] > footer {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
   [data-search-grid] > form {
     width: 100%;
     max-width: 660px;
     margin: 0 auto;
-    padding: 32px 20px 56px !important;
-    align-content: start !important;
+    padding: clamp(28px, 6dvh, 56px) 20px clamp(24px, 5dvh, 40px) !important;
+    gap: clamp(10px, 1.6dvh, 14px) !important;
+  }
+}
+/* On a short phone the giant bib digits are the single biggest line item —
+   shrinking them (rather than the surrounding chrome) buys back enough
+   height for the consent line and the credits to stay on screen too. */
+@media (max-height: 740px) and (max-width: 1024px) {
+  [data-bib-input] {
+    font-size: clamp(40px, 11vh, 64px) !important;
   }
 }
 @media (max-width: 520px) {
@@ -193,14 +214,14 @@ input:focus-visible {
   [data-hero-copy] {
     grid-template-columns: 1fr !important;
   }
-  [data-hero-grid] {
-    grid-template-columns: 1fr !important;
+  /* The bib/name group and the stats group stack instead of squeezing onto
+     one line — the flex-wrap on data-hero-toprow would otherwise let the
+     stats trail awkwardly beside a wrapped name. */
+  [data-hero-toprow] {
+    flex-direction: column !important;
+    align-items: flex-start !important;
   }
   [data-runner-stats] {
-    justify-items: start !important;
-    text-align: left !important;
-  }
-  [data-runner-stats] > div:last-child {
     justify-content: flex-start !important;
   }
 }
@@ -265,6 +286,64 @@ input:focus-visible {
   background: var(--blue);
 }
 
+/* The search submit button: two skewed panels tucked behind the edges,
+   sliding inward from left and right on hover to meet in the middle. */
+.btn-skew {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Fixed, not themed: the label is plain white, so the surface behind it
+     has to stay dark in both themes rather than flip with --paper. A dark
+     navy rather than near-black, too — the lightbox backdrop is already
+     near-black, and #0a0a0a on top of it read as barely-there. */
+  background: #16213b;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease-in;
+  z-index: 1;
+}
+.btn-skew::before,
+.btn-skew::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 100%;
+  transform: skew(15deg);
+  transition: all 0.5s;
+  overflow: hidden;
+  z-index: -1;
+}
+.btn-skew::before {
+  left: -10px;
+  background: var(--blue);
+}
+.btn-skew::after {
+  right: -10px;
+  background: var(--blue-soft);
+}
+.btn-skew:hover::before,
+.btn-skew:hover::after {
+  width: 58%;
+}
+.btn-skew:hover .btn-skew-label {
+  color: #fff;
+}
+.btn-skew:disabled {
+  pointer-events: none;
+}
+.btn-skew-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 18px;
+  transition: color 0.3s ease-in;
+}
+
 .link-mute {
   color: var(--mute);
   transition: color 0.2s;
@@ -294,24 +373,27 @@ input:focus-visible {
 
 /* --- gallery ------------------------------------------------------------- */
 
-/* Masonry by columns: each photograph keeps its own proportions and the
-   column flow packs them, the way a contact sheet of mixed shots reads. */
+/* A true grid, not column-flow masonry: column-flow packs each column top to
+   bottom independently, so columns of differently-shaped photos end at
+   different heights and the bottom edge staircases. Fixed-ratio tiles (see
+   the gallery figure's aspect-ratio) keep every row the same height, so the
+   grid lines up straight all the way down instead of just at the top. */
 [data-gallery] {
-  column-count: 3;
-  column-gap: clamp(12px, 1.6vw, 24px);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.6vw, 24px);
 }
 [data-gallery] > figure {
-  break-inside: avoid;
-  margin: 0 0 clamp(12px, 1.6vw, 24px);
+  margin: 0;
 }
 @media (max-width: 1000px) {
   [data-gallery] {
-    column-count: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 560px) {
   [data-gallery] {
-    column-count: 1;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
