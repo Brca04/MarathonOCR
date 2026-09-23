@@ -32,9 +32,9 @@ export function previewUrl(path: string | null | undefined): string | null {
 }
 
 /**
- * Short-lived signed URL for an original. Only reachable once the row is in a
- * private bucket and the caller has been through checkout; in the prototype the
- * "purchase" is local state, so this is what the download button would call.
+ * Short-lived signed URL for an original in the private bucket. Returns null
+ * when it cannot be signed (demo mode, or no storage policy allows it), and the
+ * download buttons then fall back to the preview.
  */
 export async function signedOriginalUrl(path: string): Promise<string | null> {
   if (!supabase) return null;

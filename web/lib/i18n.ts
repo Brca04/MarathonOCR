@@ -6,6 +6,8 @@
  * site, which is what makes Croatian plurals possible at all.
  */
 
+import { EVENT, EVENT_YEAR, eventTitle } from './event';
+
 export type Lang = 'hr' | 'en';
 
 export const LANGS: Lang[] = ['hr', 'en'];
@@ -56,6 +58,9 @@ export type Strings = {
   statFirstEdition: string;
   statKm: string;
   statRecord: string;
+  statPhotos: string;
+  statBibs: string;
+  statYear: string;
   scrollHint: string;
   footerRights: string;
   footerPrivacy: string;
@@ -81,10 +86,7 @@ export type Strings = {
   errNoEvent: string;
   errGeneric: string;
   toastZip: string;
-  toastUnlockedAll: string;
-  toastPurchased: string;
   toastOriginal: (dims: string) => string;
-  toastPreview: string;
   finishTime: string;
   pace: string;
   place: string;
@@ -94,7 +96,6 @@ export type Strings = {
   backToSearch: string;
   backToTop: string;
   downloadAll: string;
-  unlockAll: (price: number) => string;
   noPhotos: (bib: string) => string;
   openPhoto: (point: string, clock: string) => string;
   viewer: string;
@@ -105,8 +106,6 @@ export type Strings = {
   unknown: string;
   readAs: (read: string) => string;
   downloadOriginal: string;
-  downloadPreview: string;
-  buyOriginal: (price: number) => string;
   redirectLink: string;
   metaTitle: string;
   metaDescription: string;
@@ -116,15 +115,18 @@ export type Strings = {
 
 const hr: Strings = {
   lang: 'hr',
-  navHome: 'Zagrebački maraton, početna',
+  navHome: `${EVENT.name}, početna`,
   navOfficial: 'Službene fotografije',
-  heroAlt: 'Trkači na stazi Zagrebačkog maratona',
+  heroAlt: `Trkači na stazi: ${EVENT.name}`,
   statFinishers: (year) => `Završilo ${year}.`,
   statFirstEdition: 'Prvo izdanje',
   statKm: 'Kilometara',
   statRecord: 'Rekord staze',
+  statPhotos: 'Fotografija',
+  statBibs: 'Prepoznatih brojeva',
+  statYear: 'Godina',
   scrollHint: 'Pomaknite se dolje',
-  footerRights: '© 2026. Zagrebački maraton · Službena fotografija utrke',
+  footerRights: `© ${EVENT_YEAR}. ${EVENT.name} · Službena fotografija utrke`,
   footerPrivacy: 'Privatnost',
   footerPhotographers: 'Fotografi',
   footerContact: 'Kontakt',
@@ -148,10 +150,7 @@ const hr: Strings = {
   errNoEvent: 'Fotografije za ovu utrku još nisu objavljene.',
   errGeneric: 'Nešto je pošlo po zlu. Pokušajte ponovno.',
   toastZip: 'Preuzimanje fotografija je počelo…',
-  toastUnlockedAll: 'Sve fotografije otključane',
-  toastPurchased: 'Kupljeno — original otključan',
   toastOriginal: (dims) => `Preuzimam original (${dims})…`,
-  toastPreview: 'Preuzimam pregled s vodenim žigom…',
   finishTime: 'Ciljno vrijeme',
   pace: 'Tempo',
   place: 'Plasman',
@@ -167,7 +166,6 @@ const hr: Strings = {
   backToSearch: 'Početna',
   backToTop: 'Na vrh',
   downloadAll: 'Preuzmi sve',
-  unlockAll: (price) => `Otključaj sve · ${price} €`,
   noPhotos: (bib) =>
     `Zasad nema fotografija označenih startnim brojem ${bib}. Fotografije se dodaju kako ih fotografi učitavaju i kako se brojevi očitavaju — provjerite ponovno kasnije tijekom dana.`,
   openPhoto: (point, clock) => `Otvori fotografiju ${point} ${clock}`,
@@ -179,12 +177,10 @@ const hr: Strings = {
   unknown: 'Nepoznato',
   readAs: (read) => `očitano kao ${read}`,
   downloadOriginal: 'Preuzmi',
-  downloadPreview: 'Preuzmi pregled',
-  buyOriginal: (price) => `Kupi original · ${price} €`,
   redirectLink: 'Nastavi na pretragu fotografija',
-  metaTitle: '34. Zagrebački maraton · Službene fotografije',
+  metaTitle: `${eventTitle('hr')} · Službene fotografije`,
   metaDescription:
-    'Pronađite svoje fotografije s utrke prema startnom broju. Službena fotografija 34. Zagrebačkog maratona.',
+    `Pronađite svoje fotografije s utrke prema startnom broju. ${eventTitle('hr')} · službena fotografija.`,
   trackMarks: (raceCode) =>
     raceCode === 'marathon'
       ? ['Start', '10K', 'Polovica', '30K', 'Cilj']
@@ -195,15 +191,18 @@ const hr: Strings = {
 
 const en: Strings = {
   lang: 'en',
-  navHome: 'Zagreb Marathon, home',
+  navHome: `${EVENT.nameEn}, home`,
   navOfficial: 'Official photo',
-  heroAlt: 'Runners on the Zagreb marathon course',
+  heroAlt: `Runners on the course: ${EVENT.nameEn}`,
   statFinishers: (year) => `Finishers ${year}`,
   statFirstEdition: 'First edition',
   statKm: 'Kilometres',
   statRecord: 'Course record',
+  statPhotos: 'Photos',
+  statBibs: 'Bibs recognised',
+  statYear: 'Year',
   scrollHint: 'Scroll down',
-  footerRights: '© 2026 Zagrebački maraton · Official race photography',
+  footerRights: `© ${EVENT_YEAR} ${EVENT.name} · Official race photography`,
   footerPrivacy: 'Privacy',
   footerPhotographers: 'Photographers',
   footerContact: 'Contact',
@@ -227,10 +226,7 @@ const en: Strings = {
   errNoEvent: 'Photos for this event are not published yet.',
   errGeneric: 'Something went wrong. Try again.',
   toastZip: 'Downloading your photos…',
-  toastUnlockedAll: 'All photos unlocked',
-  toastPurchased: 'Purchased — original unlocked',
   toastOriginal: (dims) => `Downloading original (${dims})…`,
-  toastPreview: 'Downloading watermarked preview…',
   finishTime: 'Finish time',
   pace: 'Pace',
   place: 'Place',
@@ -238,7 +234,6 @@ const en: Strings = {
   backToSearch: 'Home',
   backToTop: 'Back to top',
   downloadAll: 'Download all originals',
-  unlockAll: (price) => `Unlock all · €${price}`,
   noPhotos: (bib) =>
     `No photos are tagged with bib ${bib} yet. Photos are added as the photographers upload and the numbers are read — check back later in the day.`,
   openPhoto: (point, clock) => `Open photo ${point} ${clock}`,
@@ -250,12 +245,10 @@ const en: Strings = {
   unknown: 'Unknown',
   readAs: (read) => `read as ${read}`,
   downloadOriginal: 'Download original',
-  downloadPreview: 'Download preview',
-  buyOriginal: (price) => `Buy original · €${price}`,
   redirectLink: 'Continue to the photo search',
-  metaTitle: '34th Zagreb Marathon · Official photo',
+  metaTitle: `${eventTitle('en')} · Official photos`,
   metaDescription:
-    'Find your race photos by bib number. Official photography of the 34th Zagreb Marathon.',
+    `Find your race photos by bib number. Official photography of the ${eventTitle('en')}.`,
   trackMarks: (raceCode) =>
     raceCode === 'marathon'
       ? ['Start', '10K', 'Half', '30K', 'Finish 42.195']

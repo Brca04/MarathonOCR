@@ -10,7 +10,7 @@
  * Two buckets, two jobs:
  *   race-previews  (public)  web-sized JPEG, optionally watermarked
  *   race-originals (private) the photographer's file, handed out only as a
- *                            short-lived signed URL after checkout
+ *                            short-lived signed URL
  *
  * `sharp` is used when it is installed (`npm i -D sharp`) to downscale and
  * watermark. Without it the files are uploaded untouched — fine for a prototype

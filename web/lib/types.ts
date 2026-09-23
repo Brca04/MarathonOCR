@@ -36,7 +36,9 @@ export type PhotoMatch = {
   id: string;
   file_name: string;
   preview_path: string | null;
-  original_path: string | null;
+  /** Small grid image; the gallery falls back to the preview. */
+  thumb_path?: string | null;
+  original_path?: string | null;
   width: number | null;
   height: number | null;
   captured_at: string | null;
@@ -57,6 +59,7 @@ export type FindRunnerResult =
 /** A photo with a resolved, displayable URL and a clock label. */
 export type GalleryPhoto = PhotoMatch & {
   src: string;
+  thumb: string;
   clock: string;
   hint: string;
   dims: string;

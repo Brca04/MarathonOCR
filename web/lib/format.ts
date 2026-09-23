@@ -1,3 +1,4 @@
+import { EVENT } from './event';
 import type { Strings } from './i18n';
 
 /** "3:24:17" -> 12257 */
@@ -70,7 +71,9 @@ export function trackMarks(raceCode: string, t: Strings) {
 
 export function raceFromBib(bib: string, t: Strings): { label: string; name: string } {
   const n = parseInt(bib, 10);
-  const km = !bib ? 42 : n >= 5000 ? 10 : n >= 2000 ? 21 : 42;
+  const km = EVENT.raceKm
+    ? Math.round(EVENT.raceKm)
+    : !bib ? 42 : n >= 5000 ? 10 : n >= 2000 ? 21 : 42;
   return {
     label: `${km}K`,
     name: km === 42 ? t.raceMarathon : km === 21 ? t.raceHalf : t.race10k,

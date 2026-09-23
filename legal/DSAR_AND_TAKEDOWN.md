@@ -40,9 +40,7 @@ transaction so nothing is left orphaned:
    links a bib to a photo).
 4. **`photos`**: delete the affected row(s).
 5. **`runners`**: for a full erasure of a runner, delete/anonymise the row
-   (name, dob, club, nationality). Note any legal-obligation data that must be
-   retained (e.g. an order tied to a completed sale — keep the order record but
-   sever it from identifying data where possible).
+   (name, dob, club, nationality).
 6. **Confirm** to the requester what was removed.
 
 Suggested `SECURITY DEFINER` admin function (service role only — never anon),
@@ -82,7 +80,7 @@ end; $$;
 ## 5. Access (DSAR) requests
 
 Export, for a verified requester: their `runners` row, the list of photos they
-appear in, and any order records — as a machine-readable file (JSON/CSV).
+appear in — as a machine-readable file (JSON/CSV).
 
 ## 6. Objection / opt-out
 

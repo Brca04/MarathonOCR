@@ -13,7 +13,6 @@ This site currently uses **only strictly-necessary local storage** and sets
 |---|---|---|---|
 | `zgm.theme` | localStorage | Remembers light/dark theme preference | No (functional) |
 | `zgm.lang` | localStorage | Remembers language (Croatian/English) | No (functional) |
-| `zgm.owned` | localStorage | Remembers which photos you unlocked in this browser (prototype UX only) | No (functional) |
 
 Under the ePrivacy rules, strictly-necessary/functional storage that you have
 requested (remembering your own preferences) does not require prior consent.

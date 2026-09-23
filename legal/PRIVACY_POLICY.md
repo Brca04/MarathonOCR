@@ -24,9 +24,6 @@ The service lets a runner find their official race photographs from the
   times, placings, and race status.
 - **Photographs** taken at the event, which show identifiable individuals, and
   the **bib numbers detected** in them (which link a photo to a runner).
-- **Order records** if you purchase a photo: bib number, the item purchased,
-  and a timestamp. Payment card details are handled by our payment provider and
-  are never stored by us.
 - **Strictly-necessary local storage** in your browser to remember your theme
   and language preferences. We do **not** use analytics or advertising cookies.
   [If this changes, a consent banner will be added and this section updated.]
@@ -40,8 +37,7 @@ are matched to runners only by the printed bib number.
 |---|---|
 | Publishing official race photography and letting runners find their photos | **Legitimate interests** (Art. 6(1)(f)) — documented in our Legitimate Interests Assessment; you may object at any time (see §7) |
 | Verifying identity before showing a gallery (bib **and** date of birth) | Legitimate interests — protecting other runners' data from enumeration |
-| Selling photo downloads | **Contract** (Art. 6(1)(b)) |
-| Complying with legal obligations (e.g. tax records for sales) | **Legal obligation** (Art. 6(1)(c)) |
+| Complying with legal obligations | **Legal obligation** (Art. 6(1)(c)) |
 
 [If you choose consent instead of legitimate interest for publication, state that
 here and describe how consent was obtained at registration.]
@@ -55,7 +51,6 @@ here and describe how consent was obtained at registration.]
   [SCCs / EU Data Privacy Framework]; see §6. You can avoid this by [running the
   offline OCR model].
 - **[Timing provider name]** — the source of the results data.
-- **[Payment provider]** — processes purchases.
 
 We have data processing agreements with each processor and maintain a record of
 processing activities (Art. 30).
@@ -63,8 +58,7 @@ processing activities (Art. 30).
 ## 5. How long we keep it (retention)
 
 Photos, detections, and runner data for an event are retained for **[N months]**
-after the event date, then deleted or anonymised. Order records are kept for
-**[N years]** to meet accounting/tax obligations. [State your actual periods.]
+after the event date, then deleted or anonymised. [State your actual period.]
 
 ## 6. International transfers
 

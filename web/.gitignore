@@ -8,3 +8,7 @@ next-env.d.ts
 .DS_Store
 .vercel
 .wrangler
+
+# Generated at publish time (scripts/export-static.mjs, media builder)
+public/data/
+public/media/

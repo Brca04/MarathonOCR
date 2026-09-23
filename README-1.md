@@ -140,7 +140,7 @@ trusted runs in Postgres, not in a Node server we would otherwise have to host.
 
 Two buckets. `race-previews` is public and holds the web-sized (optionally
 watermarked) JPEG. `race-originals` is private; the app asks for a 5-minute
-signed URL and only after a purchase. Swapping either for Cloudflare R2 is a
+signed URL when a runner downloads an original. Swapping either for Cloudflare R2 is a
 change to `previewUrl()` and `signedOriginalUrl()` in `lib/supabase.ts` and
 nothing else.
 
@@ -149,7 +149,7 @@ nothing else.
 ```
 app/
   page.tsx            landing — hero, animated counters
-  find/page.tsx       search ↔ runner state, lightbox, purchases, toasts
+  find/page.tsx       search ↔ runner state, lightbox, downloads, toasts
 components/
   Nav.tsx             sliding pill
   SearchForm.tsx      the bib card + birthdate field
@@ -162,7 +162,6 @@ lib/
   supabase.ts         client + storage URL resolution
 supabase/schema.sql   tables, RLS, find_runner(), event_stats()
 scripts/              importers, all with --dry-run
-public/course-map.html  Leaflet course map (iframe on the search screen)
 ```
 
 Component styles are inline, exactly as they came out of the design file, so the
@@ -173,12 +172,8 @@ two can be diffed when the design changes. Only the keyframes, media queries and
 
 ## Known gaps
 
-- **Purchases are local state.** `record_order()` logs the intent; there is no
-  payment provider behind it. Wire Stripe Checkout to that function next.
 - **No rate limiting on `find_runner`.** A determined attacker with a bib list
   could brute-force birthdates. Supabase's rate limits or a Cloudflare Turnstile
   on the form closes that before a public launch.
-- **The course map is decorative** — a fixed Leaflet view, not the real GPX, and
-  it loads Leaflet from a CDN.
 - **`upload-photos.mjs` is serial.** Fine for a few hundred photos, slow for
   20k; parallelise with a small worker pool when that day comes.

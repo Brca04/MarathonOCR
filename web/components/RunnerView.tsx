@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { PRICE_BUNDLE_EUR, WATERMARK } from '@/lib/config';
 import { easeOutCubic, fromSeconds, toSeconds, trackMarks } from '@/lib/format';
 import { dataTerm } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
@@ -22,16 +21,14 @@ const mono = (size = 11): React.CSSProperties => ({
 export default function RunnerView({
   runner,
   photos,
-  ownedAll,
   onOpen,
-  onBuyAll,
+  onDownloadAll,
   onHome,
 }: {
   runner: Runner;
   photos: GalleryPhoto[];
-  ownedAll: boolean;
   onOpen: (index: number) => void;
-  onBuyAll: () => void;
+  onDownloadAll: () => void;
   onHome: () => void;
 }) {
   const { lang, t } = useApp();
@@ -56,6 +53,8 @@ export default function RunnerView({
 
   const pct = `${(prog * 100).toFixed(2)}%`;
   const clock = fromSeconds(toSeconds(runner.time) * prog);
+  // A gallery built from photos alone has no results yet: hide the empty stats.
+  const hasResult = Boolean(runner.time || runner.pace || runner.place_overall);
   const marks = trackMarks(String(runner.race_code), t);
 
 
@@ -181,7 +180,7 @@ export default function RunnerView({
                 <div
                   data-runner-stats=""
                   style={{
-                    display: 'flex',
+                    display: hasResult ? 'flex' : 'none',
                     alignItems: 'flex-end',
                     justifyContent: 'flex-end',
                     gap: 'clamp(18px,2.8vw,40px)',
@@ -284,6 +283,7 @@ export default function RunnerView({
                         position: 'absolute',
                         left: 0,
                         top: 2,
+                        visibility: runner.time ? 'visible' : 'hidden',
                         transform: `translateX(${(-prog * 100).toFixed(1)}%)`,
                         padding: '5px 10px',
                         borderRadius: 6,
@@ -415,7 +415,7 @@ export default function RunnerView({
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={p.src}
+                    src={p.thumb}
                     alt={p.hint}
                     loading="lazy"
                     style={{
@@ -449,12 +449,12 @@ export default function RunnerView({
         >
           <button
             type="button"
-            onClick={onBuyAll}
+            onClick={onDownloadAll}
             className="btn-skew"
             style={{ padding: '0 18px', height: 40 }}
           >
             <span className="btn-skew-label" style={{ fontSize: 13 }}>
-              {ownedAll ? t.downloadAll : t.unlockAll(PRICE_BUNDLE_EUR)}
+              {t.downloadAll}
             </span>
           </button>
         </div>

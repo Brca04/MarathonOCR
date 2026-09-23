@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Nav from '@/components/Nav';
 import { useT } from '@/components/AppContext';
@@ -9,8 +9,7 @@ import SearchForm, { type SearchSubmit } from '@/components/SearchForm';
 import RunnerView from '@/components/RunnerView';
 import Lightbox from '@/components/Lightbox';
 import Toast from '@/components/Toast';
-import { findRunner, recordOrder, toGallery } from '@/lib/data';
-import { PRICE_BUNDLE_EUR, PRICE_SINGLE_EUR, WATERMARK } from '@/lib/config';
+import { findRunner, toGallery } from '@/lib/data';
 import { signedOriginalUrl } from '@/lib/supabase';
 import type { FindRunnerResult, GalleryPhoto, Runner } from '@/lib/types';
 
@@ -34,7 +33,6 @@ function Home() {
   const [busy, setBusy] = useState(false);
   const [found, setFound] = useState<{ runner: Runner; photos: GalleryPhoto[] } | null>(null);
   const [lb, setLb] = useState(-1);
-  const [owned, setOwned] = useState<Record<string, true>>({});
   const [toast, setToast] = useState('');
 
   const say = useCallback((message: string) => {
@@ -131,19 +129,6 @@ function Home() {
   }, []);
 
   const photos = found?.photos ?? [];
-  const isOwned = useCallback(
-    (photoId: string) => {
-      if (!WATERMARK) return true;
-      if (!found) return false;
-      return Boolean(owned[`${found.runner.bib}:all`] || owned[`${found.runner.bib}:${photoId}`]);
-    },
-    [found, owned],
-  );
-  const ownedAll = useMemo(
-    () => (!WATERMARK ? true : Boolean(found && owned[`${found.runner.bib}:all`])),
-    [found, owned],
-  );
-
   const step = useCallback(
     (delta: number) => {
       const n = photos.length;
@@ -154,22 +139,12 @@ function Home() {
   );
 
   /**
-   * Unlocked the first time, this actually delivers the files the second:
-   * one fetch-and-save per photo, since a static export has nothing to zip
+   * One fetch-and-save per photo, since a static export has nothing to zip
    * them with server-side. Falls back to opening the photo in a new tab if a
    * fetch is blocked (a cross-origin host without permissive CORS).
    */
-  const buyAll = useCallback(async () => {
-    if (!found) return;
-
-    if (!ownedAll) {
-      setOwned((o) => ({ ...o, [`${found.runner.bib}:all`]: true }));
-      void recordOrder(found.runner.bib, 'bundle', null, PRICE_BUNDLE_EUR);
-      say(t.toastUnlockedAll);
-      return;
-    }
-
-    if (photos.length === 0) return;
+  const downloadAll = useCallback(async () => {
+    if (!found || photos.length === 0) return;
     say(t.toastZip);
     for (let i = 0; i < photos.length; i++) {
       const p = photos[i];
@@ -196,18 +171,10 @@ function Home() {
       }
       if (i < photos.length - 1) await new Promise((r) => setTimeout(r, 200));
     }
-  }, [found, ownedAll, photos, say, t]);
-
-  const buyOne = useCallback(() => {
-    if (!found || lb < 0) return;
-    const p = photos[lb];
-    setOwned((o) => ({ ...o, [`${found.runner.bib}:${p.id}`]: true }));
-    void recordOrder(found.runner.bib, 'single', p.id, PRICE_SINGLE_EUR);
-    say(t.toastPurchased);
-  }, [found, lb, photos, say, t]);
+  }, [found, photos, say, t]);
 
   /**
-   * Same fetch-and-save approach as buyAll: signedOriginalUrl only resolves
+   * Same fetch-and-save approach as downloadAll: signedOriginalUrl only resolves
    * once Supabase is actually configured (it's null in the demo event), so
    * without it this fell straight through to a "here's the size" toast and
    * never saved anything. Falling back to the preview (p.src) — which is
@@ -258,9 +225,8 @@ function Home() {
         <RunnerView
           runner={found.runner}
           photos={photos}
-          ownedAll={ownedAll}
           onOpen={setLb}
-          onBuyAll={buyAll}
+          onDownloadAll={downloadAll}
           onHome={searchAgain}
         />
       ) : (
@@ -340,11 +306,8 @@ function Home() {
         <Lightbox
           photos={photos}
           index={lb}
-          owned={isOwned(photos[lb].id)}
           onClose={() => setLb(-1)}
           onStep={step}
-          onBuy={buyOne}
-          onDownloadPreview={() => say(t.toastPreview)}
           onDownloadOriginal={() => void downloadOriginal()}
         />
       ) : null}

@@ -11,29 +11,25 @@ _Last updated: [DATE]_
 
 ## 2. What the service does
 We publish official photographs from the [EVENT NAME] and let a runner find
-their own photos by entering their bib number and date of birth, and optionally
-purchase higher-resolution originals.
+their own photos by entering their bib number and download them.
 
 ## 3. Accounts and access
 No account is required. Access to a runner's gallery requires both the bib
 number and the correct date of birth. You must only search for your own bib, or
 one you are authorised to search for (e.g. as a parent/guardian).
 
-## 4. Purchases, prices and payment
-- Prices are shown per item and per bundle in EUR, inclusive of applicable VAT.
-- Payment is processed by **[PAYMENT PROVIDER]**; we do not store card details.
-- On successful payment you receive a licence to download and use the purchased
-  photograph(s) for **personal, non-commercial use**. [State licence scope.]
+## 4. Downloads and licence
+Photos are free to download. Downloading a photo of yourself gives you a licence
+to use it for **personal, non-commercial use**. [State licence scope, e.g.
+whether sharing on social media with credit to the photographer is allowed.]
 
-## 5. Right of withdrawal (digital content)
-Under EU consumer law you normally have 14 days to withdraw from a distance
-purchase. For **digital content supplied immediately**, this right is lost once
-download begins **if you have expressly consented and acknowledged the loss of
-the withdrawal right** at checkout. [Ensure the checkout collects this consent.]
+## 5. [Reserved]
+Photo sales are not offered at this time. If they are introduced, this section
+will cover prices, payment and the EU right of withdrawal for digital content.
 
 ## 6. Intellectual property
-Photographs are the copyright of **[PHOTOGRAPHER(S) / EVENT]**. Purchasing a
-download grants the licence in §4 only; it does not transfer copyright. The
+Photographs are the copyright of **[PHOTOGRAPHER(S) / EVENT]**. Downloading a
+photo grants the licence in §4 only; it does not transfer copyright. The
 event name and emblem are trademarks of their owner and used under [permission /
 licence — state basis].
 

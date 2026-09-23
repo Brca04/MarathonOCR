@@ -119,7 +119,7 @@ Preview** — a preview branch without them builds the demo event.
 | `NEXT_PUBLIC_EVENT_SLUG` | e.g. `zagreb-2026` |
 | `NEXT_PUBLIC_BRAND_MARK` | `/brand/znak.jpg` once self-hosted (see below) |
 | `NEXT_PUBLIC_BRAND_ICON` | `/brand/znak-150.jpg` |
-| `NEXT_PUBLIC_EVENT_TZ`, `NEXT_PUBLIC_PRICE_*`, `NEXT_PUBLIC_WATERMARK` | optional, see `.env.example` |
+| `NEXT_PUBLIC_EVENT_TZ` | optional, see `.env.example` |
 
 **Do not add the service role key** — nothing in the build needs it, and every
 `NEXT_PUBLIC_` value is visible in the browser.
@@ -162,6 +162,33 @@ from the command line.
 
 ---
 
+## Race-day traffic: publish static, keep the database as a fallback
+
+A search used to be one Postgres call. At ~60 searches/s on the smallest
+Supabase instance that is fine for a few thousand visitors and not for a
+post-race rush. So publishing now has one extra step:
+
+```bash
+npm run export:static      # writes public/data/stats.json + public/data/bib/<bib>.json
+npm run deploy             # next build + wrangler deploy
+```
+
+`export:static` calls `export_event()` (service role only) and writes exactly
+what `find_runner()` would have returned, one 2–5 KB file per bib. The site
+fetches `/data/bib/<bib>.json` first; Cloudflare serves static assets without
+a request limit, so search capacity no longer depends on the database. A bib
+missing from the export falls through to `find_runner()`, which is still there
+and is now detections-first (~5.5× faster than before on a 20k-photo event).
+
+Photos follow the same rule: the grid loads a ~30 KB thumbnail (`thumb_path`),
+the viewer the ~250 KB web-size preview. For a test event they ship as static
+assets under `/media/<event>/`; Workers allows 20,000 asset files on the free
+plan, so a real 20k-photo event should put `/media` on R2 (no egress fees) and
+point `preview_path`/`thumb_path` at it.
+
+Re-run `export:static` + `deploy` after every import; `/data/*` is cached for a
+minute at the browser, so a republish is visible almost at once.
+
 ## How the pieces fit
 
 ### Matching, and why fuzzy is worth having
@@ -190,7 +217,7 @@ trusted runs in Postgres, not in a Node server we would otherwise have to host.
 
 Two buckets. `race-previews` is public and holds the web-sized (optionally
 watermarked) JPEG. `race-originals` is private; the app asks for a 5-minute
-signed URL and only after a purchase. Swapping either for Cloudflare R2 is a
+signed URL when a runner downloads an original. Swapping either for Cloudflare R2 is a
 change to `previewUrl()` and `signedOriginalUrl()` in `lib/supabase.ts` and
 nothing else.
 
@@ -199,7 +226,7 @@ nothing else.
 ```
 app/
   page.tsx            landing — hero, animated counters
-  find/page.tsx       search ↔ runner state, lightbox, purchases, toasts
+  find/page.tsx       search ↔ runner state, lightbox, downloads, toasts
 components/
   Nav.tsx             sliding pill
   SearchForm.tsx      the bib card + birthdate field
@@ -212,7 +239,6 @@ lib/
   supabase.ts         client + storage URL resolution
 supabase/schema.sql   tables, RLS, find_runner(), event_stats()
 scripts/              importers, all with --dry-run
-public/course-map.html  Leaflet course map (iframe on the search screen)
 ```
 
 Component styles are inline, exactly as they came out of the design file, so the
@@ -223,12 +249,8 @@ two can be diffed when the design changes. Only the keyframes, media queries and
 
 ## Known gaps
 
-- **Purchases are local state.** `record_order()` logs the intent; there is no
-  payment provider behind it. Wire Stripe Checkout to that function next.
-- **No rate limiting on `find_runner`.** A determined attacker with a bib list
+- **No rate limiting on the `find_runner` fallback.** A determined attacker with a bib list
   could brute-force birthdates. Supabase's rate limits or a Cloudflare Turnstile
   on the form closes that before a public launch.
-- **The course map is decorative** — a fixed Leaflet view, not the real GPX, and
-  it loads Leaflet from a CDN.
 - **`upload-photos.mjs` is serial.** Fine for a few hundred photos, slow for
   20k; parallelise with a small worker pool when that day comes.

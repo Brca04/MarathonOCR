@@ -31,7 +31,8 @@ export default function Nav({ onSearchAgain }: { onSearchAgain?: () => void }) {
     >
       {/* The race's own emblem, straight from the official site. */}
       <Link href="/" aria-label={t.navHome} style={{ display: 'flex', alignItems: 'center' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {BRAND_MARK ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={BRAND_MARK}
           alt=""
@@ -44,6 +45,9 @@ export default function Nav({ onSearchAgain }: { onSearchAgain?: () => void }) {
             borderRadius: 6,
           }}
         />
+        ) : (
+          <span style={{ fontWeight: 800, letterSpacing: '-.02em' }}>{t.navOfficial}</span>
+        )}
       </Link>
 
       <Switches compact={inProfile} />

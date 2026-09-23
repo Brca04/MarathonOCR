@@ -1,27 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { PRICE_SINGLE_EUR } from '@/lib/config';
 import type { GalleryPhoto } from '@/lib/types';
 import { useApp } from '@/components/AppContext';
 
 export default function Lightbox({
   photos,
   index,
-  owned,
   onClose,
   onStep,
-  onBuy,
-  onDownloadPreview,
   onDownloadOriginal,
 }: {
   photos: GalleryPhoto[];
   index: number;
-  owned: boolean;
   onClose: () => void;
   onStep: (delta: number) => void;
-  onBuy: () => void;
-  onDownloadPreview: () => void;
   onDownloadOriginal: () => void;
 }) {
   const { t } = useApp();
@@ -262,53 +255,15 @@ export default function Lightbox({
           ) : null}
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {owned ? (
-            <button
-              onClick={onDownloadOriginal}
-              className="btn-skew"
-              style={{ padding: '0 20px', height: 44 }}
-            >
-              <span className="btn-skew-label" style={{ fontSize: 14 }}>
-                {t.downloadOriginal}
-              </span>
-            </button>
-          ) : (
-            <>
-              <button
-                onClick={onDownloadPreview}
-                className="btn-outline"
-                style={{
-                  border: '1px solid var(--line)',
-                  background: 'transparent',
-                  color: 'var(--paper)',
-                  borderRadius: 8,
-                  padding: '0 18px',
-                  height: 44,
-                  fontSize: 14,
-                  transition: 'border-color .2s',
-                }}
-              >
-                {t.downloadPreview}
-              </button>
-              <button
-                onClick={onBuy}
-                className="btn-blue"
-                style={{
-                  border: 0,
-                  background: 'var(--blue)',
-                  color: 'var(--ink)',
-                  borderRadius: 8,
-                  padding: '0 20px',
-                  height: 44,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  transition: 'background .2s',
-                }}
-              >
-                {t.buyOriginal(PRICE_SINGLE_EUR)}
-              </button>
-            </>
-          )}
+          <button
+            onClick={onDownloadOriginal}
+            className="btn-skew"
+            style={{ padding: '0 20px', height: 44 }}
+          >
+            <span className="btn-skew-label" style={{ fontSize: 14 }}>
+              {t.downloadOriginal}
+            </span>
+          </button>
         </div>
       </div>
     </div>

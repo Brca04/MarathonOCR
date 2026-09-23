@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { EVENT, EVENT_YEAR, eventDateLabel, eventTitle } from '@/lib/event';
 import { raceFromBib } from '@/lib/format';
 import { useT } from '@/components/AppContext';
 
@@ -120,7 +121,7 @@ export default function SearchForm({
               lineHeight: 1,
             }}
           >
-            34. Zagrebački maraton
+            {eventTitle(t.lang)}
           </span>
           <span
             style={{
@@ -132,7 +133,7 @@ export default function SearchForm({
               whiteSpace: 'nowrap',
             }}
           >
-            Zagreb · 2026
+            {[EVENT.city, EVENT_YEAR].filter(Boolean).join(' · ')}
           </span>
         </div>
 
@@ -164,7 +165,7 @@ export default function SearchForm({
               whiteSpace: 'nowrap',
             }}
           >
-            11. listopada 2026.
+            {eventDateLabel(t.lang)}
           </span>
           <span
             style={{

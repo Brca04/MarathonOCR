@@ -7,10 +7,12 @@ import './globals.css';
 export const metadata: Metadata = {
   title: STRINGS.hr.metaTitle,
   description: STRINGS.hr.metaDescription,
-  icons: {
-    icon: [{ url: BRAND_ICON, sizes: '150x150', type: 'image/jpeg' }],
-    apple: [{ url: BRAND_MARK }],
-  },
+  icons: BRAND_ICON
+    ? {
+        icon: [{ url: BRAND_ICON, sizes: '150x150', type: 'image/jpeg' }],
+        apple: BRAND_MARK ? [{ url: BRAND_MARK }] : undefined,
+      }
+    : undefined,
 };
 
 export const viewport: Viewport = {

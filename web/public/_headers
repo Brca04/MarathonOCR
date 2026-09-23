@@ -42,3 +42,14 @@
 
 /brand/*
   Cache-Control: public, max-age=604800
+
+# Per-bib search results written by scripts/export-static.mjs. Short browser
+# cache so a re-publish shows up within a minute; the edge keeps serving the
+# last good copy while it revalidates.
+/data/*
+  Cache-Control: public, max-age=60, stale-while-revalidate=600
+  Access-Control-Allow-Origin: *
+
+# Event photos served as static assets. Names are unique per photo.
+/media/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400

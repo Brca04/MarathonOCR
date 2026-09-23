@@ -7,6 +7,7 @@ import { num } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import { DEMO_STATS } from '@/lib/demo';
 import type { EventStats } from '@/lib/types';
+import { EVENT, eventTitle } from '@/lib/event';
 
 const mono: React.CSSProperties = {
   fontFamily: 'var(--mono)',
@@ -27,7 +28,7 @@ const bigNum: React.CSSProperties = {
 /**
  * The landing hero, now the left panel of the single merged screen: the course
  * photograph, the edition title over it, and the event counters rolling up
- * underneath. It replaces the course map iframe that used to sit here.
+ * underneath.
  */
 export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
   const { lang, t } = useApp();
@@ -60,18 +61,30 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
   }, []);
 
   const recordSec = toSeconds(stats.course_record);
+  // Editorial numbers (first edition, course record) only show when the event
+  // has them; otherwise the strip falls back to what the gallery itself knows.
   const cells: { value: string; label: string; accent?: boolean }[] = [
-    {
-      value: num(lang, Math.round((stats.finishers || 0) * p)),
-      label: t.statFinishers(stats.race_date ? new Date(stats.race_date).getFullYear() - 1 : 2025),
-    },
-    {
-      value: String(stats.first_year ?? 1992) + (lang === 'hr' ? '.' : ''),
-      label: t.statFirstEdition,
-    },
-    { value: num(lang, (stats.distance_km ?? 42.195) * p, 3), label: t.statKm },
-    { value: fromSeconds(recordSec * p), label: t.statRecord, accent: true },
+    stats.finishers
+      ? {
+          value: num(lang, Math.round(stats.finishers * p)),
+          label: t.statFinishers(stats.race_date ? new Date(stats.race_date).getFullYear() - 1 : 2025),
+        }
+      : { value: num(lang, Math.round((stats.photos || 0) * p)), label: t.statPhotos },
+    stats.first_year
+      ? { value: String(stats.first_year) + (lang === 'hr' ? '.' : ''), label: t.statFirstEdition }
+      : { value: num(lang, Math.round((stats.tagged_bibs || 0) * p)), label: t.statBibs },
+    { value: num(lang, (stats.distance_km ?? EVENT.raceKm ?? 42.195) * p, 3), label: t.statKm },
+    stats.course_record
+      ? { value: fromSeconds(recordSec * p), label: t.statRecord, accent: true }
+      : {
+          value: stats.race_date ? new Date(stats.race_date).getFullYear().toString() : '—',
+          label: t.statYear,
+          accent: true,
+        },
   ];
+
+  const title = eventTitle(lang);
+  const accentAt = EVENT.accent ? title.indexOf(EVENT.accent) : -1;
 
   return (
     <div
@@ -95,7 +108,7 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
           the picture takes the fixed on-media colours. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/photos/zg-hero.jpg"
+        src={EVENT.heroImage}
         alt={t.heroAlt}
         style={{
           position: 'absolute',
@@ -133,8 +146,15 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
               textWrap: 'balance',
             }}
           >
-            {stats.edition ?? 34}.{' '}
-            <span style={{ color: 'var(--on-media-accent)' }}>Zagrebački</span> maraton
+            {accentAt < 0 ? (
+              title
+            ) : (
+              <>
+                {title.slice(0, accentAt)}
+                <span style={{ color: 'var(--on-media-accent)' }}>{EVENT.accent}</span>
+                {title.slice(accentAt + EVENT.accent.length)}
+              </>
+            )}
           </h1>
         </div>
 

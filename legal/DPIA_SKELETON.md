@@ -7,24 +7,23 @@
 ## 1. Description of the processing
 - **Nature:** ingest event photographs, detect bib numbers by OCR, link each
   photo to a runner by bib, and let a runner retrieve their photos after
-  verifying bib + date of birth. Optional paid download of originals.
+  verifying bib + date of birth. Free download of photos.
 - **Scope:** ~[N] photos and ~[N] runners per event; data subjects are runners
   and any bystanders captured in frame.
 - **Context:** public sporting event; official race photography.
-- **Purposes:** let runners find/buy their photos; §3 of the Privacy Policy.
+- **Purposes:** let runners find and download their photos; §3 of the Privacy Policy.
 - **Data:** name, DOB, bib, gender/category, club, nationality, results;
-  photographs; order records. **No facial recognition or biometric templates.**
+  photographs. **No facial recognition or biometric templates.**
 
 ## 2. Necessity & proportionality
-- Lawful basis: legitimate interest for publication (with LIA), contract for
-  sales. Data minimisation: [justify holding DOB — it is the identity gate;
+- Lawful basis: legitimate interest for publication (with LIA). Data minimisation: [justify holding DOB — it is the identity gate;
   otherwise drop it]. Retention: [N months]. Transparency: Privacy Policy +
   in-context notices.
 
 ## 3. Data flows / recipients
 Timing provider → our DB (Supabase). Photos → Storage. OCR: local, with an
 optional cloud fallback to Anthropic (US) — a Chapter V transfer (see the
-transfer assessment). Delivery: Cloudflare. Payments: [provider].
+transfer assessment). Delivery: Cloudflare.
 
 ## 4. Risks to data subjects and mitigations
 
@@ -32,7 +31,6 @@ transfer assessment). Delivery: Cloudflare. Payments: [provider].
 |---|---|---|---|
 | Bib enumeration exposes a runner's PII + photos | was High | High | **Mandatory bib + DOB gate; generic "no match"; fuzzy floored at 3+ digits** (implemented) |
 | Wrong-runner fuzzy match surfaces a stranger's photo | Medium | High | Fuzzy floored at 3+ digits; match_kind shown; takedown path |
-| Unpaid access to private originals | was High | Medium | `original_path` no longer sent to anon; signing gated server-side on a verified order (to implement in the Edge Function) |
 | Bystanders who did not opt in | Medium | Medium | Objection/takedown path; consider blurring non-subject faces |
 | International transfer to US OCR | Medium | Medium | SCCs/TIA, or use the offline model |
 | Minors' images published | Medium | High | [Exclude minor races from public search / guardian process] |
