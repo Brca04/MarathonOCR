@@ -6,12 +6,16 @@
  *   npm run media:r2                                  # event from NEXT_PUBLIC_EVENT_SLUG
  *   npm run media:r2 -- --event zeljava-2026
  *   npm run media:r2 -- --from https://marathonocr.bruno-cavor.workers.dev
+ *   npm run media:r2 -- --list paths.txt --from https://…   # no Supabase key needed
  *
  * Each photo's preview_path and thumb_path ("/media/<event>/w/<id>.jpg") become
  * the R2 key without the leading slash, so the paths in Supabase stay as they
  * are. A file is taken from web/public/media/ when it is there; otherwise it is
  * downloaded from --from (the live site), which is how a machine that never
  * built the media can still fill the bucket.
+ *
+ * With --list, the paths come from a text file (one "/media/…" path per line)
+ * instead of Supabase, so the machine running it needs no service role key.
  *
  * Uploads go through `wrangler r2 object put --remote`, so run
  * `npx wrangler login` once first. Re-running is safe: it overwrites.
@@ -31,13 +35,16 @@ const from = typeof a.from === 'string' ? a.from.replace(/\/$/, '') : null;
 const concurrency = Number(a.concurrency || 8);
 const publicDir = path.resolve(__dirname, '..', 'public');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'media-r2-'));
+const paths = new Set();
+if (typeof a.list === 'string') {
+  for (const line of fs.readFileSync(a.list, 'utf8').split(/\r?\n/)) {
+    if (line.trim().startsWith('/media/')) paths.add(line.trim());
+  }
+} else {
 const db = admin();
-
 const { data: event, error: evErr } = await db.from('events').select('id').eq('slug', slug).maybeSingle();
 if (evErr) die(evErr.message);
 if (!event) die(`Event "${slug}" not found.`);
-
-const paths = new Set();
 for (let offset = 0; ; offset += 1000) {
   const { data, error } = await db
     .from('photos')
@@ -50,6 +57,8 @@ for (let offset = 0; ; offset += 1000) {
   }
   if (data.length < 1000) break;
 }
+}
+if (!paths.size) die('No /media/ paths found.');
 
 log.step(`${paths.size} files for ${slug} → r2://${bucket}`);
 
