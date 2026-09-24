@@ -2,7 +2,9 @@
   // Static site on Cloudflare Workers, with a small guard Worker in front of
   // the search data only (worker/index.ts). Pages, scripts and photos are
   // served straight from the asset store and never invoke the Worker, so they
-  // stay free and unmetered; only /data/* and /api/* run code.
+  // stay free and unmetered; only /data/*, /api/* and /media/* run code.
+  // Event photos (/media/*) come from R2, not the asset store, so a deploy
+  // never has to carry them and a GitHub-triggered build works without them.
   //
   // `name` MUST match the Worker in the dashboard, or `wrangler deploy` creates
   // a second Worker under a different *.workers.dev URL.
@@ -12,10 +14,13 @@
   "assets": {
     "directory": "./out",
     "binding": "ASSETS",
-    "run_worker_first": ["/data/*", "/api/*"],
+    "run_worker_first": ["/data/*", "/api/*", "/media/*"],
     // Unknown paths get the exported 404 page instead of a bare Worker error.
     "not_found_handling": "404-page"
   },
+  // Event photos. Filled by `npm run media:r2`; keys mirror the URL path
+  // ("media/<event>/w/<id>.jpg"), so photo paths in Supabase stay unchanged.
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media" }],
   // Per-location counters (Cloudflare Rate Limiting binding). Periods can only
   // be 10 or 60 seconds. A runner looks up a handful of bibs; a scraper
   // walking the whole field hits these within seconds.

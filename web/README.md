@@ -162,6 +162,41 @@ from the command line.
 
 ---
 
+## Deploy on every GitHub push (Workers Builds)
+
+Event photos live in the R2 bucket `marathonocr-media`, not in the build, so a
+build that only has the git checkout can publish the whole site. The guard
+Worker serves `/media/*` from the bucket (binding `MEDIA`) and falls back to
+the asset store for anything not uploaded yet.
+
+One-time setup:
+
+1. Enable R2 in the dashboard, create the bucket `marathonocr-media`, then fill
+   it: `npx wrangler login` and `npm run media:r2 -- --event zeljava-2026`.
+   Use `--from https://marathonocr.bruno-cavor.workers.dev` on a machine
+   without `public/media/`; it copies the files from the live site.
+2. Workers & Pages → `marathonocr` → Settings → Build → Connect the GitHub repo.
+   Branch: `zeljava-demo`. Root directory: `web`.
+   Build command: `npm run export:static`. Deploy command: `npm run deploy`.
+3. Build variables (Settings → Build → Variables and secrets):
+   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+   `NEXT_PUBLIC_EVENT_SLUG=zeljava-2026`, `NEXT_PUBLIC_EVENT_TZ=Europe/Zagreb`,
+   `NEXT_PUBLIC_BRAND_MARK=/brand/zeljava-logo.png`,
+   `NEXT_PUBLIC_BRAND_MARK_RATIO=606 / 313`,
+   `NEXT_PUBLIC_BRAND_ICON=/brand/zeljava-icon-32.png`,
+   `NEXT_PUBLIC_BRAND_APPLE_ICON=/brand/zeljava-icon-180.png`, the Turnstile
+   site key if used, and `SUPABASE_SERVICE_ROLE_KEY` **as a secret** (the
+   static export reads every runner through it).
+
+After that every push to the branch rebuilds and deploys. A data-only change
+(a new review import into Supabase) has no commit, so trigger a build by hand
+from the dashboard (or push an empty commit) after importing. Worker secrets
+(`SESSION_SECRET`, `TURNSTILE_SECRET`) are kept across deploys.
+
+On `*.workers.dev` every photo request runs the Worker (100k requests a day on
+the free plan). For a real event, put the site on a custom domain so photos
+can be cached at the edge, or give the bucket its own public domain.
+
 ## Race-day traffic: publish static, keep the database as a fallback
 
 A search used to be one Postgres call. At ~60 searches/s on the smallest

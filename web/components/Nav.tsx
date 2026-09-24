@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Switches from '@/components/Switches';
 import { useT } from '@/components/AppContext';
-import { BRAND_MARK } from '@/lib/config';
+import { BRAND_MARK, BRAND_MARK_RATIO } from '@/lib/config';
 
 /**
  * The emblem stays on the left, the language switch on the right — shrinking
@@ -38,10 +38,10 @@ export default function Nav({ onSearchAgain }: { onSearchAgain?: () => void }) {
           alt=""
           style={{
             display: 'block',
-            height: 'clamp(40px,4.4vw,52px)',
+            height: 'clamp(48px,5.5vw,72px)',
             width: 'auto',
-            // 336 × 400 — held so the header does not reflow while it loads.
-            aspectRatio: '336 / 400',
+            maxWidth: '60vw',
+            aspectRatio: BRAND_MARK_RATIO,
             borderRadius: 6,
           }}
         />

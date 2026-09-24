@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { AppProvider } from '@/components/AppContext';
 import { STRINGS } from '@/lib/i18n';
-import { BRAND_ICON, BRAND_MARK } from '@/lib/config';
+import { BRAND_APPLE_ICON, BRAND_ICON } from '@/lib/config';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -9,8 +9,9 @@ export const metadata: Metadata = {
   description: STRINGS.hr.metaDescription,
   icons: BRAND_ICON
     ? {
-        icon: [{ url: BRAND_ICON, sizes: '150x150', type: 'image/jpeg' }],
-        apple: BRAND_MARK ? [{ url: BRAND_MARK }] : undefined,
+        icon: [{ url: BRAND_ICON, type: BRAND_ICON.endsWith('.png') ? 'image/png' : 'image/jpeg' }],
+        // A square icon suits the home screen better than a wide logo.
+        apple: [{ url: BRAND_APPLE_ICON || BRAND_ICON }],
       }
     : undefined,
 };

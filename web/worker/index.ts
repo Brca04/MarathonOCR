@@ -1,9 +1,8 @@
 /**
  * Edge guard in front of the static site.
  *
- * Everything is still static files; this Worker only runs for /data/* and
- * /api/* (see `run_worker_first` in wrangler.jsonc). Photos, pages and scripts
- * never touch it, so they stay free and unlimited.
+ * Pages and scripts are static files; this Worker only runs for /data/*,
+ * /api/* and /media/* (see `run_worker_first` in wrangler.jsonc).
  *
  *   POST /api/session   -> short-lived signed cookie. When TURNSTILE_SECRET is
  *                          set, a valid Cloudflare Turnstile token is required
@@ -13,6 +12,9 @@
  *                          and per IP. A scraper walking bib 1..10000 hits the
  *                          limit within seconds; a runner never notices it.
  *   GET  /data/_*       -> never served.
+ *   GET  /media/*       -> event photos from the R2 bucket (binding MEDIA),
+ *                          falling back to the asset store while a bucket is
+ *                          still being filled.
  *
  * Fails open on configuration, never on abuse: without SESSION_SECRET the
  * cookie check is skipped but the per-IP limit still applies.
@@ -22,7 +24,19 @@ interface RateLimit {
   limit(opts: { key: string }): Promise<{ success: boolean }>;
 }
 
+interface R2Object {
+  body: ReadableStream;
+  httpEtag: string;
+  size: number;
+  writeHttpMetadata(headers: Headers): void;
+}
+
+interface R2Bucket {
+  get(key: string): Promise<R2Object | null>;
+}
+
 interface Env {
+  MEDIA?: R2Bucket;
   ASSETS: { fetch(req: Request | string): Promise<Response> };
   BIB_PER_SESSION: RateLimit;
   BIB_PER_IP: RateLimit;
@@ -109,6 +123,22 @@ export default {
     }
 
     if (url.pathname.startsWith('/api/')) return json(404, { ok: false });
+
+    if (url.pathname.startsWith('/media/')) {
+      if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405 });
+      const key = decodeURIComponent(url.pathname.slice(1));
+      const obj = env.MEDIA && !key.includes('..') ? await env.MEDIA.get(key) : null;
+      if (!obj) return env.ASSETS.fetch(req);
+      const headers = new Headers();
+      obj.writeHttpMetadata(headers);
+      if (!headers.has('content-type')) headers.set('content-type', 'image/jpeg');
+      headers.set('etag', obj.httpEtag);
+      // Photo files are never rewritten in place, so browsers may keep them.
+      headers.set('cache-control', 'public, max-age=604800');
+      if (req.headers.get('if-none-match') === obj.httpEtag) return new Response(null, { status: 304, headers });
+      headers.set('content-length', String(obj.size));
+      return new Response(req.method === 'HEAD' ? null : obj.body, { headers });
+    }
     if (url.pathname.startsWith('/data/_')) return new Response('Not found', { status: 404 });
 
     if (url.pathname.startsWith('/data/bib/')) {
