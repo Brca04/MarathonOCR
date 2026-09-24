@@ -3,9 +3,14 @@
  * build-time env so one codebase can be deployed per event; the defaults are
  * the Zagreb Marathon, which is what the design file was drawn for.
  *
- * Leave a value empty (e.g. NEXT_PUBLIC_EVENT_EDITION=) to hide it.
+ * Leave a value empty (e.g. NEXT_PUBLIC_EVENT_EDITION=) to hide it, or set it
+ * to "none" where the host drops empty variables (Cloudflare build settings do).
  */
-const env = (v: string | undefined, fallback: string) => (v === undefined ? fallback : v.trim());
+const env = (v: string | undefined, fallback: string) => {
+  if (v === undefined) return fallback;
+  const t = v.trim();
+  return t.toLowerCase() === 'none' ? '' : t;
+};
 
 const edition = env(process.env.NEXT_PUBLIC_EVENT_EDITION, '34');
 const raceKm = env(process.env.NEXT_PUBLIC_EVENT_RACE_KM, '');
