@@ -54,7 +54,7 @@ export type PhotoMatch = {
 
 export type FindRunnerResult =
   | { ok: true; runner: Runner; photos: PhotoMatch[] }
-  | { ok: false; reason: 'missing_input' | 'no_event' | 'no_bib' | 'dob_mismatch' };
+  | { ok: false; reason: 'missing_input' | 'no_event' | 'no_bib' | 'dob_mismatch' | 'rate_limited' };
 
 /** A photo with a resolved, displayable URL and a clock label. */
 export type GalleryPhoto = PhotoMatch & {

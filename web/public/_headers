@@ -22,7 +22,7 @@
 #    which you can drop www.zagreb-marathon.com from this line.
 
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://www.zagreb-marathon.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://www.zagreb-marathon.com; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com; upgrade-insecure-requests
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
@@ -46,9 +46,8 @@
 # Per-bib search results written by scripts/export-static.mjs. Short browser
 # cache so a re-publish shows up within a minute; the edge keeps serving the
 # last good copy while it revalidates.
-/data/*
+/data/stats.json
   Cache-Control: public, max-age=60, stale-while-revalidate=600
-  Access-Control-Allow-Origin: *
 
 # Event photos served as static assets. Names are unique per photo.
 /media/*

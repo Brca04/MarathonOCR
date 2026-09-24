@@ -39,8 +39,14 @@ create table if not exists public.events (
   first_year  int,
   -- Gate for RLS: nothing is publicly readable until this flips.
   published   boolean not null default false,
+  -- When the event is published as static files (export-static.mjs), turn the
+  -- database search off so the only way to look up a bib is through the
+  -- rate-limited edge. Leave true for events served straight from Postgres.
+  db_search   boolean not null default true,
   created_at  timestamptz not null default now()
 );
+
+alter table public.events add column if not exists db_search boolean not null default true;
 
 create table if not exists public.races (
   id          uuid primary key default uuid_generate_v4(),
@@ -163,18 +169,14 @@ create policy "races readable when published" on public.races
   for select using (exists (
     select 1 from public.events e where e.id = races.event_id and e.published));
 
+-- Photos and detections are NOT readable directly: the pair is a complete
+-- bib -> photo index, and handing it to the anon key would let anyone download
+-- every runner's gallery in one request. The app only ever reads them through
+-- find_runner() (or the static export), both of which answer one bib at a time.
 drop policy if exists "photos readable when published" on public.photos;
-create policy "photos readable when published" on public.photos
-  for select using (exists (
-    select 1 from public.events e where e.id = photos.event_id and e.published));
-
 drop policy if exists "detections readable when published" on public.detections;
-create policy "detections readable when published" on public.detections
-  for select using (exists (
-    select 1 from public.photos p join public.events e on e.id = p.event_id
-    where p.id = detections.photo_id and e.published));
 
--- No policies on public.runners at all: with RLS on and no
+-- No policies on public.runners, photos or detections: with RLS on and no
 -- permissive policy, anon and authenticated see zero rows. Deliberate.
 
 -- ===========================================================================
@@ -216,6 +218,15 @@ begin
   select * into v_event from public.events
    where slug = p_event_slug and published;
   if not found then
+    return jsonb_build_object('ok', false, 'reason', 'no_event');
+  end if;
+  -- Static-published events are searched at the edge only (see db_search).
+  -- Only browser callers (the anon/authenticated API roles) are turned away;
+  -- export_event() under the service role and direct SQL are exempt. The role
+  -- comes from the API request, since current_user here is the function owner.
+  if not v_event.db_search
+     and coalesce(current_setting('request.jwt.claims', true)::jsonb ->> 'role', '')
+         in ('anon', 'authenticated') then
     return jsonb_build_object('ok', false, 'reason', 'no_event');
   end if;
 

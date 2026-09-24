@@ -189,6 +189,34 @@ point `preview_path`/`thumb_path` at it.
 Re-run `export:static` + `deploy` after every import; `/data/*` is cached for a
 minute at the browser, so a republish is visible almost at once.
 
+## Bot and scraper protection
+
+Static per-bib files would let anyone download every gallery by counting
+1..10000. Four layers stop that without slowing a runner down:
+
+1. **Edge guard** (`worker/index.ts`) runs only for `/data/*` and `/api/*`.
+   A bib lookup needs a signed session cookie from `POST /api/session`, and is
+   rate limited per session (20/min) and per IP (120/min — race-day Wi-Fi puts
+   many phones behind one address). `/data/_*` is never served.
+2. **Cloudflare Turnstile** (optional, recommended): with
+   `NEXT_PUBLIC_TURNSTILE_SITEKEY` at build time and `TURNSTILE_SECRET` as a
+   Worker secret, a session is only issued after an invisible bot check.
+   Create the widget under Cloudflare → Turnstile → Add site (mode: Managed).
+3. **Unguessable photo URLs**: previews and thumbnails are named by an HMAC of
+   the file name, so photos can only be found through a search.
+4. **Database is edge-only**: for a statically published event set
+   `events.db_search = false`; `find_runner()` then refuses browser callers,
+   and `photos`/`detections` have no public read policy at all.
+
+```bash
+npx wrangler secret put SESSION_SECRET      # once: any long random string
+npx wrangler secret put TURNSTILE_SECRET    # optional, from the Turnstile widget
+```
+
+Only `/data/*` and `/api/*` count as Worker requests (free plan: 100,000 a
+day, roughly 30,000 visitors). For a big event, the $5/month Workers Paid plan
+raises that to 10 million.
+
 ## How the pieces fit
 
 ### Matching, and why fuzzy is worth having

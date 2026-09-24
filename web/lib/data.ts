@@ -1,6 +1,7 @@
 import { EVENT_SLUG, isLive, previewUrl, supabase } from './supabase';
 import { DEMO_STATS, demoFind } from './demo';
 import { clockLabel } from './format';
+import { ensureSession } from './guard';
 import type { EventStats, FindRunnerResult, GalleryPhoto, PhotoMatch } from './types';
 
 /**
@@ -11,11 +12,17 @@ import type { EventStats, FindRunnerResult, GalleryPhoto, PhotoMatch } from './t
  */
 const STATIC_BASE = process.env.NEXT_PUBLIC_STATIC_DATA ?? '/data';
 
-async function fetchStatic<T>(path: string): Promise<T | 'missing' | null> {
+async function fetchStatic<T>(path: string): Promise<T | 'missing' | 'limited' | null> {
   if (!STATIC_BASE) return null;
   try {
-    const res = await fetch(`${STATIC_BASE}/${path}`, { cache: 'default' });
+    let res = await fetch(`${STATIC_BASE}/${path}`, { cache: 'default', credentials: 'same-origin' });
+    if (res.status === 401) {
+      // The guard wants a (fresh) session: get one and try once more.
+      await ensureSession(true);
+      res = await fetch(`${STATIC_BASE}/${path}`, { cache: 'default', credentials: 'same-origin' });
+    }
     if (res.status === 404) return 'missing';
+    if (res.status === 429) return 'limited';
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -26,7 +33,7 @@ async function fetchStatic<T>(path: string): Promise<T | 'missing' | null> {
 /** Landing-page counters. Falls back to the demo event when unconfigured. */
 export async function getEventStats(): Promise<EventStats> {
   const cached = await fetchStatic<EventStats>('stats.json');
-  if (cached && cached !== 'missing' && cached.ok) return cached;
+  if (cached && typeof cached === 'object' && cached.ok) return cached;
   if (!supabase) return DEMO_STATS;
   const { data, error } = await supabase.rpc('event_stats', { p_event_slug: EVENT_SLUG });
   if (error || !data || !(data as EventStats).ok) {
@@ -44,8 +51,10 @@ export async function findRunner(bib: string): Promise<FindRunnerResult> {
   const clean = bib.replace(/\D/g, '');
   if (!clean) return { ok: false, reason: 'missing_input' };
 
+  await ensureSession();
   const cached = await fetchStatic<FindRunnerResult>(`bib/${clean}.json`);
-  if (cached && cached !== 'missing') return cached;
+  if (cached === 'limited') return { ok: false, reason: 'rate_limited' };
+  if (cached && typeof cached === 'object') return cached;
   // The export covers every runner, so a 404 is a real "no such bib" — unless
   // the index says otherwise (no export yet), in which case ask the database.
   if (cached === 'missing' && (await hasStaticIndex())) return { ok: false, reason: 'no_bib' };
@@ -65,7 +74,7 @@ export async function findRunner(bib: string): Promise<FindRunnerResult> {
 
 let indexProbe: Promise<boolean> | null = null;
 function hasStaticIndex(): Promise<boolean> {
-  indexProbe ??= fetchStatic<{ ok: boolean }>('stats.json').then((r) => Boolean(r && r !== 'missing' && r.ok));
+  indexProbe ??= fetchStatic<{ ok: boolean }>('stats.json').then((r) => Boolean(r && typeof r === 'object' && r.ok));
   return indexProbe;
 }
 

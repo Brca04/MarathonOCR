@@ -191,3 +191,32 @@ create index on detections using gin (text gin_trgm_ops);
 ```
 
 Store *every* candidate per bib. Rank matches by `confidence × similarity`.
+
+## Review chain: model -> Haiku -> you
+
+Three steps, each doing only what the previous one could not:
+
+1. **Local model** reads every runner (`scripts/ocr_gallery_mac.py`, or `run.py`).
+   Reads at >= 0.8 confidence are accepted - on the eval set every one of them
+   was right within a digit.
+2. **Claude Haiku** (`scripts/haiku_check.py`) looks only at the rest: low-confidence
+   reads and runners where nothing was read. It reports the bib it sees and how
+   clearly, and each runner gets a verdict - *agree*, *disagree*, *only Haiku read
+   it*, *no bib visible*.
+3. **You**, in `review_app.py`. With Haiku's results in the folder, disagreements
+   come first, suggestions are pre-filled, and each runner shows both reads side
+   by side. Tick "Only photos that need me" to skip the rest.
+
+```bash
+echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env          # never commit this
+pip install anthropic
+python scripts/haiku_check.py --photos src/slike --ocr _transfer/ocr_all.jsonl \
+    --meta _transfer/meta.csv --dry-run              # what would be sent, and the cost
+python scripts/haiku_check.py --photos src/slike --ocr _transfer/ocr_all.jsonl \
+    --meta _transfer/meta.csv                        # the real run; safe to re-run
+streamlit run review_app.py                          # then open src/slike
+```
+
+Cost is about $1 per 1,000 crops on Haiku 4.5. Results land in
+`.marathon_ocr_haiku.json` next to the photos; failed calls are retried on the
+next run.

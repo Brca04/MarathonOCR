@@ -24,6 +24,9 @@ export const EVENT = {
   /** Set for a single-distance event, e.g. 21.0975; empty = guess from bib ranges. */
   raceKm: raceKm ? Number(raceKm) : null,
   heroImage: env(process.env.NEXT_PUBLIC_HERO_IMAGE, '/photos/zg-hero.jpg'),
+  /** Card text for multi-distance events, e.g. "3 UTRKE" / "21,1 km · 10 km · 3,5 km". */
+  raceBadge: env(process.env.NEXT_PUBLIC_EVENT_RACE_BADGE, ''),
+  raceLabel: env(process.env.NEXT_PUBLIC_EVENT_RACE_LABEL, ''),
 };
 
 export const EVENT_YEAR = Number(EVENT.date.slice(0, 4)) || new Date().getFullYear();

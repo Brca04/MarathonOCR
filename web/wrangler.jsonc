@@ -1,15 +1,33 @@
 {
-  // Cloudflare Workers with static assets. The site is a Next.js static export,
-  // so there is no Worker script at all — Cloudflare just serves ./out from the
-  // edge, applying public/_headers (copied into out/ by the build).
+  // Static site on Cloudflare Workers, with a small guard Worker in front of
+  // the search data only (worker/index.ts). Pages, scripts and photos are
+  // served straight from the asset store and never invoke the Worker, so they
+  // stay free and unmetered; only /data/* and /api/* run code.
   //
   // `name` MUST match the Worker in the dashboard, or `wrangler deploy` creates
   // a second Worker under a different *.workers.dev URL.
   "name": "marathonocr",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-09-13",
   "assets": {
     "directory": "./out",
+    "binding": "ASSETS",
+    "run_worker_first": ["/data/*", "/api/*"],
     // Unknown paths get the exported 404 page instead of a bare Worker error.
     "not_found_handling": "404-page"
-  }
+  },
+  // Per-location counters (Cloudflare Rate Limiting binding). Periods can only
+  // be 10 or 60 seconds. A runner looks up a handful of bibs; a scraper
+  // walking the whole field hits these within seconds.
+  "ratelimits": [
+    // Bib lookups per browser session.
+    { "name": "BIB_PER_SESSION", "namespace_id": "4101", "simple": { "limit": 20, "period": 60 } },
+    // Bib lookups per IP — generous, because race-day Wi-Fi puts many phones behind one address.
+    { "name": "BIB_PER_IP", "namespace_id": "4102", "simple": { "limit": 120, "period": 60 } },
+    // New sessions per IP.
+    { "name": "SESSION_PER_IP", "namespace_id": "4103", "simple": { "limit": 20, "period": 60 } }
+  ]
+  // Secrets (set once, never in this file):
+  //   npx wrangler secret put SESSION_SECRET     # any long random string
+  //   npx wrangler secret put TURNSTILE_SECRET   # optional: enables the bot challenge
 }

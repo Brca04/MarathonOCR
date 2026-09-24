@@ -30,6 +30,12 @@ const bigNum: React.CSSProperties = {
  * photograph, the edition title over it, and the event counters rolling up
  * underneath.
  */
+function finishersYear(raceDate: string | null): number {
+  if (!raceDate) return new Date().getFullYear() - 1;
+  const d = new Date(raceDate);
+  return d.getTime() <= Date.now() ? d.getFullYear() : d.getFullYear() - 1;
+}
+
 export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
   const { lang, t } = useApp();
   const [stats, setStats] = useState<EventStats>(DEMO_STATS);
@@ -67,7 +73,8 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
     stats.finishers
       ? {
           value: num(lang, Math.round(stats.finishers * p)),
-          label: t.statFinishers(stats.race_date ? new Date(stats.race_date).getFullYear() - 1 : 2025),
+          // Before race day the count is last edition's; after it, this one's.
+          label: t.statFinishers(finishersYear(stats.race_date)),
         }
       : { value: num(lang, Math.round((stats.photos || 0) * p)), label: t.statPhotos },
     stats.first_year

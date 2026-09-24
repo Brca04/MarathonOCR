@@ -57,7 +57,9 @@ export function trackMarks(raceCode: string, t: Strings) {
       ? ['0%', '23.7%', '50%', '71.1%', '100%']
       : raceCode === 'half'
         ? ['0%', '23.7%', '47.4%', '71.1%', '100%']
-        : ['0%', '25%', '50%', '75%', '100%'];
+        : raceCode === '10k'
+          ? ['0%', '25%', '50%', '75%', '100%']
+          : ['0%', '100%'];
   const marks: [string, string][] = t
     .trackMarks(raceCode)
     .map((label, i) => [label, positions[i]] as [string, string]);
@@ -70,6 +72,9 @@ export function trackMarks(raceCode: string, t: Strings) {
 }
 
 export function raceFromBib(bib: string, t: Strings): { label: string; name: string } {
+  // Events with several distances and no bib ranges say so on the card instead
+  // of guessing (NEXT_PUBLIC_EVENT_RACE_BADGE / _LABEL).
+  if (EVENT.raceBadge) return { label: EVENT.raceBadge, name: EVENT.raceLabel };
   const n = parseInt(bib, 10);
   const km = EVENT.raceKm
     ? Math.round(EVENT.raceKm)

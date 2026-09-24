@@ -95,3 +95,14 @@ web/*.tsbuildinfo
 Thumbs.db
 desktop.ini
 *.log
+
+# Secrets and review artefacts
+.marathon_ocr_haiku.json*
+
+# Local photo sets, review venv and session transfer bundles
+src/slike/
+.venv-review/
+_transfer/
+.dev.vars
+public/data/
+public/media/

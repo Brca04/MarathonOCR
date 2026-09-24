@@ -12,3 +12,4 @@ next-env.d.ts
 # Generated at publish time (scripts/export-static.mjs, media builder)
 public/data/
 public/media/
+.dev.vars

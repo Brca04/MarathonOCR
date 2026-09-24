@@ -64,7 +64,9 @@ function Home() {
         if (res.reason === 'no_bib') {
           return setError(t.errUnknownBib(digits));
         }
-        return setError(res.reason === 'no_event' ? t.errNoEvent : t.errGeneric);
+        return setError(
+          res.reason === 'no_event' ? t.errNoEvent : res.reason === 'rate_limited' ? t.errBusy : t.errGeneric,
+        );
       }
 
       setFound({ runner: res.runner, photos: toGallery(res.photos) });

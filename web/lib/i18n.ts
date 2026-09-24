@@ -85,6 +85,7 @@ export type Strings = {
   errUnknownBib: (bib: string) => string;
   errNoEvent: string;
   errGeneric: string;
+  errBusy: string;
   toastZip: string;
   toastOriginal: (dims: string) => string;
   finishTime: string;
@@ -149,6 +150,7 @@ const hr: Strings = {
   errUnknownBib: (bib) => `Nema trkača sa startnim brojem ${bib} u ovom izdanju.`,
   errNoEvent: 'Fotografije za ovu utrku još nisu objavljene.',
   errGeneric: 'Nešto je pošlo po zlu. Pokušajte ponovno.',
+  errBusy: 'Previše pretraga u kratkom vremenu. Pričekajte minutu pa pokušajte ponovno.',
   toastZip: 'Preuzimanje fotografija je počelo…',
   toastOriginal: (dims) => `Preuzimam original (${dims})…`,
   finishTime: 'Ciljno vrijeme',
@@ -186,7 +188,9 @@ const hr: Strings = {
       ? ['Start', '10K', 'Polovica', '30K', 'Cilj']
       : raceCode === 'half'
         ? ['Start', '5K', '10K', '15K', 'Cilj']
-        : ['Start', '2,5K', '5K', '7,5K', 'Cilj'],
+        : raceCode === '10k'
+          ? ['Start', '2,5K', '5K', '7,5K', 'Cilj']
+          : ['Start', 'Cilj'],
 };
 
 const en: Strings = {
@@ -225,6 +229,7 @@ const en: Strings = {
   errUnknownBib: (bib) => `No runner with bib ${bib} in this edition.`,
   errNoEvent: 'Photos for this event are not published yet.',
   errGeneric: 'Something went wrong. Try again.',
+  errBusy: 'Too many searches in a short time. Wait a minute and try again.',
   toastZip: 'Downloading your photos…',
   toastOriginal: (dims) => `Downloading original (${dims})…`,
   finishTime: 'Finish time',
@@ -254,7 +259,9 @@ const en: Strings = {
       ? ['Start', '10K', 'Half', '30K', 'Finish 42.195']
       : raceCode === 'half'
         ? ['Start', '5K', '10K', '15K', 'Finish 21.1']
-        : ['Start', '2.5K', '5K', '7.5K', 'Finish 10'],
+        : raceCode === '10k'
+          ? ['Start', '2.5K', '5K', '7.5K', 'Finish 10']
+          : ['Start', 'Finish'],
 };
 
 export const STRINGS: Record<Lang, Strings> = { hr, en };
