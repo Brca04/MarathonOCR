@@ -5,6 +5,8 @@ import { easeOutCubic, fromSeconds, toSeconds, trackMarks } from '@/lib/format';
 import { dataTerm } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import type { GalleryPhoto, Runner } from '@/lib/types';
+import { EVENT_SLUG } from '@/lib/supabase';
+import profilePhotos from '@/lib/profile-photos.json';
 
 const mono = (size = 11): React.CSSProperties => ({
   fontFamily: 'var(--mono)',
@@ -37,6 +39,31 @@ function pickCover(photos: GalleryPhoto[]): GalleryPhoto | undefined {
     if (run.length >= best.length) best = [...run];
   }
   return best[best.length - 1].p;
+}
+
+type Shot = { photo?: string; position?: string };
+const PROFILE_PHOTOS = profilePhotos as Record<string, Record<string, { desktop?: Shot; mobile?: Shot }>>;
+
+/**
+ * The runner-page photo for one screen shape: a hand-picked photo and crop from
+ * lib/profile-photos.json (event slug -> bib -> desktop/mobile) when one is set
+ * and that photo is in the runner's gallery, else the automatic cover.
+ */
+function profileShot(
+  bib: string,
+  kind: 'desktop' | 'mobile',
+  photos: GalleryPhoto[],
+  cover: GalleryPhoto | undefined,
+  fallbackPosition: string,
+): { src: string; position: string } {
+  const pick = PROFILE_PHOTOS[EVENT_SLUG]?.[bib]?.[kind];
+  const picked = pick?.photo ? photos.find((p) => p.file_name === pick.photo) : undefined;
+  // A crop only fits the photo it was chosen for; with no photo named it applies to the cover.
+  const usePick = picked || (pick && !pick.photo);
+  return {
+    src: (picked ?? cover)?.src ?? '/photos/zg-runner.jpg',
+    position: (usePick && pick?.position) || fallbackPosition,
+  };
 }
 
 /**
@@ -78,6 +105,8 @@ export default function RunnerView({
   }, [runner.bib]);
 
   const cover = pickCover(photos);
+  const desktop = profileShot(runner.bib, 'desktop', photos, cover, '48% 30%');
+  const mobile = profileShot(runner.bib, 'mobile', photos, cover, '50% 30%');
   const pct = `${(prog * 100).toFixed(2)}%`;
   const clock = fromSeconds(toSeconds(runner.time) * prog);
   // A gallery built from photos alone has no results yet: hide the empty stats.
@@ -101,32 +130,29 @@ export default function RunnerView({
         }}
       >
         {/* The photograph is the screen: it runs the full height and the
-            runner's numbers and the course track sit straight on it — no deck,
-            no blur — in the fixed on-media colours. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {/* On a tall phone screen a landscape photo cropped to fill it keeps
-            only its middle third, and the runner is often outside it. There the
-            whole photo is shown (data-runner-photo, see globals.css) over a
-            blurred, darkened copy of itself that fills the screen. */}
+            runner's numbers and the course track sit straight on it, in the
+            fixed on-media colours. A phone shows only the middle third of a
+            landscape photo, so it gets its own image (data-runner-photo-mobile,
+            swapped in by globals.css): a hand-picked photo and crop from
+            lib/profile-photos.json when there is one, else the same cover. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          data-runner-backdrop=""
-          src={cover?.src ?? '/photos/zg-runner.jpg'}
+          data-runner-photo=""
+          src={desktop.src}
           alt=""
-          aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            display: 'none',
+            objectPosition: desktop.position,
           }}
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          data-runner-photo=""
-          src={cover?.src ?? '/photos/zg-runner.jpg'}
+          data-runner-photo-mobile=""
+          src={mobile.src}
           alt=""
           style={{
             position: 'absolute',
@@ -134,7 +160,8 @@ export default function RunnerView({
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            objectPosition: '48% 30%',
+            objectPosition: mobile.position,
+            display: 'none',
           }}
         />
 
