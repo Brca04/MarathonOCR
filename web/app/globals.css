@@ -607,3 +607,36 @@ input:focus-visible {
     background: rgba(var(--ink-rgb), 0.85);
   }
 }
+
+/* Privacy and contact pages (components/InfoPage.tsx). */
+[data-info-page] h2 {
+  font-size: 19px;
+  letter-spacing: -0.015em;
+  margin: 34px 0 10px;
+}
+[data-info-page] p,
+[data-info-page] li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--mute-2);
+}
+[data-info-page] ul {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+[data-info-page] li + li {
+  margin-top: 4px;
+}
+[data-info-page] a:not(.link-mute) {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+[data-info-draft] {
+  border: 1px solid var(--line-2);
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px !important;
+  color: var(--mute-2);
+}

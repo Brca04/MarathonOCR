@@ -24,3 +24,9 @@ export const BRAND_ICON =
 
 /** Square home-screen icon (180 × 180). Falls back to BRAND_ICON. */
 export const BRAND_APPLE_ICON = process.env.NEXT_PUBLIC_BRAND_APPLE_ICON || '';
+
+/** Where runners write about photos, removals and privacy (shown on /kontakt and /privatnost). */
+export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'bruno.cavor@gmail.com';
+
+/** Optional link to the organiser's own site, shown on /kontakt for questions about results. */
+export const ORGANIZER_URL = process.env.NEXT_PUBLIC_ORGANIZER_URL || '';

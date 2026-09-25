@@ -552,10 +552,10 @@ export default function RunnerView({
       >
         <span>{t.footerRights}</span>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
-          <a href="#" className="link-mute">
+          <a href="/privatnost/" className="link-mute">
             {t.footerPrivacy}
           </a>
-          <a href="#" className="link-mute">
+          <a href="/kontakt/" className="link-mute">
             {t.footerContact}
           </a>
         </div>

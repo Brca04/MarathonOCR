@@ -277,7 +277,9 @@ export default function SearchForm({
         <span style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--mute)' }}>
           {t.consentPrefix}
           <a
-            href="#"
+            href="/privatnost/"
+            target="_blank"
+            rel="noopener"
             className="link-mute"
             onClick={(e) => e.stopPropagation()}
             style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}
