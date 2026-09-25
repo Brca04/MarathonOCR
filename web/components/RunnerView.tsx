@@ -14,6 +14,32 @@ const mono = (size = 11): React.CSSProperties => ({
 });
 
 /**
+ * The photo the runner screen opens on. The first photo is often a start-line
+ * crowd where this runner is one face among many, so prefer photos with the
+ * fewest bibs in them. Among those, take the last frame of the longest burst
+ * (shots a few seconds apart): a runner coming towards the camera is largest
+ * in the final frames. Without timestamps it falls back to the first photo.
+ */
+function pickCover(photos: GalleryPhoto[]): GalleryPhoto | undefined {
+  if (photos.length < 2) return photos[0];
+  const fewest = Math.min(...photos.map((p) => p.bibs_in_photo ?? Infinity));
+  const solo = photos.filter((p) => (p.bibs_in_photo ?? Infinity) === fewest);
+  const timed = solo
+    .map((p) => ({ p, t: p.captured_at ? Date.parse(p.captured_at) : NaN }))
+    .filter((x) => !Number.isNaN(x.t))
+    .sort((a, b) => a.t - b.t);
+  if (!timed.length) return solo[0];
+  let best: typeof timed = [];
+  let run: typeof timed = [];
+  for (const x of timed) {
+    if (run.length && x.t - run[run.length - 1].t > 5000) run = [];
+    run.push(x);
+    if (run.length >= best.length) best = [...run];
+  }
+  return best[best.length - 1].p;
+}
+
+/**
  * The runner screen. The only motion left is the one that carries meaning: the
  * marker runs the course track while the clock counts up to the finish time.
  * Nothing fades or rises in.
@@ -51,6 +77,7 @@ export default function RunnerView({
     };
   }, [runner.bib]);
 
+  const cover = pickCover(photos);
   const pct = `${(prog * 100).toFixed(2)}%`;
   const clock = fromSeconds(toSeconds(runner.time) * prog);
   // A gallery built from photos alone has no results yet: hide the empty stats.
@@ -77,8 +104,29 @@ export default function RunnerView({
             runner's numbers and the course track sit straight on it — no deck,
             no blur — in the fixed on-media colours. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* On a tall phone screen a landscape photo cropped to fill it keeps
+            only its middle third, and the runner is often outside it. There the
+            whole photo is shown (data-runner-photo, see globals.css) over a
+            blurred, darkened copy of itself that fills the screen. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={photos[0]?.src ?? '/photos/zg-runner.jpg'}
+          data-runner-backdrop=""
+          src={cover?.src ?? '/photos/zg-runner.jpg'}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'none',
+          }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          data-runner-photo=""
+          src={cover?.src ?? '/photos/zg-runner.jpg'}
           alt=""
           style={{
             position: 'absolute',

@@ -315,6 +315,21 @@ input:focus-visible {
   }
 }
 
+/* Runner screen on a portrait screen: the whole photo, not a middle slice of
+   it, over a blurred copy that fills the rest. The photo sits in the upper
+   part so the result card below does not cover the runner. */
+@media (max-aspect-ratio: 1/1) {
+  [data-runner-backdrop] {
+    display: block !important;
+    filter: blur(28px) brightness(0.55) saturate(1.1);
+    transform: scale(1.15);
+  }
+  [data-runner-photo] {
+    object-fit: contain !important;
+    object-position: center 22% !important;
+  }
+}
+
 /* Five course marks do not fit a phone: keep the ends and the halfway point. */
 @media (max-width: 560px) {
   [data-mark-index='1'],

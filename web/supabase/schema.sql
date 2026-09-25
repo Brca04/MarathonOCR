@@ -293,7 +293,13 @@ begin
            'course_km',     p.course_km,
            'match_kind',    b.match_kind,
            'match_score',   round(b.score::numeric, 4),
-           'read_as',       b.bib_text
+           'read_as',       b.bib_text,
+           -- How many different bibs are in this photo. The runner page opens on
+           -- the photo with the fewest, where this runner is most likely the
+           -- subject rather than one face in a crowd.
+           'bibs_in_photo', (select count(distinct d2.bib_text)
+                               from public.detections d2
+                              where d2.photo_id = p.id)
          ) order by p.course_km nulls last, p.captured_at nulls last, p.file_name), '[]'::jsonb)
     into v_photos
     from best b

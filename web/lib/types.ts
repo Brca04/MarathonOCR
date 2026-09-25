@@ -50,6 +50,8 @@ export type PhotoMatch = {
   match_score: number;
   /** What the recognizer actually read — useful when match_kind is 'fuzzy'. */
   read_as: string;
+  /** Different bibs seen in this photo; 1 means this runner is alone in it. */
+  bibs_in_photo?: number;
 };
 
 export type FindRunnerResult =
