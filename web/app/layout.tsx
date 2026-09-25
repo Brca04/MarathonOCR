@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { AppProvider } from '@/components/AppContext';
 import { STRINGS } from '@/lib/i18n';
 import { BRAND_APPLE_ICON, BRAND_ICON } from '@/lib/config';
+import { EVENT } from '@/lib/event';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ if(l==='en'||l==='hr'){document.documentElement.setAttribute('lang',l);}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="hr" data-theme="light" suppressHydrationWarning>
+    <html lang="hr" data-theme="light" data-event={EVENT.theme || undefined} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT }} />
       </head>

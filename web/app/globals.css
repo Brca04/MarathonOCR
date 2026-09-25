@@ -67,6 +67,38 @@
   --rule: rgba(var(--paper-rgb), 0.14);
 }
 
+/*
+ * Per-event colour schemes, switched by NEXT_PUBLIC_EVENT_THEME (it lands on
+ * <html data-event="…">). Each one only re-points the tokens above, so every
+ * component follows without changes.
+ *
+ * Željava: the forest green and black of the race logo, on a warm grey-green
+ * page instead of the default blue-grey. --blue keeps its name so nothing
+ * else has to change, but here it is the logo green.
+ */
+:root[data-theme='light'][data-event='zeljava'] {
+  --ink: #e8ece5;
+  --ink-rgb: 232, 236, 229;
+  --paper: #11190f;
+  --paper-rgb: 17, 25, 15;
+  --blue: #386e30;
+  --blue-soft: #4d8c43;
+  --blue-soft-rgb: 77, 140, 67;
+  --mute: #5b6857;
+  --mute-rgb: 91, 104, 87;
+  --mute-2: #333d2f;
+  --mute-3: #707c6b;
+  --panel: #dbe3d6;
+  --line: #c3cdbd;
+  --line-2: #a6b39f;
+  --on-media-accent: #a6dc92;
+  --card-bg: #f6f8f4;
+  --card-mute: #56644f;
+  --card-faint: #87937f;
+  --card-line: #dde4d8;
+  --card-line-2: #c3cdbd;
+}
+
 html,
 body {
   margin: 0;
@@ -133,6 +165,32 @@ input:focus-visible {
    hero panel itself rather than the window, so it is right at every width the
    panel can end up at.
    --------------------------------------------------------------------------- */
+
+/* Darkens the lower part of the hero photo so the title and counters read on
+   any picture. Taller on a phone, where the copy covers more of the frame. */
+[data-hero-scrim] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.5) 28%,
+    rgba(0, 0, 0, 0.12) 55%,
+    rgba(0, 0, 0, 0) 70%
+  );
+}
+@media (max-width: 1024px) {
+  [data-hero-scrim] {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.55) 38%,
+      rgba(0, 0, 0, 0.15) 62%,
+      rgba(0, 0, 0, 0) 78%
+    );
+  }
+}
 
 [data-hero-stats] > div {
   grid-template-columns: repeat(4, minmax(0, 1fr));

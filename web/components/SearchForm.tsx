@@ -80,7 +80,7 @@ export default function SearchForm({
       <div
         style={{
           position: 'relative',
-          background: '#f7f8fb',
+          background: 'var(--card-bg, #f7f8fb)',
           color: '#0a0a0a',
           borderRadius: 6,
           padding: '20px 18px 14px',
@@ -129,7 +129,7 @@ export default function SearchForm({
               fontSize: 10,
               letterSpacing: '.1em',
               textTransform: 'uppercase',
-              color: '#4c5c7c',
+              color: 'var(--card-mute, #4c5c7c)',
               whiteSpace: 'nowrap',
             }}
           >
@@ -161,7 +161,7 @@ export default function SearchForm({
               fontSize: 7,
               letterSpacing: '.12em',
               textTransform: 'uppercase',
-              color: '#8b9bba',
+              color: 'var(--card-faint, #8b9bba)',
               whiteSpace: 'nowrap',
             }}
           >
@@ -214,7 +214,7 @@ export default function SearchForm({
             gap: 12,
             marginTop: 12,
             padding: '10px 4px 0',
-            borderTop: '1px solid #dfe3ec',
+            borderTop: '1px solid var(--card-line, #dfe3ec)',
           }}
         >
           <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-.02em', lineHeight: 1 }}>
@@ -226,7 +226,7 @@ export default function SearchForm({
               fontSize: 10,
               letterSpacing: '.1em',
               textTransform: 'uppercase',
-              color: '#4c5c7c',
+              color: 'var(--card-mute, #4c5c7c)',
             }}
           >
             {race.name}

@@ -111,8 +111,10 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
       }}
     >
       {/* The photograph is the panel: it runs the full height and the copy sits
-          straight on it — no deck, no blur, no fade, no shadow. Anything over
-          the picture takes the fixed on-media colours. */}
+          on it. A dark scrim rises from the bottom (data-hero-scrim) so the
+          title and counters stay readable on bright or busy photos, such as a
+          drone shot of grass and concrete. Anything over the picture takes the
+          fixed on-media colours. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={EVENT.heroImage}
@@ -123,9 +125,10 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          objectPosition: 'center 30%',
+          objectPosition: EVENT.heroPosition,
         }}
       />
+      <div data-hero-scrim="" aria-hidden="true" />
 
       {/* Holds the photograph open above the copy. */}
       <div data-hero-space="" aria-hidden="true" style={{ minHeight: 200 }} />

@@ -32,6 +32,10 @@ export const EVENT = {
   /** Card text for multi-distance events, e.g. "3 UTRKE" / "21,1 km · 10 km · 3,5 km". */
   raceBadge: env(process.env.NEXT_PUBLIC_EVENT_RACE_BADGE, ''),
   raceLabel: env(process.env.NEXT_PUBLIC_EVENT_RACE_LABEL, ''),
+  /** Colour scheme, matched by `:root[data-event='…']` in globals.css. Empty = the default blue. */
+  theme: env(process.env.NEXT_PUBLIC_EVENT_THEME, ''),
+  /** Where the hero photo is anchored when cropped, as CSS object-position. */
+  heroPosition: env(process.env.NEXT_PUBLIC_HERO_POSITION, 'center 30%'),
 };
 
 export const EVENT_YEAR = Number(EVENT.date.slice(0, 4)) || new Date().getFullYear();

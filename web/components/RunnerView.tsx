@@ -117,7 +117,7 @@ export default function RunnerView({
             <div
               data-hero-grid=""
               style={{
-                background: '#f7f8fb',
+                background: 'var(--card-bg, #f7f8fb)',
                 color: '#0a0a0a',
                 borderRadius: 14,
                 padding: 'clamp(16px,2.4cqh,26px) clamp(20px,3vw,40px)',
@@ -205,7 +205,7 @@ export default function RunnerView({
                     </div>
                   </div>
                   <div>
-                    <div style={{ ...mono(), color: '#4c5c7c', marginBottom: 4 }}>{t.pace}</div>
+                    <div style={{ ...mono(), color: 'var(--card-mute, #4c5c7c)', marginBottom: 4 }}>{t.pace}</div>
                     <div
                       style={{
                         fontSize: 'clamp(22px,min(2.9cqw,5.2cqh),34px)',
@@ -221,7 +221,7 @@ export default function RunnerView({
                         style={{
                           fontSize: '.5em',
                           fontWeight: 500,
-                          color: '#4c5c7c',
+                          color: 'var(--card-mute, #4c5c7c)',
                           letterSpacing: 0,
                           marginLeft: '.2em',
                         }}
@@ -231,7 +231,7 @@ export default function RunnerView({
                     </div>
                   </div>
                   <div>
-                    <div style={{ ...mono(), color: '#4c5c7c', marginBottom: 4 }}>{t.place}</div>
+                    <div style={{ ...mono(), color: 'var(--card-mute, #4c5c7c)', marginBottom: 4 }}>{t.place}</div>
                     <div
                       style={{
                         fontSize: 'clamp(22px,min(2.9cqw,5.2cqh),34px)',
@@ -253,7 +253,7 @@ export default function RunnerView({
                 style={{
                   marginTop: 'clamp(12px,1.8cqh,20px)',
                   paddingTop: 'clamp(12px,1.8cqh,20px)',
-                  borderTop: '1px solid #dfe3ec',
+                  borderTop: '1px solid var(--card-line, #dfe3ec)',
                 }}
               >
                 <div style={{ position: 'relative', height: 70 }}>
@@ -264,7 +264,7 @@ export default function RunnerView({
                       right: 0,
                       top: 44,
                       height: 1,
-                      background: '#dfe3ec',
+                      background: 'var(--card-line, #dfe3ec)',
                     }}
                   />
                   <div
@@ -330,14 +330,14 @@ export default function RunnerView({
                         style={{
                           width: 1,
                           height: 6,
-                          background: '#c2cbdb',
+                          background: 'var(--card-line-2, #c2cbdb)',
                         }}
                       />
                       <span
                         style={{
                           ...mono(10),
                           letterSpacing: '.12em',
-                          color: '#4c5c7c',
+                          color: 'var(--card-mute, #4c5c7c)',
                           whiteSpace: 'nowrap',
                         }}
                       >
