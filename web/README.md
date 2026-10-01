@@ -229,10 +229,17 @@ minute at the browser, so a republish is visible almost at once.
 Static per-bib files would let anyone download every gallery by counting
 1..10000. Four layers stop that without slowing a runner down:
 
-1. **Edge guard** (`worker/index.ts`) runs only for `/data/*` and `/api/*`.
-   A bib lookup needs a signed session cookie from `POST /api/session`, and is
-   rate limited per session (20/min) and per IP (120/min — race-day Wi-Fi puts
-   many phones behind one address). `/data/_*` is never served.
+1. **Edge guard** (`worker/index.ts`) runs only for `/data/*`, `/api/*` and
+   `/media/*`. A bib lookup needs a signed session cookie from
+   `POST /api/session` (valid 15 minutes). Each session may open at most
+   **30 different bibs** (`BIB_QUOTA` in `wrangler.jsonc`), counted exactly by
+   a small Durable Object per session; repeats are free. The browser silently
+   gets a new session (and passes Turnstile again) when the quota is used up,
+   so a runner never notices, while a scraper needs a new Turnstile pass for
+   every 30 bibs. Cloudflare's per-location rate limits (20/min per session,
+   120/min per IP) sit in front as an approximate flood guard; measured, about
+   3x the configured rate gets through, which is why the exact quota exists.
+   `/data/_*` is never served.
 2. **Cloudflare Turnstile** (optional, recommended): with
    `NEXT_PUBLIC_TURNSTILE_SITEKEY` at build time and `TURNSTILE_SECRET` as a
    Worker secret, a session is only issued after an invisible bot check.

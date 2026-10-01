@@ -21,7 +21,14 @@
   // Event photos. Filled by `npm run media:r2`; keys mirror the URL path
   // ("media/<event>/w/<id>.jpg"), so photo paths in Supabase stay unchanged.
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media" }],
-  // Per-location counters (Cloudflare Rate Limiting binding). Periods can only
+  // Exact per-session quota: at most BIB_QUOTA different bibs per session
+  // (worker/index.ts, class SessionQuota). One small SQLite-backed Durable
+  // Object per session, wiped when the session expires.
+  "durable_objects": { "bindings": [{ "name": "QUOTA", "class_name": "SessionQuota" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionQuota"] }],
+  "vars": { "BIB_QUOTA": "30" },
+  // Per-location counters (Cloudflare Rate Limiting binding). Approximate by
+  // design — a first layer against floods; the exact cap is QUOTA above. Periods can only
   // be 10 or 60 seconds. A runner looks up a handful of bibs; a scraper
   // walking the whole field hits these within seconds.
   "ratelimits": [

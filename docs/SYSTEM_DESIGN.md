@@ -143,7 +143,7 @@ Technically, finding a runner in a photo means **reading a race bib**. That is h
 
 **UC-6: Takedown or erasure request.** A runner asks for a photo or their data to be removed. A procedure is drafted in `legal/DSAR_AND_TAKEDOWN.md`; today it is a manual database edit plus republish.
 
-**UC-7: Abuse attempt.** A script tries to enumerate bibs 1…N. It is blocked at session issuance by Turnstile. Per-session limits are intended to cap it further, but are currently ineffective (§19).
+**UC-7: Abuse attempt.** A script tries to enumerate bibs 1…N. It must pass Turnstile to get a session, and each session can open at most 30 different bibs. Harvesting a 300-runner field therefore needs about 10 separate Turnstile passes.
 
 ---
 
@@ -360,7 +360,8 @@ findRunner(bib):
      200  → render
      404  → "no runner with that number"   (reason: no_bib)
      401  → session expired → ensureSession(force) → retry once
-     429  → "busy, try again"              (reason: rate_limited)
+     429 quota        → new session (Turnstile again) → retry once
+     429 rate_limited → "busy, try again"
   if static file missing and db_search enabled → supabase.rpc('find_runner')
 ```
 
@@ -372,15 +373,15 @@ The Worker runs **only** for `/api/*`, `/data/*` and `/media/*`. Everything else
 
 | Route | Behaviour |
 |---|---|
-| `POST /api/session` | 1. Per-IP limit (`SESSION_PER_IP`). 2. If `TURNSTILE_SECRET` is set, verify `body.token` at Turnstile siteverify; otherwise **403 `challenge`**. 3. If `SESSION_SECRET` is set, issue the cookie `mg_s=<sid>.<exp>.<hmac>` (HttpOnly, Secure, SameSite=Strict, Path=/data, 30 min); otherwise open mode |
-| `GET /data/bib/*` | Verify the HMAC cookie (constant-time compare) → **401 `session`**; per-session limit (`BIB_PER_SESSION`) and per-IP limit (`BIB_PER_IP`) → **429**; fetch the asset; missing → **404 `no_bib`**; response `Cache-Control: private, max-age=300` |
+| `POST /api/session` | 1. Per-IP limit (`SESSION_PER_IP`). 2. If `TURNSTILE_SECRET` is set, verify `body.token` at Turnstile siteverify; otherwise **403 `challenge`**. 3. If `SESSION_SECRET` is set, issue the cookie `mg_s=<sid>.<exp>.<hmac>` (HttpOnly, Secure, SameSite=Strict, Path=/data, **15 min**); otherwise open mode |
+| `GET /data/bib/*` | Verify the HMAC cookie (constant-time compare) → **401 `session`**; per-session and per-IP rate limits (approximate) → **429 `rate_limited`**; **session quota** (Durable Object `SessionQuota`, at most `BIB_QUOTA` = 30 distinct bibs; repeats are free) → **429 `quota`**; fetch the asset; missing → **404 `no_bib`**; response `Cache-Control: private, max-age=300` |
 | `GET /data/_*` | 404 (reserved for internal files) |
 | `GET/HEAD /media/*` | Serve from R2 (`MEDIA`) with ETag / 304 and `max-age=604800`; rejects `..`; falls back to the asset store |
 | other `/api/*` | 404 |
 
 **Design properties**
 
-- **Stateless sessions:** there is no server-side session store. A session is a signed, expiring token.
+- **Stateless sessions:** there is no server-side session store. A session is a signed, expiring token. The only per-session state is the quota counter: one small SQLite-backed Durable Object per session, wiped by an alarm when the session expires.
 - **Fails open on configuration, never on abuse:** a missing secret degrades protection but doesn't take the site down. A failed check blocks.
 - The cookie is scoped to `/data`, so it is never sent with page or media requests.
 
@@ -516,7 +517,7 @@ Matching lives in **one place**, `find_runner()`, and is pre-computed for every 
 
 | Threat | Impact | Mitigation | Status |
 |---|---|---|---|
-| Bulk scraping of galleries by enumerating bibs | Mass collection of photos and names | Turnstile at session issuance; HMAC sessions; per-session and per-IP limits | Turnstile and sessions **verified working**. Rate limits **not effective** (§19) |
+| Bulk scraping of galleries by enumerating bibs | Mass collection of photos and names | Turnstile at session issuance; HMAC sessions (15 min); **exact cap of 30 distinct bibs per session** (Durable Object); approximate per-location rate limits | Turnstile and sessions verified live. Quota verified locally; live check pending deploy |
 | Enumerating photos directly | Bypasses search | HMAC-named media paths; no listing; no public `photos` read | Done |
 | Reading PII via the Supabase anon key | Leak of names and birthdates | RLS with no select policy on `runners`/`photos`/`detections`; definer functions only; `db_search=false` | Done |
 | Birthdate brute force | Identity verification bypass | Not applicable while the DOB check is off. If enabled: rate limits plus Turnstile | Pending decision |
@@ -532,7 +533,7 @@ Matching lives in **one place**, `find_runner()`, and is pre-computed for every 
 | `POST /api/session` with a fake token | `403 {"reason":"challenge"}` |
 | `GET /data/bib/91.json` without a cookie | `401` |
 | `GET /data/_anything` | `404` |
-| 150 rapid bib requests on one session | **All 200: rate limiter not enforcing** |
+| 120 session requests in 15 s from one IP (limit 20/min) | 69 allowed, 51 blocked (first block at about request 30). **The Cloudflare limiter works but is approximate, ~3× the limit** |
 
 ### 11.3 Privacy (GDPR)
 
@@ -553,8 +554,8 @@ Matching lives in **one place**, `find_runner()`, and is pre-computed for every 
 |---|---|---|---|
 | Page shell, JS, CSS | Static assets (no Worker) | ~7–11 KB HTML + chunks | Immutable caching for `/_next/static/*` |
 | `/data/stats.json` | Static asset | ~0.2 KB | Short browser cache |
-| `/api/session` | Worker (+ Turnstile siteverify) | tiny | Once per 30 minutes per visitor |
-| `/data/bib/<bib>.json` | Worker → asset | 2–5 KB | `private, max-age=300` |
+| `/api/session` | Worker (+ Turnstile siteverify) | tiny | Once per 15 minutes per visitor |
+| `/data/bib/<bib>.json` | Worker → Durable Object (quota) → asset | 2–5 KB | `private, max-age=300`; one DO call adds a few ms |
 | Thumbnails / web photos | Worker → R2 | ~30 KB / ~250 KB | `max-age=604800`, ETag/304 |
 
 Measured page loads were 0.4–0.8 s from the test location.
@@ -706,6 +707,8 @@ Image tokens ≈ ⌈w/28⌉ × ⌈h/28⌉, so **a small crop costs ~50× less th
 | `BIB_PER_SESSION` | Rate limit (4101) | 20 requests per 60 s |
 | `BIB_PER_IP` | Rate limit (4102) | 120 requests per 60 s |
 | `SESSION_PER_IP` | Rate limit (4103) | 20 requests per 60 s |
+| `QUOTA` | Durable Object (`SessionQuota`, migration `v1`) | Exact per-session cap on distinct bibs |
+| `BIB_QUOTA` | Variable (in `wrangler.jsonc`) | Distinct bibs per session, default `30` |
 
 ### 16.4 Ingest (`.env` in the repo root, never committed)
 
@@ -759,7 +762,7 @@ MarathonOCR/
 
 **ADR-7: LLMs only on crops of the residue.** *Context:* the budget can't cover per-photo LLM calls. *Decision:* the LLM is an optional, capped fallback on small crops through the Batch API. *Consequences:* predictable cost of a few dollars per event.
 
-**ADR-8: Edge guard with stateless sessions and Turnstile.** *Decision:* HMAC session cookies, Turnstile at issuance, unguessable media URLs, and a database closed to browsers. *Consequences:* no server state. It fails open on missing configuration, which is acceptable for availability but must be monitored.
+**ADR-8: Edge guard with stateless sessions, Turnstile and a session quota.** *Decision:* HMAC session cookies (15 min), Turnstile at issuance, an exact cap of 30 distinct bibs per session, unguessable media URLs, and a database closed to browsers. *Why a quota, not only a rate:* a perfect 20/min limit still allows ~300 lookups in a 15-minute session, which is a whole small event; a total cap per session forces a new Turnstile pass every 30 bibs. *Consequences:* no server state. It fails open on missing configuration, which is acceptable for availability but must be monitored.
 
 **ADR-9: One deployment per event.** *Decision:* event selection by build variables. *Consequences:* simple and isolated, but N events means N deployments (or future multi-tenant work).
 
@@ -771,7 +774,7 @@ MarathonOCR/
 
 | # | Limitation / risk | Severity | Mitigation / plan |
 |---|---|---|---|
-| L1 | **Workers rate-limit bindings do not enforce** (150/150 requests allowed against a limit of 20/min) | High | Replace with a Durable Object counter, or a WAF rate-limit rule once on a custom domain |
+| L1 | Cloudflare rate-limit bindings are approximate (~3× the limit gets through) | Low (now) | Exact per-session quota added (Durable Object). WAF rate-limit rule possible once on a custom domain |
 | L2 | **Automatic detection misses ~23% of bibs** (stand-in detector); the trained bib detector is unmeasured | High | Score `best.pt` at full resolution against the Željava answer key; tiling; burst linking |
 | L3 | **Ultralytics YOLO is AGPL-3.0**; the Enterprise licence price is not public | Medium (commercial) | Licence it, or move to an Apache-2.0 detector (RF-DETR, YOLOX) |
 | L4 | **Legal documents are drafts**; DPIA not done; bib-only access decision pending | High before commercial use | Counsel review; decide on the birthdate check |
@@ -810,7 +813,7 @@ MarathonOCR/
 
 ### 20.3 Platform and launch readiness
 
-- Durable Object rate limiter (L1).
+- Confirm the session quota on the live site after deploy.
 - Custom domain plus a WAF rule (L8).
 - A final privacy decision and legal review (L4).
 - One-command publish (L5).

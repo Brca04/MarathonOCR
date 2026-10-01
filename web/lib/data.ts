@@ -16,8 +16,15 @@ async function fetchStatic<T>(path: string): Promise<T | 'missing' | 'limited' |
   if (!STATIC_BASE) return null;
   try {
     let res = await fetch(`${STATIC_BASE}/${path}`, { cache: 'default', credentials: 'same-origin' });
-    if (res.status === 401) {
-      // The guard wants a (fresh) session: get one and try once more.
+    // 401: the session expired. 429 "quota": this session has looked up its
+    // share of bibs. Either way get a fresh session (Turnstile again) and
+    // try once more; a second refusal is shown to the visitor as "busy".
+    let renew = res.status === 401;
+    if (res.status === 429) {
+      const body = (await res.clone().json().catch(() => ({}))) as { reason?: string };
+      renew = body.reason === 'quota';
+    }
+    if (renew) {
       await ensureSession(true);
       res = await fetch(`${STATIC_BASE}/${path}`, { cache: 'default', credentials: 'same-origin' });
     }
