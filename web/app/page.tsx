@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Nav from '@/components/Nav';
 import { useT } from '@/components/AppContext';
-import Hero from '@/components/Hero';
+import Hero, { EventStatsStrip } from '@/components/Hero';
 import SearchForm, { type SearchSubmit } from '@/components/SearchForm';
 import RunnerView from '@/components/RunnerView';
 import Lightbox from '@/components/Lightbox';
@@ -269,6 +269,8 @@ function Home() {
               busy={busy}
               onSubmit={onSubmit}
             />
+            {/* Hidden except on a phone, where the counters move below the search. */}
+            <EventStatsStrip />
 
             {/* Stacked and centred rather than spread edge-to-edge — this
                 column is narrow, and a copyright line plus three links never

@@ -23,6 +23,11 @@ export default function SearchForm({
   const t = useT();
   const race = raceFromBib(bib, t);
   const [agreed, setAgreed] = useState(false);
+  // Set when someone presses search without ticking the box: the row is
+  // highlighted and explained instead of the button just staying dead.
+  const [needConsent, setNeedConsent] = useState(false);
+  const consentRef = useRef<HTMLInputElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const bibInputRef = useRef<HTMLInputElement>(null);
 
   // Autofocus on load, but not on a touch device: focusing this giant
@@ -40,6 +45,11 @@ export default function SearchForm({
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
+        if (!agreed) {
+          setNeedConsent(true);
+          consentRef.current?.focus();
+          return;
+        }
         onSubmit({ bib });
       }}
       style={{
@@ -51,7 +61,7 @@ export default function SearchForm({
         background: 'var(--ink)',
       }}
     >
-      <div style={{ display: 'grid', gap: 8, marginBottom: 10, textAlign: 'center' }}>
+      <div data-search-head="" style={{ display: 'grid', gap: 8, marginBottom: 10, textAlign: 'center' }}>
         <h2
           style={{
             margin: 0,
@@ -78,6 +88,8 @@ export default function SearchForm({
 
       {/* --- the bib itself ------------------------------------------------ */}
       <div
+        ref={cardRef}
+        data-bib-card=""
         style={{
           position: 'relative',
           background: 'var(--card-bg, #f7f8fb)',
@@ -121,9 +133,15 @@ export default function SearchForm({
               lineHeight: 1,
             }}
           >
-            {eventTitle(t.lang)}
+            <span data-card-event="">{eventTitle(t.lang)}</span>
+            {/* Phone only: the photo above already names the race, so the
+                card's top line becomes the label for the field under it. */}
+            <span data-card-prompt="" style={{ display: 'none' }}>
+              {t.searchTitle}
+            </span>
           </span>
           <span
+            data-card-meta=""
             style={{
               fontFamily: 'var(--mono)',
               fontSize: 10,
@@ -185,7 +203,20 @@ export default function SearchForm({
             value={bib}
             onChange={(e) => setBib(e.target.value.replace(/\D/g, '').slice(0, 6))}
             inputMode="numeric"
+            enterKeyHint="search"
             autoComplete="off"
+            onFocus={() => {
+              // On a phone the keyboard takes the lower half of the screen:
+              // bring the card to the top so the card, the box and the button
+              // all stay visible above it.
+              if (!window.matchMedia('(pointer: coarse)').matches) return;
+              window.setTimeout(() => {
+                const el = cardRef.current;
+                if (!el) return;
+                const top = el.getBoundingClientRect().top + window.scrollY - 12;
+                window.scrollTo({ top, behavior: 'smooth' });
+              }, 250);
+            }}
             placeholder="0000"
             style={{
               display: 'block',
@@ -253,6 +284,8 @@ export default function SearchForm({
 
       {/* --- privacy consent ------------------------------------------------ */}
       <label
+        data-consent=""
+        data-need={needConsent && !agreed ? '' : undefined}
         style={{
           display: 'flex',
           alignItems: 'flex-start',
@@ -262,9 +295,13 @@ export default function SearchForm({
         }}
       >
         <input
+          ref={consentRef}
           type="checkbox"
           checked={agreed}
-          onChange={(e) => setAgreed(e.target.checked)}
+          onChange={(e) => {
+            setAgreed(e.target.checked);
+            if (e.target.checked) setNeedConsent(false);
+          }}
           style={{
             marginTop: 2,
             width: 18,
@@ -289,11 +326,17 @@ export default function SearchForm({
           {t.consentSuffix}
         </span>
       </label>
+      {needConsent && !agreed ? (
+        <p role="alert" data-consent-hint="" style={{ margin: '-4px 0 0', padding: '0 4px', fontSize: 13, lineHeight: 1.4, color: 'var(--danger)' }}>
+          {t.consentNeeded}
+        </p>
+      ) : null}
 
       <button
         type="submit"
         className="btn-skew"
-        disabled={busy || !agreed}
+        disabled={busy}
+        aria-disabled={!agreed || undefined}
         style={{
           width: '100%',
           padding: '0 24px',
@@ -305,6 +348,7 @@ export default function SearchForm({
       </button>
 
       <p
+        data-credits=""
         style={{
           margin: 0,
           padding: '4px 4px 0',

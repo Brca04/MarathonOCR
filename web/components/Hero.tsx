@@ -7,7 +7,7 @@ import { num } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import { DEMO_STATS } from '@/lib/demo';
 import type { EventStats } from '@/lib/types';
-import { EVENT, eventTitle } from '@/lib/event';
+import { EVENT, eventDateLabel, eventTitle } from '@/lib/event';
 
 const mono: React.CSSProperties = {
   fontFamily: 'var(--mono)',
@@ -36,7 +36,10 @@ function finishersYear(raceDate: string | null): number {
   return d.getTime() <= Date.now() ? d.getFullYear() : d.getFullYear() - 1;
 }
 
-export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
+type Cell = { value: string; label: string; accent?: boolean };
+
+/** Event counters, rolling up once on mount. Shared by the hero and the phone strip. */
+function useEventCells(): Cell[] {
   const { lang, t } = useApp();
   const [stats, setStats] = useState<EventStats>(DEMO_STATS);
   const [p, setP] = useState(0);
@@ -69,7 +72,7 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
   const recordSec = toSeconds(stats.course_record);
   // Editorial numbers (first edition, course record) only show when the event
   // has them; otherwise the strip falls back to what the gallery itself knows.
-  const cells: { value: string; label: string; accent?: boolean }[] = [
+  return [
     stats.finishers
       ? {
           value: num(lang, Math.round(stats.finishers * p)),
@@ -89,6 +92,32 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
           accent: true,
         },
   ];
+}
+
+/**
+ * Phone only (shown by globals.css below 760px): the same counters as a quiet
+ * strip under the search, because on a phone the first screen belongs to the
+ * bib field, not to numbers over a photograph.
+ */
+export function EventStatsStrip() {
+  const cells = useEventCells();
+  return (
+    <section data-mobile-stats="" aria-label="Statistika" style={{ display: 'none' }}>
+      {cells.map((c) => (
+        <div key={c.label}>
+          <div data-mobile-stat-value="" style={{ color: c.accent ? 'var(--blue)' : undefined }}>
+            {c.value}
+          </div>
+          <div data-mobile-stat-label="">{c.label}</div>
+        </div>
+      ))}
+    </section>
+  );
+}
+
+export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
+  const { lang, t } = useApp();
+  const cells = useEventCells();
 
   const title = eventTitle(lang);
   const accentAt = EVENT.accent ? title.indexOf(EVENT.accent) : -1;
@@ -166,6 +195,10 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
               </>
             )}
           </h1>
+          {/* Phone only: one quiet line under the title instead of the counters. */}
+          <p data-hero-sub="" style={{ display: 'none' }}>
+            {[t.heroSub, eventDateLabel(lang)].filter(Boolean).join(' · ')}
+          </p>
         </div>
 
         <div data-hero-stats="" style={{ padding: '0 clamp(16px,4vw,48px)' }}>

@@ -640,3 +640,152 @@ input:focus-visible {
   font-size: 13px !important;
   color: var(--mute-2);
 }
+
+/* ===========================================================================
+   Phone home screen (below 760px). The first screen is the search itself:
+   a short photo band with the race title, the bib card overlapping its lower
+   edge, the consent and the button — all above the fold on a typical phone.
+   The counters move below as a quiet strip. Desktop and tablet are untouched.
+   =========================================================================== */
+@media (max-width: 760px) {
+  [data-search-grid] {
+    grid-template-rows: auto auto auto auto !important;
+  }
+  [data-hero-panel] {
+    height: clamp(232px, 34svh, 320px);
+    border-bottom: 0 !important;
+  }
+  [data-hero-panel] [data-hero-space] {
+    min-height: 0 !important;
+  }
+  [data-hero-scrim] {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.55) 34%,
+      rgba(0, 0, 0, 0.1) 62%,
+      rgba(0, 0, 0, 0.35) 100%
+    ) !important;
+  }
+  [data-hero-stats],
+  [data-scroll-hint] {
+    display: none !important;
+  }
+  [data-hero-copy] {
+    /* room for the bib card that overlaps the bottom of the photo */
+    padding: 0 20px 44px !important;
+  }
+  [data-hero-copy] h1 {
+    font-size: clamp(26px, 7.6vw, 34px) !important;
+    line-height: 0.98 !important;
+  }
+  [data-hero-sub] {
+    display: block !important;
+    margin: 8px 0 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--on-media-mute);
+  }
+
+  /* The search, pulled up over the photo's lower edge. */
+  [data-search-grid] > form {
+    position: relative;
+    z-index: 2;
+    margin-top: -32px !important;
+    padding: 0 16px 8px !important;
+    background: transparent !important;
+    gap: 12px !important;
+    align-content: start !important;
+  }
+  [data-bib-card] {
+    order: -2;
+    padding: 18px 14px 12px !important;
+    border-radius: 10px !important;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.28),
+      0 2px 6px rgba(0, 0, 0, 0.18);
+  }
+  [data-bib-card] > div:last-child > span:first-child {
+    white-space: nowrap;
+  }
+  [data-bib-card] > div:last-child > span:last-child {
+    text-align: right;
+  }
+  [data-bib-card] [data-bib-input] {
+    font-size: clamp(54px, 17vw, 72px) !important;
+  }
+  /* The instruction lives on the card itself, right above the field. */
+  [data-search-head],
+  [data-card-event],
+  [data-card-meta] {
+    display: none !important;
+  }
+  [data-card-prompt] {
+    display: inline !important;
+  }
+  [data-consent] {
+    padding: 4px 6px !important;
+    border-radius: 8px;
+    border: 1px solid transparent;
+  }
+  [data-search-grid] > form .btn-skew {
+    height: 54px !important;
+  }
+  [data-credits] {
+    display: none;
+  }
+
+  /* Counters, now a small 2 x 2 strip on the page colour. */
+  [data-mobile-stats] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 20px 16px 4px;
+    border-top: 1px solid var(--line);
+  }
+  [data-mobile-stats] > div {
+    padding: 14px 4px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  [data-mobile-stats] > div:nth-child(even) {
+    padding-left: 16px;
+    border-left: 1px solid var(--line);
+  }
+  [data-mobile-stat-value] {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  [data-mobile-stat-label] {
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  [data-search-grid] > footer {
+    grid-row: auto !important;
+    margin-top: 12px;
+  }
+}
+
+/* Pressing search without the box ticked: point at the box instead of a dead button. */
+[data-consent][data-need] {
+  border-color: var(--danger-line) !important;
+  animation: consent-nudge 0.4s ease;
+}
+@keyframes consent-nudge {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+@media (max-width: 380px) {
+  [data-bib-card] > div:last-child > span:last-child {
+    font-size: 8.5px !important;
+    letter-spacing: 0.06em !important;
+  }
+}

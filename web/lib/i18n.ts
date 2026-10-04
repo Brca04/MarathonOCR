@@ -62,6 +62,8 @@ export type Strings = {
   statBibs: string;
   statYear: string;
   scrollHint: string;
+  heroSub: string;
+  consentNeeded: string;
   footerRights: string;
   footerPrivacy: string;
   footerPhotographers: string;
@@ -127,6 +129,8 @@ const hr: Strings = {
   statBibs: 'Prepoznatih brojeva',
   statYear: 'Godina',
   scrollHint: 'Pomaknite se dolje',
+  heroSub: 'Službene fotografije utrke',
+  consentNeeded: 'Za pretragu označite da se slažete s pravilima privatnosti.',
   footerRights: `© ${EVENT_YEAR}. ${EVENT.name} · Službena fotografija utrke`,
   footerPrivacy: 'Privatnost',
   footerPhotographers: 'Fotografi',
@@ -206,6 +210,8 @@ const en: Strings = {
   statBibs: 'Bibs recognised',
   statYear: 'Year',
   scrollHint: 'Scroll down',
+  heroSub: 'Official race photos',
+  consentNeeded: 'Tick the box to agree to the privacy policy, then search.',
   footerRights: `© ${EVENT_YEAR} ${EVENT.name} · Official race photography`,
   footerPrivacy: 'Privacy',
   footerPhotographers: 'Photographers',
