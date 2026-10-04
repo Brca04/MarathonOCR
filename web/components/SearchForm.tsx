@@ -335,35 +335,16 @@ export default function SearchForm({
       <button
         type="submit"
         className="btn-skew"
-        data-search-submit=""
-        data-busy={busy ? '' : undefined}
         disabled={busy}
         aria-disabled={!agreed || undefined}
         style={{
           width: '100%',
           padding: '0 24px',
           height: 52,
+          opacity: busy || !agreed ? 0.6 : 1,
         }}
       >
-        <span className="btn-skew-label">
-          {busy ? t.searchBusy : t.searchSubmit}
-          {busy ? null : (
-            <svg
-              className="btn-arrow"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          )}
-        </span>
+        <span className="btn-skew-label">{busy ? t.searchBusy : t.searchSubmit}</span>
       </button>
 
       <p
