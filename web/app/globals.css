@@ -326,13 +326,6 @@ input:focus-visible {
   }
 }
 
-/* Five course marks do not fit a phone: keep the ends and the halfway point. */
-@media (max-width: 560px) {
-  [data-mark-index='1'],
-  [data-mark-index='3'] {
-    display: none !important;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

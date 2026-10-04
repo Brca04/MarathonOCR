@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { easeOutCubic, fromSeconds, toSeconds, trackMarks } from '@/lib/format';
 import { dataTerm } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import type { GalleryPhoto, Runner } from '@/lib/types';
@@ -67,9 +65,8 @@ function profileShot(
 }
 
 /**
- * The runner screen. The only motion left is the one that carries meaning: the
- * marker runs the course track while the clock counts up to the finish time.
- * Nothing fades or rises in.
+ * The runner screen: photo, name and result card, then the gallery. Nothing
+ * fades, rises or animates in.
  */
 export default function RunnerView({
   runner,
@@ -85,33 +82,12 @@ export default function RunnerView({
   onHome: () => void;
 }) {
   const { lang, t } = useApp();
-  const [prog, setProg] = useState(0);
-  const raf = useRef<number>(0);
-
-  useEffect(() => {
-    const dur = 3400;
-    const delay = 500;
-    const t0 = performance.now();
-    setProg(0);
-    const tick = (now: number) => {
-      const x = Math.min(1, Math.max(0, (now - t0 - delay) / dur));
-      setProg(easeOutCubic(x));
-      if (x < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf.current);
-    };
-  }, [runner.bib]);
 
   const cover = pickCover(photos);
   const desktop = profileShot(runner.bib, 'desktop', photos, cover, '48% 30%');
   const mobile = profileShot(runner.bib, 'mobile', photos, cover, '50% 30%');
-  const pct = `${(prog * 100).toFixed(2)}%`;
-  const clock = fromSeconds(toSeconds(runner.time) * prog);
   // A gallery built from photos alone has no results yet: hide the empty stats.
   const hasResult = Boolean(runner.time || runner.pace || runner.place_overall);
-  const marks = trackMarks(String(runner.race_code), t);
 
 
   return (
@@ -130,7 +106,7 @@ export default function RunnerView({
         }}
       >
         {/* The photograph is the screen: it runs the full height and the
-            runner's numbers and the course track sit straight on it, in the
+            runner's numbers sit straight on it, in the
             fixed on-media colours. A phone shows only the middle third of a
             landscape photo, so it gets its own image (data-runner-photo-mobile,
             swapped in by globals.css): a hand-picked photo and crop from
@@ -320,106 +296,6 @@ export default function RunnerView({
                       {runner.place_overall ?? '—'}
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* --- course track --------------------------------------------- */}
-              <div
-                style={{
-                  marginTop: 'clamp(12px,1.8cqh,20px)',
-                  paddingTop: 'clamp(12px,1.8cqh,20px)',
-                  borderTop: '1px solid var(--card-line, #dfe3ec)',
-                }}
-              >
-                <div style={{ position: 'relative', height: 70 }}>
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      top: 44,
-                      height: 1,
-                      background: 'var(--card-line, #dfe3ec)',
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      top: 44,
-                      height: 2,
-                      background: 'var(--blue)',
-                      width: pct,
-                    }}
-                  />
-                  <div style={{ position: 'absolute', top: 0, left: pct, width: 0 }}>
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 2,
-                        visibility: runner.time ? 'visible' : 'hidden',
-                        transform: `translateX(${(-prog * 100).toFixed(1)}%)`,
-                        padding: '5px 10px',
-                        borderRadius: 6,
-                        background: '#0a0a0a',
-                        color: '#fff',
-                        fontFamily: 'var(--mono)',
-                        fontSize: 13,
-                        fontWeight: 500,
-                        whiteSpace: 'nowrap',
-                        letterSpacing: '.02em',
-                        fontVariantNumeric: 'tabular-nums',
-                      }}
-                    >
-                      {clock}
-                    </span>
-                    <span
-                      style={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 44,
-                        width: 10,
-                        height: 10,
-                        transform: 'translate(-50%,-50%)',
-                        borderRadius: '50%',
-                        background: 'var(--blue)',
-                      }}
-                    />
-                  </div>
-                  {marks.map((m, i) => (
-                    <div
-                      key={m.label}
-                      data-mark-index={i}
-                      style={{
-                        position: 'absolute',
-                        top: 50,
-                        left: m.left,
-                        transform: `translateX(${m.shift})`,
-                        display: 'grid',
-                        gap: 5,
-                        justifyItems: m.align,
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: 1,
-                          height: 6,
-                          background: 'var(--card-line-2, #c2cbdb)',
-                        }}
-                      />
-                      <span
-                        style={{
-                          ...mono(10),
-                          letterSpacing: '.12em',
-                          color: 'var(--card-mute, #4c5c7c)',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {m.label}
-                      </span>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
