@@ -79,6 +79,8 @@ export type Strings = {
   searchSubmit: string;
   searchBusy: string;
   credits: string;
+  errUpcoming: string;
+  upcomingNote: string;
   raceMarathon: string;
   raceHalf: string;
   race10k: string;
@@ -145,7 +147,9 @@ const hr: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Pronađi svoje fotografije',
   searchBusy: 'Tražim…',
-  credits: 'Omogućili Sklop i FramePaceMedia',
+  credits: EVENT.creditsHr || 'Omogućili Sklop i FramePaceMedia',
+  errUpcoming: 'Fotografije još nisu objavljene. Vratite se nakon utrke i unesite svoj startni broj.',
+  upcomingNote: 'Fotografije stižu nakon utrke. Spremite ovu stranicu i vratite se s brojem koji ste nosili.',
   raceMarathon: 'Maraton · 42,195 km',
   raceHalf: 'Polumaraton · 21,1 km',
   race10k: 'Utrka · 10 km',
@@ -226,7 +230,9 @@ const en: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Find my photos',
   searchBusy: 'Searching…',
-  credits: 'Made by Sklop and FramePaceMedia',
+  credits: EVENT.creditsEn || 'Made by Sklop and FramePaceMedia',
+  errUpcoming: 'Photos are not published yet. Come back after the race and enter your bib number.',
+  upcomingNote: 'Photos arrive after the race. Save this page and come back with the number you wore.',
   raceMarathon: 'Marathon · 42.195 km',
   raceHalf: 'Half marathon · 21.1 km',
   race10k: 'Run · 10 km',

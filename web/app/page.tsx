@@ -9,7 +9,8 @@ import SearchForm, { type SearchSubmit } from '@/components/SearchForm';
 import RunnerView from '@/components/RunnerView';
 import Lightbox from '@/components/Lightbox';
 import Toast from '@/components/Toast';
-import { findRunner, toGallery } from '@/lib/data';
+import { findRunner, getEventStats, toGallery } from '@/lib/data';
+import { beforeRace } from '@/lib/event';
 import { signedOriginalUrl } from '@/lib/supabase';
 import type { FindRunnerResult, GalleryPhoto, Runner } from '@/lib/types';
 
@@ -34,6 +35,18 @@ function Home() {
   const [found, setFound] = useState<{ runner: Runner; photos: GalleryPhoto[] } | null>(null);
   const [lb, setLb] = useState(-1);
   const [toast, setToast] = useState('');
+  // Before the race, or after it until photos are published, a search can only
+  // come back empty: say so up front instead.
+  const [upcoming, setUpcoming] = useState(() => beforeRace());
+  useEffect(() => {
+    let live = true;
+    getEventStats().then((s) => {
+      if (live && s.ok && !s.photos) setUpcoming(true);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
 
   const say = useCallback((message: string) => {
     setToast(message);
@@ -48,6 +61,7 @@ function Home() {
     async (nextBib: string, push = true) => {
       const digits = nextBib.replace(/\D/g, '');
       if (!digits) return setError(t.errNoBib);
+      if (upcoming) return setError(t.errUpcoming);
 
       setBusy(true);
       setError('');
@@ -74,7 +88,7 @@ function Home() {
       if (push) window.history.pushState({ bib: digits }, '', `?bib=${digits}`);
       window.scrollTo(0, 0);
     },
-    [t],
+    [t, upcoming],
   );
 
   const onSubmit = useCallback(
@@ -268,6 +282,7 @@ function Home() {
               error={error}
               busy={busy}
               onSubmit={onSubmit}
+              notice={upcoming ? t.upcomingNote : undefined}
             />
             {/* Hidden except on a phone, where the counters move below the search. */}
             <EventStatsStrip />

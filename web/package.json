@@ -2,10 +2,10 @@
   "name": "zagreb-marathon-photos",
   "version": "0.1.0",
   "private": true,
-  "description": "Bib-number photo search for the Zagreb Marathon. Next.js + Supabase, static-exported for Cloudflare Pages.",
+  "description": "Bib-number race photo search. One codebase, one settings file per event (events/*.env). Next.js + Supabase, static export on Cloudflare Workers.",
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-deploy-env.mjs",
+    "prebuild": "node scripts/event-env.mjs && node scripts/check-deploy-env.mjs",
     "build": "next build",
     "start": "npx serve out",
     "lint": "next lint",
@@ -17,7 +17,11 @@
     "fetch:brand": "node scripts/fetch-brand.mjs",
     "export:static": "node scripts/export-static.mjs",
     "media:r2": "node scripts/media-to-r2.mjs",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:zagreb": "EVENT=zagreb-2026 npm run build && wrangler deploy --env zagreb",
+    "publish:photos": "node scripts/publish-photos.mjs",
+    "publish": "node scripts/publish-event.mjs",
+    "takedown": "node scripts/takedown.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
@@ -26,11 +30,13 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1146.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "csv-parse": "^5.6.0",
     "dotenv": "^16.4.7",
+    "sharp": "^0.34.5",
     "typescript": "^5.7.3",
     "wrangler": "^4.137.0"
   },

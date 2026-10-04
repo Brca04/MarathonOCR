@@ -83,6 +83,7 @@ create table if not exists public.runners (
 );
 
 create index if not exists runners_event_bib_idx on public.runners (event_id, bib);
+create index if not exists runners_race_id_idx on public.runners (race_id);
 
 -- Pace, derived — never stored, so it can never disagree with finish_time.
 create or replace function public.runner_pace(p_time interval, p_km numeric)
@@ -94,6 +95,7 @@ returns text language sql immutable as $$
       'FMMI:SS')
   end;
 $$;
+alter function public.runner_pace(interval, numeric) set search_path = public, pg_temp;
 
 -- ---------------------------------------------------------------------------
 -- Photos and detections

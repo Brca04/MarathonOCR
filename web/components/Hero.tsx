@@ -38,25 +38,33 @@ function finishersYear(raceDate: string | null): number {
 
 type Cell = { value: string; label: string; accent?: boolean };
 
-/** Event counters, rolling up once on mount. Shared by the hero and the phone strip. */
-function useEventCells(): Cell[] {
+/**
+ * Event counters, rolling up once the numbers arrive. Shared by the hero and
+ * the phone strip. Null until they arrive, and for an event with no photos yet
+ * (before the race), where a row of zeros would only look broken.
+ */
+function useEventCells(): Cell[] | null {
   const { lang, t } = useApp();
   const [stats, setStats] = useState<EventStats>(DEMO_STATS);
+  const [loaded, setLoaded] = useState(false);
   const [p, setP] = useState(0);
   const raf = useRef<number>(0);
 
   useEffect(() => {
     let live = true;
     getEventStats().then((s) => {
-      if (live) setStats(s);
+      if (!live) return;
+      setStats(s);
+      setLoaded(true);
     });
     return () => {
       live = false;
     };
   }, []);
 
-  // Counters roll up once on mount, easing out over 1.5s after a 300ms beat.
+  // Counters roll up once the numbers are in, easing out over 1.5s after a 300ms beat.
   useEffect(() => {
+    if (!loaded) return;
     const t0 = performance.now();
     const dur = 1500;
     const delay = 300;
@@ -67,8 +75,9 @@ function useEventCells(): Cell[] {
     };
     raf.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf.current);
-  }, []);
+  }, [loaded]);
 
+  if (!loaded || !stats.photos) return null;
   const recordSec = toSeconds(stats.course_record);
   // Editorial numbers (first edition, course record) only show when the event
   // has them; otherwise the strip falls back to what the gallery itself knows.
@@ -101,6 +110,7 @@ function useEventCells(): Cell[] {
  */
 export function EventStatsStrip() {
   const cells = useEventCells();
+  if (!cells) return null;
   return (
     <section data-mobile-stats="" aria-label="Statistika" style={{ display: 'none' }}>
       {cells.map((c) => (
@@ -158,6 +168,11 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
         }}
       />
       <div data-hero-scrim="" aria-hidden="true" />
+      {EVENT.heroCredit ? (
+        <span data-hero-credit="" style={{ position: 'absolute', right: 12, bottom: 8, zIndex: 1, fontSize: 10, letterSpacing: '.04em', color: 'rgba(255,255,255,.72)', textShadow: '0 1px 2px rgba(0,0,0,.5)' }}>
+          {EVENT.heroCredit}
+        </span>
+      ) : null}
 
       {/* Holds the photograph open above the copy. */}
       <div data-hero-space="" aria-hidden="true" style={{ minHeight: 200 }} />
@@ -201,6 +216,7 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
           </p>
         </div>
 
+        {cells ? (
         <div data-hero-stats="" style={{ padding: '0 clamp(16px,4vw,48px)' }}>
           {/* Nothing but hairlines: the photograph shows between the numbers,
               rather than a panel of its own. */}
@@ -233,6 +249,7 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
             ))}
           </div>
         </div>
+        ) : null}
 
         {/* Mobile only (see globals.css): once the hero runs the full
             display, nothing on screen hints that the form is one scroll

@@ -13,12 +13,15 @@ export default function SearchForm({
   error,
   busy,
   onSubmit,
+  notice,
 }: {
   bib: string;
   setBib: (v: string) => void;
   error: string;
   busy: boolean;
   onSubmit: (v: SearchSubmit) => void;
+  /** A short line above the search, e.g. "photos arrive after the race". */
+  notice?: string;
 }) {
   const t = useT();
   const race = raceFromBib(bib, t);
@@ -264,6 +267,24 @@ export default function SearchForm({
           </span>
         </div>
       </div>
+
+      {notice && !error ? (
+        <p
+          data-search-notice=""
+          style={{
+            margin: 0,
+            padding: '12px 16px',
+            borderRadius: 8,
+            border: '1px solid var(--line)',
+            background: 'var(--panel)',
+            fontSize: 14,
+            lineHeight: 1.45,
+            color: 'var(--paper)',
+          }}
+        >
+          {notice}
+        </p>
+      ) : null}
 
       {error ? (
         <p

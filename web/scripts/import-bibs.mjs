@@ -162,10 +162,21 @@ const db = admin();
 const { event } = await ensureEvent(db, slug);
 
 log.step(`Writing to event ${slug}`);
+// A column with no value for any photo is left out of the upsert, so it keeps
+// what publish-photos.mjs already stored (capture time, size, photographer)
+// instead of being overwritten with nulls.
+const emptyCols = ['course_point', 'course_km', 'photographer', 'captured_at', 'width', 'height'].filter(
+  (k) => photos.every((p) => p[k] == null || p[k] === ''),
+);
+if (emptyCols.length) log.info(`keeping stored values for: ${emptyCols.join(', ')}`);
 await upsertBatched(
   db,
   'photos',
-  photos.map((p) => ({ ...p, event_id: event.id })),
+  photos.map((p) => {
+    const row = { ...p, event_id: event.id };
+    for (const k of emptyCols) delete row[k];
+    return row;
+  }),
   'event_id,file_name',
 );
 
@@ -203,4 +214,4 @@ for (let i = 0; i < detRows.length; i += 500) {
 if (detRows.length) process.stdout.write('\n');
 
 log.ok(`${photos.length} photos, ${inserted} detections`);
-log.info('Next: node scripts/upload-photos.mjs --dir <folder of photos>');
+log.info('Next: node scripts/publish-event.mjs (exports search data and rebuilds the site).');

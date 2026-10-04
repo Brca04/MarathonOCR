@@ -12,6 +12,15 @@ import dotenv from 'dotenv';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '..', '.env.local') });
 
+// EVENT=<slug> picks events/<slug>.env (see scripts/event-env.mjs).
+import { loadEvent } from './event-env.mjs';
+try {
+  loadEvent();
+} catch (e) {
+  console.error(`\n  ✗ ${e.message}\n`);
+  process.exit(1);
+}
+
 // ---------------------------------------------------------------------------
 // CLI
 // ---------------------------------------------------------------------------
@@ -241,6 +250,8 @@ export function parseInt0(raw) {
 /** Map whatever the race column says onto one of our three race codes. */
 export function raceCodeFrom(text, bib) {
   const t = String(text ?? '').toLowerCase();
+  // Relay first: a "42K štafeta" row is a relay team, not a marathon runner.
+  if (/(štafet|stafet|relay)/.test(t)) return 'relay';
   if (/(^|\D)(42|maraton|marathon|full)/.test(t) && !/(pol|half|1\/2)/.test(t)) return 'marathon';
   if (/(pol|half|1\/2|21)/.test(t)) return 'half';
   if (/(^|\D)(10\s*k|10k|10 km|deset)/.test(t)) return '10k';

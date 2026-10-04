@@ -6,8 +6,23 @@ import { EVENT } from '@/lib/event';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: EVENT.siteUrl ? new URL(EVENT.siteUrl) : undefined,
   title: STRINGS.hr.metaTitle,
   description: STRINGS.hr.metaDescription,
+  // Link previews: a shared link shows the race photo, name and one line.
+  openGraph: {
+    type: 'website',
+    locale: 'hr_HR',
+    title: STRINGS.hr.metaTitle,
+    description: STRINGS.hr.metaDescription,
+    images: EVENT.ogImage ? [{ url: EVENT.ogImage, width: 1200, height: 630 }] : undefined,
+  },
+  twitter: {
+    card: EVENT.ogImage ? 'summary_large_image' : 'summary',
+    title: STRINGS.hr.metaTitle,
+    description: STRINGS.hr.metaDescription,
+    images: EVENT.ogImage ? [EVENT.ogImage] : undefined,
+  },
   icons: BRAND_ICON
     ? {
         icon: [{ url: BRAND_ICON, type: BRAND_ICON.endsWith('.png') ? 'image/png' : 'image/jpeg' }],

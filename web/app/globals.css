@@ -99,6 +99,18 @@
   --card-line-2: #c3cdbd;
 }
 
+/*
+ * Zagreb Marathon: the sky blue and grass green of the race emblem. The page
+ * stays the default blue-grey; the accent is the emblem blue, darkened enough
+ * to read on it, and the word set in colour on the photo is the emblem green.
+ */
+:root[data-theme='light'][data-event='zagreb'] {
+  --blue: #0a74b5;
+  --blue-soft: #2a9fd8;
+  --blue-soft-rgb: 42, 159, 216;
+  --on-media-accent: #a3d65a;
+}
+
 html,
 body {
   margin: 0;
@@ -671,6 +683,12 @@ input:focus-visible {
   [data-hero-copy] h1 {
     font-size: clamp(26px, 7.6vw, 34px) !important;
     line-height: 0.98 !important;
+  }
+  [data-hero-credit] {
+    top: 84px !important;
+    bottom: auto !important;
+    right: 18px !important;
+    font-size: 9px !important;
   }
   [data-hero-sub] {
     display: block !important;

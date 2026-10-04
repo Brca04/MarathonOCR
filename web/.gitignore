@@ -13,3 +13,6 @@ next-env.d.ts
 public/data/
 public/media/
 .dev.vars
+
+# Written by scripts/event-env.mjs for the event being built
+.env.production.local

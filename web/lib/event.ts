@@ -36,7 +36,26 @@ export const EVENT = {
   theme: env(process.env.NEXT_PUBLIC_EVENT_THEME, ''),
   /** Where the hero photo is anchored when cropped, as CSS object-position. */
   heroPosition: env(process.env.NEXT_PUBLIC_HERO_POSITION, 'center 30%'),
+  /** Photographer of the hero photo, shown small on it: "Foto: Davor Denkovski". */
+  heroCredit: env(process.env.NEXT_PUBLIC_HERO_CREDIT, ''),
+  /** Credit line under the search, per language. Empty = the built-in default. */
+  creditsHr: env(process.env.NEXT_PUBLIC_CREDITS_HR, ''),
+  creditsEn: env(process.env.NEXT_PUBLIC_CREDITS_EN, ''),
+  /** Public address of this deployment, for link previews: "https://….workers.dev". */
+  siteUrl: env(process.env.NEXT_PUBLIC_SITE_URL, ''),
+  /** 1200 x 630 picture for link previews (WhatsApp, Facebook). */
+  ogImage: env(process.env.NEXT_PUBLIC_OG_IMAGE, ''),
 };
+
+/**
+ * True until race day is over (in the race's own time zone, roughly): the site
+ * then says photos come after the race instead of offering a search that can
+ * only fail. Publishing photos for the event also ends it (see page.tsx).
+ */
+export function beforeRace(now: Date = new Date()): boolean {
+  const end = new Date(EVENT.date + 'T23:59:59');
+  return !Number.isNaN(end.getTime()) && now.getTime() < end.getTime();
+}
 
 export const EVENT_YEAR = Number(EVENT.date.slice(0, 4)) || new Date().getFullYear();
 

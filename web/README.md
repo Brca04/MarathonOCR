@@ -237,7 +237,9 @@ Static per-bib files would let anyone download every gallery by counting
    gets a new session (and passes Turnstile again) when the quota is used up,
    so a runner never notices, while a scraper needs a new Turnstile pass for
    every 30 bibs. Cloudflare's per-location rate limits (20/min per session,
-   120/min per IP) sit in front as an approximate flood guard; measured, about
+   120/min per IP; new sessions 300/min per IP, high so a whole race venue
+   on one Wi-Fi address gets through) sit in front as an approximate flood
+   guard; measured, about
    3x the configured rate gets through, which is why the exact quota exists.
    `/data/_*` is never served.
 2. **Cloudflare Turnstile** (optional, recommended): with
@@ -258,6 +260,71 @@ npx wrangler secret put TURNSTILE_SECRET    # optional, from the Turnstile widge
 Only `/data/*` and `/api/*` count as Worker requests (free plan: 100,000 a
 day, roughly 30,000 visitors). For a big event, the $5/month Workers Paid plan
 raises that to 10 million.
+
+---
+
+## Events: one codebase, one site per race
+
+Each race has a settings file in `events/` (public values only) and its own
+Worker. Pick the event with `EVENT=<slug>`:
+
+| Event | Settings | Worker | Site |
+|---|---|---|---|
+| Željava 2026 (demo) | `events/zeljava-2026.env` | `marathonocr` | marathonocr.bruno-cavor.workers.dev |
+| 34. Zagrebački maraton | `events/zagreb-2026.env` | `marathonocr-zagreb` (`--env zagreb`) | marathonocr-zagreb.bruno-cavor.workers.dev |
+
+A new race: copy an `events/*.env`, change the values, add a block under `env`
+in `wrangler.jsonc` (copy `zagreb`, new rate-limit namespace ids), add the
+event row in Supabase (`import-results` creates it), create the Worker.
+
+### Secrets, in `web/.env.local` on the machine that publishes (never committed)
+
+```
+SUPABASE_SERVICE_ROLE_KEY=...      # Supabase → Project Settings → API
+MEDIA_SALT=...                     # long random string; never change it for an event
+R2_ACCOUNT_ID=...                  # optional, fast upload: Cloudflare → R2 → Manage API tokens
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+DEPLOY_HOOK_ZAGREB_2026=https://... # Worker → Settings → Builds → Deploy Hooks
+```
+
+### Race day, in order
+
+```bash
+cd web && npm install                       # once, after pulling
+export EVENT=zagreb-2026
+
+# 1. Results from the timing company (check the column mapping first)
+node scripts/import-results.mjs --csv results.csv --dry-run
+node scripts/import-results.mjs --csv results.csv
+
+# 2. Photos: resize, unguessable names, upload to R2, database rows
+node scripts/publish-photos.mjs --dir ~/Photos/ZG26 --photographer "Name" --dry-run
+node scripts/publish-photos.mjs --dir ~/Photos/ZG26 --photographer "Name"
+
+# 3. Recognition + review on the GPU machine → bib_export.csv, then
+node scripts/import-bibs.mjs --csv bib_export.csv --review .marathon_ocr_review.json
+
+# 4. Check and put it live (rebuilds the site through the deploy hook)
+node scripts/publish-event.mjs --check
+node scripts/publish-event.mjs
+```
+
+Every step is safe to re-run. Photos can go out in batches (finish line first):
+re-run steps 2–4 as more arrive. The file name stored for a photo is its path
+inside `--dir`, so keep the folder layout the same between runs.
+
+Before photos are published the site says so ("Fotografije stižu nakon
+utrke") instead of offering a search that can only fail; it switches over by
+itself on the first rebuild with photos.
+
+### Removal requests
+
+```bash
+node scripts/takedown.mjs --photo "Cilj/DSC_0412.jpg"    # one photo, for everyone
+node scripts/takedown.mjs --bib 1042                     # a runner's page and photo links
+node scripts/publish-event.mjs
+```
 
 ## How the pieces fit
 
