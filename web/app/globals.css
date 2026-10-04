@@ -382,61 +382,124 @@ input:focus-visible {
 
 /* The search submit button: two skewed panels tucked behind the edges,
    sliding inward from left and right on hover to meet in the middle. */
+/* Primary button. Deep event green (the logo green on Željava, --blue on
+   other events), a soft inner highlight and a tinted shadow so it reads as a
+   solid, pressable object. Motion is restrained: on hover a single band of
+   light glides across and the arrow nudges forward; on press it settles a
+   fraction lower. When it becomes ready (privacy box ticked) the same light
+   passes once, so the change of state is felt rather than just seen. */
 .btn-skew {
+  --btn-base: var(--blue);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* The same fixed black used everywhere else on the site — the bib chip,
-     the course-clock marker, the bib card's own labels. The label is plain
-     white, so this stays a solid, un-themed black rather than following
-     --paper (the site is fixed to the light theme, but this keeps the
-     button consistent even if that ever changes). */
-  background: #0a0a0a;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
   position: relative;
   overflow: hidden;
-  transition: all 0.5s ease-in;
-  z-index: 1;
+  isolation: isolate;
+  border: 0;
+  border-radius: 14px;
+  color: #fff;
+  cursor: pointer;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, color-mix(in srgb, var(--btn-base) 88%, #fff), color-mix(in srgb, var(--btn-base) 82%, #000));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 8px 22px -8px color-mix(in srgb, var(--btn-base) 70%, transparent);
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.4s ease,
+    opacity 0.4s ease;
+  -webkit-tap-highlight-color: transparent;
 }
-.btn-skew::before,
+/* the band of light */
 .btn-skew::after {
   content: '';
   position: absolute;
-  top: 0;
-  width: 0;
-  height: 100%;
-  transform: skew(15deg);
-  transition: all 0.5s;
-  overflow: hidden;
+  inset: 0;
   z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.22) 46%,
+    rgba(255, 255, 255, 0.34) 50%,
+    rgba(255, 255, 255, 0.22) 54%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
 }
-.btn-skew::before {
-  left: -10px;
-  background: var(--blue);
+@media (hover: hover) {
+  .btn-skew:not(:disabled):not([aria-disabled]):hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.26),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+      0 2px 4px rgba(0, 0, 0, 0.14),
+      0 14px 30px -10px color-mix(in srgb, var(--btn-base) 80%, transparent);
+  }
+  .btn-skew:not(:disabled):not([aria-disabled]):hover::after {
+    animation: btn-sheen 1.1s cubic-bezier(0.25, 0.7, 0.2, 1) forwards;
+  }
+  .btn-skew:not(:disabled):not([aria-disabled]):hover .btn-arrow {
+    transform: translateX(3px);
+  }
 }
-.btn-skew::after {
-  right: -10px;
-  background: var(--blue-soft);
+.btn-skew:not(:disabled):not([aria-disabled]):active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 2px 6px rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+  transition-duration: 0.12s;
 }
-.btn-skew:hover::before,
-.btn-skew:hover::after {
-  width: 58%;
+/* Not ready yet (search without the privacy box ticked): calm and greyed,
+   still tappable so it can explain what is missing. */
+.btn-skew[aria-disabled] {
+  filter: saturate(0.15) brightness(1.05);
+  opacity: 0.55 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.1);
 }
-.btn-skew:hover .btn-skew-label {
-  color: #fff;
+/* Becomes ready: one pass of light. */
+[data-search-submit]:not([aria-disabled]):not(:disabled)::after {
+  animation: btn-sheen 1.2s 0.1s cubic-bezier(0.25, 0.7, 0.2, 1) both;
+}
+/* Working: a slow, continuous shimmer. */
+.btn-skew[data-busy]::after {
+  animation: btn-sheen 1.4s ease-in-out infinite !important;
 }
 .btn-skew:disabled {
   pointer-events: none;
 }
+.btn-skew:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--btn-base) 60%, #fff);
+  outline-offset: 3px;
+}
+@keyframes btn-sheen {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
 .btn-skew-label {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: #fff;
   font-weight: 600;
-  font-size: 18px;
-  transition: color 0.3s ease-in;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.18);
+}
+.btn-arrow {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .link-mute {
