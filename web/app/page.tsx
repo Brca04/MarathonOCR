@@ -282,7 +282,6 @@ function Home() {
               error={error}
               busy={busy}
               onSubmit={onSubmit}
-              notice={upcoming ? t.upcomingNote : undefined}
             />
             {/* Hidden except on a phone, where the counters move below the search. */}
             <EventStatsStrip />

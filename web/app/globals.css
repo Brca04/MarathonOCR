@@ -653,23 +653,32 @@ input:focus-visible {
    counters and the footer follow below the photo. Desktop is untouched.
    =========================================================================== */
 @media (max-width: 760px) {
+  /* Exactly one screen: no scrolling on the phone home page. */
   [data-home-screen] {
-    height: auto !important;
+    height: 100svh !important;
     min-height: 0 !important;
+    overflow: hidden;
+  }
+  [data-mobile-stats],
+  [data-search-grid] > footer {
+    display: none !important;
   }
   [data-search-grid] {
     grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto auto !important;
+    grid-template-rows: 100% !important;
+    height: 100%;
   }
   /* Photo and search share the first row, the search drawn on top. */
   [data-hero-panel] {
     grid-row: 1 !important;
     grid-column: 1 !important;
-    min-height: 100svh !important;
-    height: 100svh;
+    min-height: 0 !important;
+    height: 100%;
     border: 0 !important;
   }
   [data-search-grid] > form {
+    min-width: 0;
+    width: 100%;
     grid-row: 1 !important;
     grid-column: 1 !important;
     align-self: end;
@@ -677,7 +686,7 @@ input:focus-visible {
     z-index: 2;
     max-width: 520px;
     margin: 0 auto !important;
-    padding: 96px 18px max(18px, env(safe-area-inset-bottom)) !important;
+    padding: 88px 18px max(14px, env(safe-area-inset-bottom)) !important;
     background: transparent !important;
     gap: 14px !important;
     align-content: end !important;
@@ -775,7 +784,7 @@ input:focus-visible {
     display: none !important;
   }
   [data-bib-card] [data-bib-input] {
-    font-size: clamp(56px, 18vw, 76px) !important;
+    font-size: clamp(48px, min(18vw, 9svh), 76px) !important;
   }
   [data-card-foot] {
     justify-content: center !important;
@@ -830,41 +839,35 @@ input:focus-visible {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
-  /* --- below the photograph -------------------------------------------- */
-  [data-mobile-stats] {
-    display: grid !important;
-    grid-row: 2;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 24px 16px 4px;
-    border-top: 1px solid var(--line);
+}
+
+/* Narrow phones (iPhone SE, mini): keep the race name and button on one line. */
+@media (max-width: 380px) {
+  [data-bib-card] {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
-  [data-mobile-stats] > div {
-    padding: 14px 4px 12px;
-    border-bottom: 1px solid var(--line);
+  [data-card-head] {
+    gap: 8px !important;
   }
-  [data-mobile-stats] > div:nth-child(even) {
-    padding-left: 16px;
-    border-left: 1px solid var(--line);
+  [data-card-head] > span:first-child {
+    font-size: 10px !important;
+    letter-spacing: 0.04em !important;
+    white-space: nowrap;
   }
-  [data-mobile-stat-value] {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  [data-mobile-stat-label] {
-    margin-top: 6px;
-    font-family: var(--mono);
+  [data-card-date] {
     font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--mute);
+    letter-spacing: 0.04em;
   }
-  [data-search-grid] > footer {
-    grid-column: 1 !important;
-    grid-row: 3 !important;
-    margin-top: 12px;
+  [data-card-title] {
+    font-size: 20px;
+  }
+  [data-search-grid] > form .btn-skew {
+    height: 50px !important;
+  }
+  [data-search-grid] > form .btn-skew-label {
+    font-size: 16px !important;
+    white-space: nowrap;
   }
 }
 
