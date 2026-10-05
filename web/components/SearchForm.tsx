@@ -106,6 +106,7 @@ export default function SearchForm({
         {(['left', 'right'] as const).map((side) => (
           <span
             key={side}
+            data-card-hole=""
             aria-hidden="true"
             style={{
               position: 'absolute',
@@ -119,6 +120,7 @@ export default function SearchForm({
           />
         ))}
         <div
+          data-card-head=""
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -156,7 +158,15 @@ export default function SearchForm({
           >
             {[EVENT.city, EVENT_YEAR].filter(Boolean).join(' · ')}
           </span>
+          {/* Phone only: the race date in place of city and year. */}
+          <span data-card-date="" style={{ display: 'none' }}>
+            {eventDateLabel(t.lang)}
+          </span>
         </div>
+        {/* Phone only: the instruction sits on the card, between the race name and the field. */}
+        <p data-card-title="" style={{ display: 'none' }}>
+          {t.searchTitle}
+        </p>
 
         <label
           data-bib-band=""
@@ -241,6 +251,7 @@ export default function SearchForm({
         </label>
 
         <div
+          data-card-foot=""
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -251,10 +262,11 @@ export default function SearchForm({
             borderTop: '1px solid var(--card-line, #dfe3ec)',
           }}
         >
-          <span style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-.02em', lineHeight: 1 }}>
+          <span data-race-label="" style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-.02em', lineHeight: 1 }}>
             {race.label}
           </span>
           <span
+            data-race-name=""
             style={{
               fontFamily: 'var(--mono)',
               fontSize: 10,
@@ -268,6 +280,10 @@ export default function SearchForm({
         </div>
       </div>
 
+      {/* Everything you act on below the card. On a phone it is one frosted
+          panel over the photograph; elsewhere the wrapper does not exist for
+          layout (display: contents). */}
+      <div data-search-actions="" style={{ display: 'contents' }}>
       {notice && !error ? (
         <p
           data-search-notice=""
@@ -367,6 +383,7 @@ export default function SearchForm({
       >
         <span className="btn-skew-label">{busy ? t.searchBusy : t.searchSubmit}</span>
       </button>
+      </div>
 
       <p
         data-credits=""

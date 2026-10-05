@@ -647,42 +647,59 @@ input:focus-visible {
 }
 
 /* ===========================================================================
-   Phone home screen (below 760px). The first screen is the search itself:
-   a short photo band with the race title, the bib card overlapping its lower
-   edge, the consent and the button — all above the fold on a typical phone.
-   The counters move below as a quiet strip. Desktop and tablet are untouched.
+   Phone home screen (below 760px): one full-screen photograph, the bib card
+   and a frosted panel with the consent and the button standing on its lower
+   half, so the number field is in view the moment the page opens. The
+   counters and the footer follow below the photo. Desktop is untouched.
    =========================================================================== */
 @media (max-width: 760px) {
-  [data-search-grid] {
-    grid-template-rows: auto auto auto auto !important;
+  [data-home-screen] {
+    height: auto !important;
+    min-height: 0 !important;
   }
+  [data-search-grid] {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto auto !important;
+  }
+  /* Photo and search share the first row, the search drawn on top. */
   [data-hero-panel] {
-    height: clamp(232px, 34svh, 320px);
-    border-bottom: 0 !important;
+    grid-row: 1 !important;
+    grid-column: 1 !important;
+    min-height: 100svh !important;
+    height: 100svh;
+    border: 0 !important;
+  }
+  [data-search-grid] > form {
+    grid-row: 1 !important;
+    grid-column: 1 !important;
+    align-self: end;
+    position: relative;
+    z-index: 2;
+    max-width: 520px;
+    margin: 0 auto !important;
+    padding: 96px 18px max(18px, env(safe-area-inset-bottom)) !important;
+    background: transparent !important;
+    gap: 14px !important;
+    align-content: end !important;
   }
   [data-hero-panel] [data-hero-space] {
     min-height: 0 !important;
   }
-  [data-hero-scrim] {
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.82) 0%,
-      rgba(0, 0, 0, 0.55) 34%,
-      rgba(0, 0, 0, 0.1) 62%,
-      rgba(0, 0, 0, 0.35) 100%
-    ) !important;
-  }
+  /* The photo carries no text of its own here: the card names the race. */
+  [data-hero-copy],
   [data-hero-stats],
   [data-scroll-hint] {
     display: none !important;
   }
-  [data-hero-copy] {
-    /* room for the bib card that overlaps the bottom of the photo */
-    padding: 0 20px 44px !important;
-  }
-  [data-hero-copy] h1 {
-    font-size: clamp(26px, 7.6vw, 34px) !important;
-    line-height: 0.98 !important;
+  [data-hero-scrim] {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.55) 0%,
+      rgba(0, 0, 0, 0.25) 30%,
+      rgba(0, 0, 0, 0) 55%,
+      rgba(0, 0, 0, 0) 80%,
+      rgba(0, 0, 0, 0.3) 100%
+    ) !important;
   }
   [data-hero-credit] {
     top: 84px !important;
@@ -690,69 +707,135 @@ input:focus-visible {
     right: 18px !important;
     font-size: 9px !important;
   }
-  [data-hero-sub] {
-    display: block !important;
-    margin: 8px 0 0;
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--on-media-mute);
-  }
 
-  /* The search, pulled up over the photo's lower edge. */
-  [data-search-grid] > form {
-    position: relative;
-    z-index: 2;
-    margin-top: -32px !important;
-    padding: 0 16px 8px !important;
-    background: transparent !important;
-    gap: 12px !important;
-    align-content: start !important;
+  /* --- the bib card ---------------------------------------------------- */
+  [data-search-head] {
+    display: none !important;
   }
   [data-bib-card] {
     order: -2;
-    padding: 18px 14px 12px !important;
-    border-radius: 10px !important;
-    box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.28),
-      0 2px 6px rgba(0, 0, 0, 0.18);
+    padding: 14px 16px 12px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
   }
-  [data-bib-card] > div:last-child > span:first-child {
-    white-space: nowrap;
+  [data-card-hole] {
+    display: none !important;
   }
-  [data-bib-card] > div:last-child > span:last-child {
-    text-align: right;
+  [data-card-head] > span:first-child {
+    font-family: var(--mono);
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
   }
-  [data-bib-card] [data-bib-input] {
-    font-size: clamp(54px, 17vw, 72px) !important;
-  }
-  /* The instruction lives on the card itself, right above the field. */
-  [data-search-head],
-  [data-card-event],
   [data-card-meta] {
     display: none !important;
   }
-  [data-card-prompt] {
+  [data-card-date] {
     display: inline !important;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--card-mute, #4c5c7c);
+    white-space: nowrap;
   }
-  [data-consent] {
-    padding: 4px 6px !important;
+  [data-card-title] {
+    display: block !important;
+    margin: 12px 0 0;
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: #0a0a0a;
+  }
+  [data-bib-band] {
+    margin: 10px 4px 0 !important;
+    padding: 14px 18px 10px !important;
+    border-radius: 6px !important;
+  }
+  /* Two punched holes, like a real bib. */
+  [data-bib-band]::before,
+  [data-bib-band]::after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f4f6f2;
+  }
+  [data-bib-band]::before {
+    left: 12px;
+  }
+  [data-bib-band]::after {
+    right: 12px;
+  }
+  [data-bib-date] {
+    display: none !important;
+  }
+  [data-bib-card] [data-bib-input] {
+    font-size: clamp(56px, 18vw, 76px) !important;
+  }
+  [data-card-foot] {
+    justify-content: center !important;
+    margin-top: 12px !important;
+    padding-top: 10px !important;
+    border-top: 1px dashed var(--card-line-2, #c3cdbd) !important;
+  }
+  [data-race-label] {
+    display: none !important;
+  }
+
+  /* --- frosted panel: notice, consent, button ------------------------- */
+  [data-search-actions] {
+    display: grid !important;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.34);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    [data-search-actions] {
+      background: rgba(255, 255, 255, 0.82);
+    }
+  }
+  [data-search-actions] [data-consent] {
+    padding: 2px 4px !important;
     border-radius: 8px;
     border: 1px solid transparent;
+  }
+  [data-search-actions] [data-consent] span,
+  [data-search-actions] [data-consent] a {
+    color: #1d2330 !important;
+  }
+  [data-search-actions] [data-search-notice] {
+    background: rgba(255, 255, 255, 0.7) !important;
+    border-color: transparent !important;
+    color: #11161f !important;
+  }
+  [data-search-actions] [role='alert'] {
+    background: rgba(255, 255, 255, 0.82);
   }
   [data-search-grid] > form .btn-skew {
     height: 54px !important;
   }
   [data-credits] {
-    display: none;
+    display: block !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
-  /* Counters, now a small 2 x 2 strip on the page colour. */
+  /* --- below the photograph -------------------------------------------- */
   [data-mobile-stats] {
     display: grid !important;
+    grid-row: 2;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 20px 16px 4px;
+    margin: 24px 16px 4px;
     border-top: 1px solid var(--line);
   }
   [data-mobile-stats] > div {
@@ -779,7 +862,8 @@ input:focus-visible {
     color: var(--mute);
   }
   [data-search-grid] > footer {
-    grid-row: auto !important;
+    grid-column: 1 !important;
+    grid-row: 3 !important;
     margin-top: 12px;
   }
 }
