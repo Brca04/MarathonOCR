@@ -6,9 +6,9 @@
 cd "$(dirname "$0")"
 # ./dev-local.sh zagreb   → the Zagreb site with its own settings (events/zagreb-2026.env)
 if [ "$1" = "zagreb" ]; then
+  # Runner data straight from the database (needs SUPABASE_SERVICE_ROLE_KEY in .env.local).
+  EVENT=zagreb-2026 node scripts/export-static.mjs --event zagreb-2026 || exit 1
   EVENT=zagreb-2026 npm run build || exit 1
-  mkdir -p out/data
-  [ -f out/data/stats.json ] || echo '{"ok":true,"photos":0,"finishers":0,"tagged_bibs":0}' > out/data/stats.json
   rm -f .env.production.local
   echo ""
   echo "  On this Mac:  http://localhost:3000"
