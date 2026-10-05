@@ -155,7 +155,21 @@ export default function RunnerView({
               the finish stats — rather than splitting the numbers out into
               their own card while the name sits bare on the photo. The back
               link now lives in the header, next to the emblem. */}
+          {/* The photos are below the fold: say how many and point down. */}
+          {photos.length ? (
+            <button
+              type="button"
+              data-scroll-cue=""
+              onClick={() => document.getElementById('runner-gallery')?.scrollIntoView({ behavior: 'smooth' })}
+            >
+              <span>{t.photosFound(photos.length)}</span>
+              <svg data-scroll-cue-arrow="" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          ) : null}
           <div
+            data-runner-card-wrap=""
             style={{
               position: 'relative',
               zIndex: 1,
@@ -305,7 +319,9 @@ export default function RunnerView({
 
       {/* --- gallery ------------------------------------------------------- */}
       <section
+        id="runner-gallery"
         style={{
+          scrollMarginTop: 8,
           maxWidth: 1440,
           margin: '0 auto',
           padding: 'clamp(28px,4.5vh,52px) clamp(16px,4vw,48px) clamp(20px,3vh,32px)',

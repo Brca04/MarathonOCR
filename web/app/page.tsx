@@ -296,6 +296,7 @@ function Home() {
                 fit on one line here anyway, so they're arranged for that
                 instead of fighting it. */}
             <footer
+              data-home-footer=""
               style={{
                 gridColumn: 2,
                 gridRow: 2,

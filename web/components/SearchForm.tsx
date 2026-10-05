@@ -288,6 +288,10 @@ export default function SearchForm({
           >
             {race.name}
           </span>
+          {/* Phone only: the partners' line takes the place of the distances. */}
+          <span data-card-credit="" style={{ display: 'none' }}>
+            {t.credits}
+          </span>
         </div>
       </div>
 
