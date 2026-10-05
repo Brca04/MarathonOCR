@@ -24,6 +24,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const a = args();
 const slug = a.event || DEFAULT_SLUG;
 const outDir = path.resolve(__dirname, '..', 'public', 'data');
+// --if-key: used by the Cloudflare build. Without the service key there is
+// nothing to export from, so the site builds without data instead of failing.
+if (a['if-key'] && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  log.warn('SUPABASE_SERVICE_ROLE_KEY not set: skipping the data export (searches will find nothing).');
+  process.exit(0);
+}
 const db = admin();
 
 log.step(`Exporting ${slug} → ${path.relative(process.cwd(), outDir)}`);

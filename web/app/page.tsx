@@ -61,7 +61,6 @@ function Home() {
     async (nextBib: string, push = true) => {
       const digits = nextBib.replace(/\D/g, '');
       if (!digits) return setError(t.errNoBib);
-      if (upcoming) return setError(t.errUpcoming);
 
       setBusy(true);
       setError('');
@@ -75,6 +74,12 @@ function Home() {
       setBusy(false);
 
       if (!res.ok) {
+        // Before photos are out every real bib comes back empty: say why
+        // instead of "no such bib". A bib that is published (the test runner,
+        // or an early upload) still opens normally.
+        if (upcoming && (res.reason === 'no_bib' || res.reason === 'no_event')) {
+          return setError(t.errUpcoming);
+        }
         if (res.reason === 'no_bib') {
           return setError(t.errUnknownBib(digits));
         }

@@ -32,6 +32,17 @@ export default function SearchForm({
   const consentRef = useRef<HTMLInputElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const bibInputRef = useRef<HTMLInputElement>(null);
+  // The last error stays on screen for a moment after it is cleared, so it
+  // can slide shut instead of vanishing (data-leaving drives the animation).
+  const [shownError, setShownError] = useState(error);
+  useEffect(() => {
+    if (error) {
+      setShownError(error);
+      return;
+    }
+    const id = window.setTimeout(() => setShownError(''), 280);
+    return () => window.clearTimeout(id);
+  }, [error]);
 
   // Autofocus on load, but not on a touch device: focusing this giant
   // numeric input immediately pops the keyboard and, on iOS Safari
@@ -284,7 +295,7 @@ export default function SearchForm({
           panel over the photograph; elsewhere the wrapper does not exist for
           layout (display: contents). */}
       <div data-search-actions="" style={{ display: 'contents' }}>
-      {notice && !error ? (
+      {notice && !shownError ? (
         <p
           data-search-notice=""
           style={{
@@ -302,9 +313,12 @@ export default function SearchForm({
         </p>
       ) : null}
 
-      {error ? (
+      {shownError ? (
         <p
+          key={shownError}
           role="alert"
+          data-search-error=""
+          data-leaving={error ? undefined : ''}
           style={{
             margin: 0,
             padding: '12px 16px',
@@ -315,7 +329,7 @@ export default function SearchForm({
             color: 'var(--danger)',
           }}
         >
-          {error}
+          {shownError}
         </p>
       ) : null}
 

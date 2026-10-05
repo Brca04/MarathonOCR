@@ -18,7 +18,7 @@
     "export:static": "node scripts/export-static.mjs",
     "media:r2": "node scripts/media-to-r2.mjs",
     "deploy": "npm run build && wrangler deploy",
-    "deploy:zagreb": "EVENT=zagreb-2026 npm run build && wrangler deploy --env zagreb",
+    "deploy:zagreb": "EVENT=zagreb-2026 node scripts/export-static.mjs --event zagreb-2026 --if-key && EVENT=zagreb-2026 npm run build && wrangler deploy --env zagreb",
     "publish:photos": "node scripts/publish-photos.mjs",
     "publish": "node scripts/publish-event.mjs",
     "takedown": "node scripts/takedown.mjs"

@@ -887,3 +887,70 @@ input:focus-visible {
     letter-spacing: 0.06em !important;
   }
 }
+
+/* ===========================================================================
+   Warnings slide open instead of popping in: the box grows from nothing,
+   fades in and settles, so the card above does not jump. A new message
+   (keyed by its text) plays it again.
+   =========================================================================== */
+@keyframes warn-open {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -12px;
+    transform: translateY(-6px);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    max-height: 160px;
+    transform: none;
+  }
+}
+@keyframes warn-hint-open {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    max-height: 80px;
+    transform: none;
+  }
+}
+[data-search-error] {
+  overflow: hidden;
+  animation: warn-open 0.38s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+[data-consent-hint] {
+  overflow: hidden;
+  animation: warn-hint-open 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes warn-close {
+  from {
+    opacity: 1;
+    max-height: 160px;
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -12px;
+    border-width: 0;
+  }
+}
+[data-search-error][data-leaving] {
+  animation: warn-close 0.26s cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-search-error][data-leaving],
+  [data-search-error],
+  [data-consent-hint] {
+    animation-duration: 0.01s;
+  }
+}
