@@ -77,7 +77,7 @@ create table if not exists public.runners (
   place_overall  int,
   place_gender   int,
   place_category int,
-  status         text default 'finished',  -- finished | dnf | dns | dsq
+  status         text default 'finished',  -- finished | dnf | dns | dsq | test
   created_at     timestamptz not null default now(),
   unique (event_id, bib)
 );
@@ -386,10 +386,14 @@ as $$
     'first_year', e.first_year,
     'finishers', (select count(*) from public.runners r
                    where r.event_id = e.id and r.status = 'finished'),
-    'photos', (select count(*) from public.photos p where p.event_id = e.id),
+    -- Test photos (file names under _test/) and test runners (status 'test')
+    -- open normally in a search but never count on the landing page.
+    'photos', (select count(*) from public.photos p
+                where p.event_id = e.id and p.file_name not like '\_test/%'),
     -- Runners with at least one photo that reads their bib exactly.
     'tagged_bibs', (select count(*) from public.runners r
                      where r.event_id = e.id
+                       and r.status is distinct from 'test'
                        and exists (select 1 from public.detections d
                                      join public.photos p on p.id = d.photo_id
                                     where p.event_id = e.id and d.bib_text = r.bib)),
