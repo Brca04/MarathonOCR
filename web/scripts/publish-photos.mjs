@@ -27,7 +27,7 @@
  *                               (Cloudflare → R2 → Manage API tokens). Without them
  *                               it falls back to `wrangler r2 object put`, one file
  *                               at a time per worker: fine for hundreds, slow for 20k.
- * Options: --concurrency 8  --bucket marathonocr-media  --skip-upload  --skip-db
+ * Options: --concurrency 8  --bucket <name> (default: R2_BUCKET from the event file)  --skip-upload  --skip-db
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -51,7 +51,7 @@ const dryRun = Boolean(a['dry-run']);
 const skipUpload = Boolean(a['skip-upload']);
 const skipDb = Boolean(a['skip-db']);
 const concurrency = Math.max(1, Number(a.concurrency || Math.min(8, os.cpus().length)));
-const bucket = a.bucket || 'marathonocr-media';
+const bucket = a.bucket || process.env.R2_BUCKET || 'marathonocr-media';
 const photographer = typeof a.photographer === 'string' ? a.photographer : null;
 const tz = process.env.NEXT_PUBLIC_EVENT_TZ || 'Europe/Zagreb';
 const publicDir = path.resolve(__dirname, '..', 'public');

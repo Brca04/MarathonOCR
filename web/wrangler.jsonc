@@ -48,7 +48,7 @@
   // so each one lists its own; rate-limit namespaces are separate per event.
   "env": {
     "zagreb": {
-      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media" }],
+      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media-zagreb" }],
       "durable_objects": { "bindings": [{ "name": "QUOTA", "class_name": "SessionQuota" }] },
       "vars": { "BIB_QUOTA": "30" },
       "ratelimits": [
