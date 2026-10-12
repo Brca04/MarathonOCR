@@ -6,7 +6,7 @@ import { easeOutQuart, fromSeconds, toSeconds } from '@/lib/format';
 import { num } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import type { EventStats } from '@/lib/types';
-import { EVENT, eventDateLabel, eventTitle } from '@/lib/event';
+import { EVENT, eventDateLabel, eventTitle, heroPosition } from '@/lib/event';
 
 const mono: React.CSSProperties = {
   fontFamily: 'var(--mono)',
@@ -124,6 +124,54 @@ export function EventStatsStrip() {
   );
 }
 
+const SLIDE_MS = 7000;
+
+/**
+ * The hero photographs, stacked. With more than one they cross-fade in turn
+ * (slowly, every 7 s); with reduced motion requested, the first one stays.
+ * The later photos load after the first, so they never delay the page.
+ */
+function HeroPhotos({ alt }: { alt: string }) {
+  const images = EVENT.heroImages;
+  const [shown, setShown] = useState(0);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (images.length < 2) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    setReady(true);
+    const id = window.setInterval(() => setShown((i) => (i + 1) % images.length), SLIDE_MS);
+    return () => window.clearInterval(id);
+  }, [images.length]);
+
+  return (
+    <>
+      {images.map((src, i) =>
+        i > 0 && !ready ? null : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={src}
+            src={src}
+            alt={i === shown ? alt : ''}
+            aria-hidden={i === shown ? undefined : true}
+            data-hero-photo=""
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: heroPosition(i),
+              opacity: i === shown ? 1 : 0,
+              transition: 'opacity 1.6s ease',
+            }}
+          />
+        ),
+      )}
+    </>
+  );
+}
+
 export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
   const { lang, t } = useApp();
   const cells = useEventCells();
@@ -153,19 +201,7 @@ export default function Hero({ style }: { style?: React.CSSProperties } = {}) {
           title and counters stay readable on bright or busy photos, such as a
           drone shot of grass and concrete. Anything over the picture takes the
           fixed on-media colours. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={EVENT.heroImage}
-        alt={t.heroAlt}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: EVENT.heroPosition,
-        }}
-      />
+      <HeroPhotos alt={t.heroAlt} />
       <div data-hero-scrim="" aria-hidden="true" />
       {EVENT.heroCredit ? (
         <span data-hero-credit="" style={{ position: 'absolute', right: 12, bottom: 8, zIndex: 1, fontSize: 10, letterSpacing: '.04em', color: 'rgba(255,255,255,.72)', textShadow: '0 1px 2px rgba(0,0,0,.5)' }}>

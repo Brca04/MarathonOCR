@@ -1,6 +1,6 @@
 'use client';
 
-import { EVENT } from '@/lib/event';
+import { EVENT, HERO_IMAGE } from '@/lib/event';
 import { dataTerm } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import type { GalleryPhoto, Runner } from '@/lib/types';
@@ -46,7 +46,7 @@ function profileShot(
   cover: GalleryPhoto | undefined,
   fallbackPosition: string,
 ): { src: string; position: string } {
-  return { src: cover?.src ?? EVENT.heroImage, position: fallbackPosition };
+  return { src: cover?.src ?? HERO_IMAGE, position: fallbackPosition };
 }
 
 /**

@@ -335,7 +335,8 @@ export default function SearchForm({
         data-need={needConsent && !agreed ? '' : undefined}
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
+          justifyContent: 'center',
+          alignItems: 'center',
           gap: 10,
           padding: '2px 4px',
           cursor: 'pointer',
@@ -374,7 +375,7 @@ export default function SearchForm({
         </span>
       </label>
       {needConsent && !agreed ? (
-        <p role="alert" data-consent-hint="" style={{ margin: '-4px 0 0', padding: '0 4px', fontSize: 13, lineHeight: 1.4, color: 'var(--danger)' }}>
+        <p role="alert" data-consent-hint="" style={{ margin: '-4px 0 0', padding: '0 4px', fontSize: 13, lineHeight: 1.4, color: 'var(--danger)', textAlign: 'center' }}>
           {t.consentNeeded}
         </p>
       ) : null}

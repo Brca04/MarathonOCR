@@ -12,6 +12,8 @@ const env = (v: string | undefined, fallback: string) => {
   return t.toLowerCase() === 'none' ? '' : t;
 };
 
+const list = (v: string) => v.split(',').map((x) => x.trim()).filter(Boolean);
+
 const edition = env(process.env.NEXT_PUBLIC_EVENT_EDITION, '34');
 const raceKm = env(process.env.NEXT_PUBLIC_EVENT_RACE_KM, '');
 
@@ -28,17 +30,17 @@ export const EVENT = {
   date: env(process.env.NEXT_PUBLIC_EVENT_DATE, '2026-10-11'),
   /** Set for a single-distance event, e.g. 21.0975; empty = guess from bib ranges. */
   raceKm: raceKm ? Number(raceKm) : null,
-  heroImage: env(process.env.NEXT_PUBLIC_HERO_IMAGE, '/brand/zagreb-hero.jpg'),
+  /** Hero photos, comma-separated; more than one cross-fade in turn. */
+  heroImages: list(env(process.env.NEXT_PUBLIC_HERO_IMAGE, '/brand/zagreb-hero-1.jpg,/brand/zagreb-hero-2.jpg')),
   /** Card text for multi-distance events, e.g. "3 UTRKE" / "21,1 km · 10 km · 3,5 km". */
   raceBadge: env(process.env.NEXT_PUBLIC_EVENT_RACE_BADGE, ''),
   raceLabel: env(process.env.NEXT_PUBLIC_EVENT_RACE_LABEL, ''),
   /** Colour scheme, matched by `:root[data-event='…']` in globals.css. Empty = the default blue. */
   theme: env(process.env.NEXT_PUBLIC_EVENT_THEME, ''),
-  /** Where the hero photo is anchored when cropped, as CSS object-position. */
-  heroPosition: env(process.env.NEXT_PUBLIC_HERO_POSITION, 'center 30%'),
-  /** Photographer of the hero photo, shown small on it: "Foto: Davor Denkovski". */
+  /** Where each hero photo is anchored when cropped (CSS object-position), comma-separated in the same order. */
+  heroPositions: list(env(process.env.NEXT_PUBLIC_HERO_POSITION, 'center 30%')),
+  /** Photographer of the hero photos, shown small on them: "Foto: Krume Ivanovski". */
   heroCredit: env(process.env.NEXT_PUBLIC_HERO_CREDIT, ''),
-  /** Credit line under the search, per language. Empty = the built-in default. */
   /** Public address of this deployment, for link previews: "https://bibfind.eu". */
   siteUrl: env(process.env.NEXT_PUBLIC_SITE_URL, ''),
   /** 1200 x 630 picture for link previews (WhatsApp, Facebook). */
@@ -54,6 +56,10 @@ export function beforeRace(now: Date = new Date()): boolean {
   const end = new Date(EVENT.date + 'T23:59:59');
   return !Number.isNaN(end.getTime()) && now.getTime() < end.getTime();
 }
+
+/** The first hero photo and its crop: the fallback picture elsewhere on the site. */
+export const HERO_IMAGE = EVENT.heroImages[0] || '';
+export const heroPosition = (i: number) => EVENT.heroPositions[i] || EVENT.heroPositions[0] || 'center 30%';
 
 export const EVENT_YEAR = Number(EVENT.date.slice(0, 4)) || new Date().getFullYear();
 
