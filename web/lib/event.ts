@@ -30,14 +30,14 @@ export const EVENT = {
   date: env(process.env.NEXT_PUBLIC_EVENT_DATE, '2026-10-11'),
   /** Set for a single-distance event, e.g. 21.0975; empty = guess from bib ranges. */
   raceKm: raceKm ? Number(raceKm) : null,
-  /** Hero photos, comma-separated; more than one cross-fade in turn. */
+  /** Hero photo, or two comma-separated: the first for desktop, the second for phones. */
   heroImages: list(env(process.env.NEXT_PUBLIC_HERO_IMAGE, '/brand/zagreb-hero-1.jpg,/brand/zagreb-hero-2.jpg')),
   /** Card text for multi-distance events, e.g. "3 UTRKE" / "21,1 km · 10 km · 3,5 km". */
   raceBadge: env(process.env.NEXT_PUBLIC_EVENT_RACE_BADGE, ''),
   raceLabel: env(process.env.NEXT_PUBLIC_EVENT_RACE_LABEL, ''),
   /** Colour scheme, matched by `:root[data-event='…']` in globals.css. Empty = the default blue. */
   theme: env(process.env.NEXT_PUBLIC_EVENT_THEME, ''),
-  /** Where each hero photo is anchored when cropped (CSS object-position), comma-separated in the same order. */
+  /** Where each hero photo is anchored when cropped (CSS object-position), in the same order. */
   heroPositions: list(env(process.env.NEXT_PUBLIC_HERO_POSITION, 'center 30%')),
   /** Photographer of the hero photos, shown small on them: "Foto: Krume Ivanovski". */
   heroCredit: env(process.env.NEXT_PUBLIC_HERO_CREDIT, ''),

@@ -650,6 +650,10 @@ input:focus-visible {
     grid-template-rows: 100% !important;
     height: 100%;
   }
+  /* The phone photo has its own crop (second NEXT_PUBLIC_HERO_POSITION). */
+  [data-hero-photo] {
+    object-position: var(--hero-pos-phone) !important;
+  }
   /* Photo and search share the first row, the search drawn on top. */
   [data-hero-panel] {
     grid-row: 1 !important;
