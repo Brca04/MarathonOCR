@@ -13,7 +13,7 @@ export default function InfoPage({
   title,
   children,
 }: {
-  kicker: string;
+  kicker?: string;
   title: string;
   children: React.ReactNode;
 }) {
@@ -27,6 +27,7 @@ export default function InfoPage({
         data-info-page=""
         style={{ maxWidth: 720, margin: '0 auto', padding: 'clamp(28px,6vw,64px) 20px 80px' }}
       >
+        {kicker && (
         <div
           style={{
             fontFamily: 'var(--mono)',
@@ -38,6 +39,7 @@ export default function InfoPage({
         >
           {kicker}
         </div>
+        )}
         <h1 style={{ fontSize: 'clamp(30px,5vw,44px)', letterSpacing: '-.035em', lineHeight: 1.05, margin: '10px 0 24px' }}>
           {title}
         </h1>
