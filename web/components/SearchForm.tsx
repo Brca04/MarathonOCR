@@ -276,7 +276,13 @@ export default function SearchForm({
             data-card-credit=""
             style={{ flex: 1, textAlign: 'center', fontWeight: 800, fontSize: 18, letterSpacing: '.02em', lineHeight: 1 }}
           >
-            {t.credits}
+            <a href="https://sklop.eu" target="_blank" rel="noopener noreferrer" className="card-credit-link">
+              Sklop
+            </a>
+            {' × '}
+            <a href="https://framepacemedia.com" target="_blank" rel="noopener noreferrer" className="card-credit-link">
+              FramePaceMedia
+            </a>
           </span>
         </div>
       </div>

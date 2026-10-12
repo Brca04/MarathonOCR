@@ -78,7 +78,6 @@ export type Strings = {
   consentSuffix: string;
   searchSubmit: string;
   searchBusy: string;
-  credits: string;
   errUpcoming: string;
   upcomingNote: string;
   raceMarathon: string;
@@ -147,7 +146,6 @@ const hr: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Pronađi svoje fotografije',
   searchBusy: 'Tražim…',
-  credits: EVENT.creditsHr || 'Sklop × FramePace',
   errUpcoming: 'Fotografije još nisu objavljene. Objavljujemo ih ovaj tjedan, vratite se za koji dan.',
   upcomingNote: 'Fotografije stižu ovaj tjedan. Spremite ovu stranicu i vratite se sa svojim startnim brojem.',
   raceMarathon: 'Maraton · 42,195 km',
@@ -230,7 +228,6 @@ const en: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Find my photos',
   searchBusy: 'Searching…',
-  credits: EVENT.creditsEn || 'Sklop × FramePace',
   errUpcoming: 'Photos are not published yet. They go online this week; please check back in a few days.',
   upcomingNote: 'Photos arrive this week. Save this page and come back with your bib number.',
   raceMarathon: 'Marathon · 42.195 km',

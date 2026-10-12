@@ -1000,3 +1000,14 @@ input:focus-visible {
     gap: 12px !important;
   }
 }
+
+/* Partner links on the bib card: read as plain text, underline on hover. */
+.card-credit-link {
+  color: inherit;
+  text-decoration: none;
+}
+.card-credit-link:hover,
+.card-credit-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
