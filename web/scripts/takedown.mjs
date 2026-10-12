@@ -13,7 +13,7 @@
  * note of the request (who, when, what) for your GDPR records.
  */
 import { spawn } from 'node:child_process';
-import { admin, args, DEFAULT_SLUG, die, log } from './lib.mjs';
+import { admin, args, DEFAULT_SLUG, die, log, r2Bucket, r2Endpoint, r2WranglerArgs } from './lib.mjs';
 
 const a = args();
 const slug = a.event || DEFAULT_SLUG;
@@ -28,14 +28,14 @@ async function deleteR2(key) {
     const { S3Client, DeleteObjectCommand } = await import('@aws-sdk/client-s3');
     const s3 = new S3Client({
       region: 'auto',
-      endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      endpoint: r2Endpoint(),
       credentials: { accessKeyId: process.env.R2_ACCESS_KEY_ID, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY },
     });
-    await s3.send(new DeleteObjectCommand({ Bucket: a.bucket || 'marathonocr-media', Key: key }));
+    await s3.send(new DeleteObjectCommand({ Bucket: r2Bucket(a.bucket), Key: key }));
     return;
   }
   await new Promise((resolve, reject) => {
-    const c = spawn('npx', ['wrangler', 'r2', 'object', 'delete', `${a.bucket || 'marathonocr-media'}/${key}`, '--remote'], { stdio: 'inherit' });
+    const c = spawn('npx', ['wrangler', 'r2', 'object', 'delete', `${r2Bucket(a.bucket)}/${key}`, '--remote', ...r2WranglerArgs()], { stdio: 'inherit' });
     c.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`wrangler exit ${code}`))));
   });
 }

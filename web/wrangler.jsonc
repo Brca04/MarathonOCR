@@ -20,7 +20,7 @@
   },
   // Event photos, uploaded by scripts/publish-photos.mjs; keys mirror the URL
   // path ("media/<event>/w/<token>.jpg").
-  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media-zagreb" }],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "zagreb-photos", "jurisdiction": "eu" }],
   // Exact per-session quota: at most BIB_QUOTA different bibs per session
   // (worker/index.ts, class SessionQuota). One small SQLite-backed Durable
   // Object per session, wiped when the session expires.

@@ -283,3 +283,21 @@ export async function upsertBatched(db, table, rows, onConflict, size = 500) {
   if (rows.length) process.stdout.write('\n');
   return done;
 }
+
+// --- R2 (photo storage) -------------------------------------------------------
+// The bucket and its jurisdiction come from the event file (R2_BUCKET,
+// R2_JURISDICTION). An EU-jurisdiction bucket keeps the photos in the EU and
+// has its own S3 address (<account>.eu.r2.cloudflarestorage.com).
+export function r2Bucket(override) {
+  const b = override || process.env.R2_BUCKET;
+  if (!b) die('Set R2_BUCKET in events/<event>.env (or pass --bucket).');
+  return b;
+}
+export function r2Endpoint() {
+  const j = (process.env.R2_JURISDICTION || '').toLowerCase();
+  return `https://${process.env.R2_ACCOUNT_ID}.${j ? `${j}.` : ''}r2.cloudflarestorage.com`;
+}
+/** Extra arguments for `wrangler r2 object ...` when the bucket has a jurisdiction. */
+export function r2WranglerArgs() {
+  return process.env.R2_JURISDICTION ? ['--jurisdiction', process.env.R2_JURISDICTION.toLowerCase()] : [];
+}

@@ -164,34 +164,30 @@ from the command line.
 
 ## Deploy on every GitHub push (Workers Builds)
 
-Event photos live in the R2 bucket `marathonocr-media`, not in the build, so a
-build that only has the git checkout can publish the whole site. The guard
-Worker serves `/media/*` from the bucket (binding `MEDIA`) and falls back to
-the asset store for anything not uploaded yet.
+Event photos live in the R2 bucket `zagreb-photos` (EU jurisdiction), not in
+the build, so a build that only has the git checkout can publish the whole
+site. The guard Worker serves `/media/*` from the bucket (binding `MEDIA`).
+The bucket name and jurisdiction are set in `wrangler.jsonc` and in
+`events/zagreb-2026.env` (`R2_BUCKET`, `R2_JURISDICTION`); keep them equal.
 
 One-time setup:
 
-1. Enable R2 in the dashboard, create the bucket `marathonocr-media`, then fill
-   it: `npx wrangler login` and `npm run media:r2 -- --event zeljava-2026`.
-   Use `--from https://marathonocr.bruno-cavor.workers.dev` on a machine
-   without `public/media/`; it copies the files from the live site.
-2. Workers & Pages → `marathonocr` → Settings → Build → Connect the GitHub repo.
-   Branch: `zeljava-demo`. Root directory: `web`.
-   Build command: `npm run export:static`. Deploy command: `npm run deploy`.
-3. Build variables (Settings → Build → Variables and secrets):
-   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-   `NEXT_PUBLIC_EVENT_SLUG=zeljava-2026`, `NEXT_PUBLIC_EVENT_TZ=Europe/Zagreb`,
-   `NEXT_PUBLIC_BRAND_MARK=/brand/zeljava-logo.png`,
-   `NEXT_PUBLIC_BRAND_MARK_RATIO=606 / 313`,
-   `NEXT_PUBLIC_BRAND_ICON=/brand/zeljava-icon-32.png`,
-   `NEXT_PUBLIC_BRAND_APPLE_ICON=/brand/zeljava-icon-180.png`, the Turnstile
-   site key if used, and `SUPABASE_SERVICE_ROLE_KEY` **as a secret** (the
-   static export reads every runner through it).
+1. R2 → Create bucket `zagreb-photos`, jurisdiction European Union. Create an
+   R2 API token (Object Read & Write, this bucket only) and put
+   `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` in `.env.local`.
+2. Workers & Pages → Create → Import a repository. Name `zagreb-photos`,
+   branch `main`, root directory `web`.
+   Build command: `node scripts/export-static.mjs --if-key && npm run build`.
+   Deploy command: `npx wrangler deploy`.
+3. Build secret: `SUPABASE_SERVICE_ROLE_KEY` (the static export reads every
+   runner through it). Everything else comes from `events/zagreb-2026.env`.
+4. Worker secrets: `SESSION_SECRET`, `TURNSTILE_SECRET`.
+5. Settings → Builds → Deploy hooks: create one and put its URL in
+   `.env.local` as `DEPLOY_HOOK_ZAGREB_2026`; publishing calls it.
 
-After that every push to the branch rebuilds and deploys. A data-only change
-(a new review import into Supabase) has no commit, so trigger a build by hand
-from the dashboard (or push an empty commit) after importing. Worker secrets
-(`SESSION_SECRET`, `TURNSTILE_SECRET`) are kept across deploys.
+After that every push to `main` rebuilds and deploys, and `publish-event`
+triggers a rebuild after a data-only change. Worker secrets are kept across
+deploys.
 
 On `*.workers.dev` every photo request runs the Worker (100k requests a day on
 the free plan). For a real event, put the site on a custom domain so photos
@@ -265,17 +261,16 @@ raises that to 10 million.
 
 ## Events: one codebase, one site per race
 
-Each race has a settings file in `events/` (public values only) and its own
-Worker. Pick the event with `EVENT=<slug>`:
+Each race has a settings file in `events/` (public values only). The scripts
+use `zagreb-2026` unless `EVENT=<slug>` says otherwise.
 
-| Event | Settings | Worker | Site |
+| Event | Settings | Worker | Bucket |
 |---|---|---|---|
-| Željava 2026 (demo) | `events/zeljava-2026.env` | `marathonocr` | marathonocr.bruno-cavor.workers.dev |
-| 34. Zagrebački maraton | `events/zagreb-2026.env` | `marathonocr-zagreb` (`--env zagreb`) | marathonocr-zagreb.bruno-cavor.workers.dev |
+| 34. Zagrebački maraton | `events/zagreb-2026.env` | `zagreb-photos` | `zagreb-photos` (EU) |
 
-A new race: copy an `events/*.env`, change the values, add a block under `env`
-in `wrangler.jsonc` (copy `zagreb`, new rate-limit namespace ids), add the
-event row in Supabase (`import-results` creates it), create the Worker.
+A new race: copy `events/zagreb-2026.env`, change the values, point
+`wrangler.jsonc` at a new Worker name, bucket and rate-limit namespace ids,
+and create the Worker as above.
 
 ### Secrets, in `web/.env.local` on the machine that publishes (never committed)
 

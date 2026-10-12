@@ -36,7 +36,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { admin, args, DEFAULT_SLUG, die, ensureEvent, log, upsertBatched } from './lib.mjs';
+import { admin, args, DEFAULT_SLUG, die, ensureEvent, log, r2Bucket, r2Endpoint, r2WranglerArgs, upsertBatched } from './lib.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const a = args();
@@ -51,7 +51,7 @@ const dryRun = Boolean(a['dry-run']);
 const skipUpload = Boolean(a['skip-upload']);
 const skipDb = Boolean(a['skip-db']);
 const concurrency = Math.max(1, Number(a.concurrency || Math.min(8, os.cpus().length)));
-const bucket = a.bucket || process.env.R2_BUCKET || 'marathonocr-media';
+const bucket = r2Bucket(a.bucket);
 const photographer = typeof a.photographer === 'string' ? a.photographer : null;
 const tz = process.env.NEXT_PUBLIC_EVENT_TZ || 'Europe/Zagreb';
 const publicDir = path.resolve(__dirname, '..', 'public');
@@ -117,7 +117,7 @@ if (!skipUpload && !dryRun && process.env.R2_ACCESS_KEY_ID && process.env.R2_SEC
   PutObjectCommand = mod.PutObjectCommand;
   s3 = new mod.S3Client({
     region: 'auto',
-    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    endpoint: r2Endpoint(),
     credentials: { accessKeyId: process.env.R2_ACCESS_KEY_ID, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY },
   });
 }
@@ -140,7 +140,7 @@ async function upload(key, file) {
         }));
       } else {
         await run('npx', ['wrangler', 'r2', 'object', 'put', `${bucket}/${key}`, '--file', file,
-          '--content-type', 'image/jpeg', '--remote']);
+          '--content-type', 'image/jpeg', '--remote', ...r2WranglerArgs()]);
       }
       return;
     } catch (e) {
