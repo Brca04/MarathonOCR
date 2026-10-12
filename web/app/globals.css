@@ -609,14 +609,6 @@ input:focus-visible {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-[data-info-draft] {
-  border: 1px solid var(--line-2);
-  background: var(--panel);
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 13px !important;
-  color: var(--mute-2);
-}
 
 /* ===========================================================================
    Phone home screen (below 760px): one full-screen photograph, the bib card
