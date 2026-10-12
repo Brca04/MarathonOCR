@@ -41,7 +41,7 @@ export const EVENT = {
   /** Credit line under the search, per language. Empty = the built-in default. */
   creditsHr: env(process.env.NEXT_PUBLIC_CREDITS_HR, ''),
   creditsEn: env(process.env.NEXT_PUBLIC_CREDITS_EN, ''),
-  /** Public address of this deployment, for link previews: "https://….workers.dev". */
+  /** Public address of this deployment, for link previews: "https://bibfind.eu". */
   siteUrl: env(process.env.NEXT_PUBLIC_SITE_URL, ''),
   /** 1200 x 630 picture for link previews (WhatsApp, Facebook). */
   ogImage: env(process.env.NEXT_PUBLIC_OG_IMAGE, ''),
