@@ -1,33 +1,15 @@
 #!/bin/bash
-# Local test of the site with the live Željava settings: builds the same
-# static site Cloudflare serves, then serves it on port 3000.
-# Open http://localhost:3000 on this Mac, or the address printed below on a
-# phone connected to the same Wi-Fi.
+# Local test of the site: exports the runner data from Supabase (needs
+# SUPABASE_SERVICE_ROLE_KEY in .env.local), builds the same static site
+# Cloudflare serves, and serves it on port 3000.
+# Open http://localhost:3000 on this computer, or the address printed below on
+# a phone on the same Wi-Fi.
 cd "$(dirname "$0")"
-# ./dev-local.sh zagreb   → the Zagreb site with its own settings (events/zagreb-2026.env)
-if [ "$1" = "zagreb" ]; then
-  # Runner data straight from the database (needs SUPABASE_SERVICE_ROLE_KEY in .env.local).
-  EVENT=zagreb-2026 node scripts/export-static.mjs --event zagreb-2026 || exit 1
-  EVENT=zagreb-2026 npm run build || exit 1
-  rm -f .env.production.local
-  echo ""
-  echo "  On this Mac:  http://localhost:3000"
-  echo "  On a phone:   http://$(ipconfig getifaddr en0 2>/dev/null || echo 'YOUR-MAC-IP'):3000   (same Wi-Fi)"
-  echo ""
-  echo "  Stop with Ctrl+C"
-  exec python3 -m http.server 3000 --bind 0.0.0.0 --directory out
-fi
-set -a; source .env.demo; set +a
-export NEXT_PUBLIC_EVENT_THEME=zeljava
-export NEXT_PUBLIC_BRAND_MARK=/brand/zeljava-logo.png
-export NEXT_PUBLIC_BRAND_MARK_RATIO="606 / 313"
-export NEXT_PUBLIC_BRAND_ICON=/brand/zeljava-icon-32.png
-export NEXT_PUBLIC_HERO_IMAGE=/media/zeljava-2026/w/9f095ded287cb4d969d14618.jpg
-export NEXT_PUBLIC_TURNSTILE_SITEKEY=
-npx next build || exit 1
+node scripts/export-static.mjs || exit 1
+npm run build || exit 1
 echo ""
-echo "  On this Mac:  http://localhost:3000"
-echo "  On a phone:   http://$(ipconfig getifaddr en0 2>/dev/null || echo 'YOUR-MAC-IP'):3000   (same Wi-Fi)"
+echo "  On this computer:  http://localhost:3000"
+echo "  On a phone:        http://$(ipconfig getifaddr en0 2>/dev/null || hostname -I 2>/dev/null | cut -d' ' -f1):3000   (same Wi-Fi)"
 echo ""
 echo "  Stop with Ctrl+C"
-python3 -m http.server 3000 --bind 0.0.0.0 --directory out
+exec python3 -m http.server 3000 --bind 0.0.0.0 --directory out

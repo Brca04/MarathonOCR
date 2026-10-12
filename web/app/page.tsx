@@ -196,11 +196,8 @@ function Home() {
 
   /**
    * Same fetch-and-save approach as downloadAll: signedOriginalUrl only resolves
-   * once Supabase is actually configured (it's null in the demo event), so
-   * without it this fell straight through to a "here's the size" toast and
-   * never saved anything. Falling back to the preview (p.src) — which is
-   * always a real, reachable image — means the button actually downloads
-   * something in every case, demo included.
+   * when an original is stored; otherwise the web-size preview (p.src), which
+   * is always reachable, is what gets saved.
    */
   const downloadOriginal = useCallback(async () => {
     const p = photos[lb];

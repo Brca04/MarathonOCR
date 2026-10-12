@@ -1,0 +1,4 @@
+train: C:/Users/bruno/Desktop/GitHub/MarathonOCR/data/finetune_zeljava/train.txt
+val: C:/Users/bruno/Desktop/GitHub/MarathonOCR/data/finetune_zeljava/images/val
+nc: 1
+names: ['bib-number']

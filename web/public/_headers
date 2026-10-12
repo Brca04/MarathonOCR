@@ -35,11 +35,6 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Race photographs change only when they are replaced, and previews are served
-# from Supabase in production — this covers the bundled demo set.
-/photos/*
-  Cache-Control: public, max-age=604800
-
 /brand/*
   Cache-Control: public, max-age=604800
 

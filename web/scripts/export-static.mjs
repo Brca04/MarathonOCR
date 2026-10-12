@@ -3,7 +3,7 @@
  * Publish step: write every runner's search result into the static site.
  *
  *   node scripts/export-static.mjs                 # event from NEXT_PUBLIC_EVENT_SLUG
- *   node scripts/export-static.mjs --event zeljava-2026
+ *   node scripts/export-static.mjs --event zagreb-2026
  *
  * Output (copied into out/ by `npm run build`):
  *   public/data/stats.json          landing-page counters

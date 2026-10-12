@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { getEventStats } from '@/lib/data';
+import { getEventStats, NO_STATS } from '@/lib/data';
 import { easeOutQuart, fromSeconds, toSeconds } from '@/lib/format';
 import { num } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
-import { DEMO_STATS } from '@/lib/demo';
 import type { EventStats } from '@/lib/types';
 import { EVENT, eventDateLabel, eventTitle } from '@/lib/event';
 
@@ -45,7 +44,7 @@ type Cell = { value: string; label: string; accent?: boolean };
  */
 function useEventCells(): Cell[] | null {
   const { lang, t } = useApp();
-  const [stats, setStats] = useState<EventStats>(DEMO_STATS);
+  const [stats, setStats] = useState<EventStats>(NO_STATS);
   const [loaded, setLoaded] = useState(false);
   const [p, setP] = useState(0);
   const raf = useRef<number>(0);

@@ -16,8 +16,7 @@
  *
  * As a script (it runs before every `next build`) it writes the chosen event
  * to .env.production.local, which Next.js reads during the build. Without
- * EVENT it removes a file it wrote earlier, so an old event can't leak into
- * the next build.
+ * EVENT it builds the default event (zagreb-2026).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,7 +32,9 @@ export function eventFile(slug) {
 }
 
 /** Load events/<EVENT>.env into process.env without overriding what is set. */
-export function loadEvent(slug = process.env.EVENT) {
+export const DEFAULT_EVENT = 'zagreb-2026';
+
+export function loadEvent(slug = process.env.EVENT || DEFAULT_EVENT) {
   if (!slug) return null;
   const file = eventFile(slug);
   if (!fs.existsSync(file)) {
@@ -51,14 +52,7 @@ export function loadEvent(slug = process.env.EVENT) {
 
 // Run directly: write (or clear) .env.production.local for `next build`.
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const slug = process.env.EVENT;
-  if (!slug) {
-    if (fs.existsSync(GENERATED) && fs.readFileSync(GENERATED, 'utf8').startsWith(MARK)) {
-      fs.unlinkSync(GENERATED);
-      console.log('[event] no EVENT set: removed the previous event settings');
-    }
-    process.exit(0);
-  }
+  const slug = process.env.EVENT || DEFAULT_EVENT;
   try {
     const values = loadEvent(slug);
     const lines = Object.entries(values).map(([k, v]) => `${k}=${JSON.stringify(v)}`);

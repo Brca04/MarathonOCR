@@ -8,7 +8,7 @@
   //
   // `name` MUST match the Worker in the dashboard, or `wrangler deploy` creates
   // a second Worker under a different *.workers.dev URL.
-  "name": "marathonocr",
+  "name": "zagreb-photos",
   "main": "worker/index.ts",
   "compatibility_date": "2026-09-13",
   "assets": {
@@ -18,9 +18,9 @@
     // Unknown paths get the exported 404 page instead of a bare Worker error.
     "not_found_handling": "404-page"
   },
-  // Event photos. Filled by `npm run media:r2`; keys mirror the URL path
-  // ("media/<event>/w/<id>.jpg"), so photo paths in Supabase stay unchanged.
-  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media" }],
+  // Event photos, uploaded by scripts/publish-photos.mjs; keys mirror the URL
+  // path ("media/<event>/w/<token>.jpg").
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media-zagreb" }],
   // Exact per-session quota: at most BIB_QUOTA different bibs per session
   // (worker/index.ts, class SessionQuota). One small SQLite-backed Durable
   // Object per session, wiped when the session expires.
@@ -33,32 +33,18 @@
   // walking the whole field hits these within seconds.
   "ratelimits": [
     // Bib lookups per browser session.
-    { "name": "BIB_PER_SESSION", "namespace_id": "4101", "simple": { "limit": 20, "period": 60 } },
+    { "name": "BIB_PER_SESSION", "namespace_id": "4301", "simple": { "limit": 20, "period": 60 } },
     // Bib lookups per IP — generous, because race-day Wi-Fi puts many phones behind one address.
-    { "name": "BIB_PER_IP", "namespace_id": "4102", "simple": { "limit": 300, "period": 60 } },
+    { "name": "BIB_PER_IP", "namespace_id": "4302", "simple": { "limit": 300, "period": 60 } },
     // New sessions per IP. High on purpose: hundreds of phones on race-venue
     // Wi-Fi or one mobile carrier share an address; Turnstile and the
     // per-session quota are what stop scrapers.
-    { "name": "SESSION_PER_IP", "namespace_id": "4103", "simple": { "limit": 300, "period": 60 } }
+    { "name": "SESSION_PER_IP", "namespace_id": "4303", "simple": { "limit": 300, "period": 60 } }
   ],
 
-  // One Worker per event, same code. `wrangler deploy --env zagreb` (or
-  // `npm run deploy:zagreb`) publishes marathonocr-zagreb with the settings in
-  // events/zagreb-2026.env. Bindings are not inherited between environments,
-  // so each one lists its own; rate-limit namespaces are separate per event.
-  "env": {
-    "zagreb": {
-      "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marathonocr-media-zagreb" }],
-      "durable_objects": { "bindings": [{ "name": "QUOTA", "class_name": "SessionQuota" }] },
-      "vars": { "BIB_QUOTA": "30" },
-      "ratelimits": [
-        { "name": "BIB_PER_SESSION", "namespace_id": "4201", "simple": { "limit": 20, "period": 60 } },
-        { "name": "BIB_PER_IP", "namespace_id": "4202", "simple": { "limit": 300, "period": 60 } },
-        { "name": "SESSION_PER_IP", "namespace_id": "4203", "simple": { "limit": 300, "period": 60 } }
-      ]
-    }
-  }
   // Secrets (set once, never in this file):
   //   npx wrangler secret put SESSION_SECRET     # any long random string
-  //   npx wrangler secret put TURNSTILE_SECRET   # optional: enables the bot challenge
+  //   npx wrangler secret put TURNSTILE_SECRET   # enables the bot challenge
+  // Build variable (Settings -> Build -> Variables and secrets):
+  //   SUPABASE_SERVICE_ROLE_KEY                  # lets the build export the search data
 }

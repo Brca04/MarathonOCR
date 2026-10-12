@@ -1,10 +1,9 @@
 'use client';
 
+import { EVENT } from '@/lib/event';
 import { dataTerm } from '@/lib/i18n';
 import { useApp } from '@/components/AppContext';
 import type { GalleryPhoto, Runner } from '@/lib/types';
-import { EVENT_SLUG } from '@/lib/supabase';
-import profilePhotos from '@/lib/profile-photos.json';
 
 const mono = (size = 11): React.CSSProperties => ({
   fontFamily: 'var(--mono)',
@@ -39,29 +38,15 @@ function pickCover(photos: GalleryPhoto[]): GalleryPhoto | undefined {
   return best[best.length - 1].p;
 }
 
-type Shot = { photo?: string; position?: string };
-const PROFILE_PHOTOS = profilePhotos as Record<string, Record<string, { desktop?: Shot; mobile?: Shot }>>;
-
-/**
- * The runner-page photo for one screen shape: a hand-picked photo and crop from
- * lib/profile-photos.json (event slug -> bib -> desktop/mobile) when one is set
- * and that photo is in the runner's gallery, else the automatic cover.
- */
+/** The runner-page photo: the gallery's cover, cropped for the screen shape. */
 function profileShot(
-  bib: string,
-  kind: 'desktop' | 'mobile',
-  photos: GalleryPhoto[],
+  _bib: string,
+  _kind: 'desktop' | 'mobile',
+  _photos: GalleryPhoto[],
   cover: GalleryPhoto | undefined,
   fallbackPosition: string,
 ): { src: string; position: string } {
-  const pick = PROFILE_PHOTOS[EVENT_SLUG]?.[bib]?.[kind];
-  const picked = pick?.photo ? photos.find((p) => p.file_name === pick.photo) : undefined;
-  // A crop only fits the photo it was chosen for; with no photo named it applies to the cover.
-  const usePick = picked || (pick && !pick.photo);
-  return {
-    src: (picked ?? cover)?.src ?? '/photos/zg-runner.jpg',
-    position: (usePick && pick?.position) || fallbackPosition,
-  };
+  return { src: cover?.src ?? EVENT.heroImage, position: fallbackPosition };
 }
 
 /**
@@ -109,8 +94,7 @@ export default function RunnerView({
             runner's numbers sit straight on it, in the
             fixed on-media colours. A phone shows only the middle third of a
             landscape photo, so it gets its own image (data-runner-photo-mobile,
-            swapped in by globals.css): a hand-picked photo and crop from
-            lib/profile-photos.json when there is one, else the same cover. */}
+            swapped in by globals.css): the same cover, cropped for a tall frame. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           data-runner-photo=""

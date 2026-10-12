@@ -1,5 +1,4 @@
 import { EVENT_SLUG, isLive, previewUrl, supabase } from './supabase';
-import { DEMO_STATS, demoFind } from './demo';
 import { clockLabel } from './format';
 import { ensureSession } from './guard';
 import type { EventStats, FindRunnerResult, GalleryPhoto, PhotoMatch } from './types';
@@ -37,15 +36,18 @@ async function fetchStatic<T>(path: string): Promise<T | 'missing' | 'limited' |
   }
 }
 
-/** Landing-page counters. Falls back to the demo event when unconfigured. */
+/** No counters to show: the landing page hides the strip rather than invent numbers. */
+export const NO_STATS: EventStats = { ok: false } as EventStats;
+
+/** Landing-page counters, from the published stats.json, else the database. */
 export async function getEventStats(): Promise<EventStats> {
   const cached = await fetchStatic<EventStats>('stats.json');
   if (cached && typeof cached === 'object' && cached.ok) return cached;
-  if (!supabase) return DEMO_STATS;
+  if (!supabase) return NO_STATS;
   const { data, error } = await supabase.rpc('event_stats', { p_event_slug: EVENT_SLUG });
   if (error || !data || !(data as EventStats).ok) {
     if (error) console.warn('[event_stats]', error.message);
-    return DEMO_STATS;
+    return NO_STATS;
   }
   return data as EventStats;
 }
@@ -66,7 +68,7 @@ export async function findRunner(bib: string): Promise<FindRunnerResult> {
   // the index says otherwise (no export yet), in which case ask the database.
   if (cached === 'missing' && (await hasStaticIndex())) return { ok: false, reason: 'no_bib' };
 
-  if (!supabase) return demoFind(bib);
+  if (!supabase) return { ok: false, reason: 'no_event' };
   const { data, error } = await supabase.rpc('find_runner', {
     p_event_slug: EVENT_SLUG,
     p_bib: clean,
@@ -92,8 +94,8 @@ export function toGallery(photos: PhotoMatch[]): GalleryPhoto[] {
     const h = p.height ?? 2;
     return {
       ...p,
-      src: previewUrl(p.preview_path) ?? '/photos/zg-44.jpg',
-      thumb: previewUrl(p.thumb_path) ?? previewUrl(p.preview_path) ?? '/photos/zg-44.jpg',
+      src: previewUrl(p.preview_path) ?? '',
+      thumb: previewUrl(p.thumb_path) ?? previewUrl(p.preview_path) ?? '',
       clock: clockLabel(p.captured_at, i * 20),
       hint: [p.course_point, p.photographer].filter(Boolean).join(' · ') || 'Race photo',
       dims: p.width && p.height ? `${p.width} × ${p.height} px` : '—',

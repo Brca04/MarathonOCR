@@ -32,8 +32,8 @@ export function num(lang: Lang, value: number, digits = 0): string {
 }
 
 /**
- * Course points and race names arrive from the data (Postgres or the demo
- * event) already written in Croatian, so they are mapped rather than looked up.
+ * Course points and race names arrive from the database already written in
+ * Croatian, so they are mapped rather than looked up.
  * Anything unrecognised — a point some photographer typed — passes through.
  */
 const DATA_EN: Record<string, string> = {
@@ -147,9 +147,9 @@ const hr: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Pronađi svoje fotografije',
   searchBusy: 'Tražim…',
-  credits: EVENT.creditsHr || 'Omogućili Sklop i FramePaceMedia',
-  errUpcoming: 'Fotografije još nisu objavljene. Vratite se nakon utrke i unesite svoj startni broj.',
-  upcomingNote: 'Fotografije stižu nakon utrke. Spremite ovu stranicu i vratite se s brojem koji ste nosili.',
+  credits: EVENT.creditsHr || 'Sklop × FramePace',
+  errUpcoming: 'Fotografije još nisu objavljene. Objavljujemo ih ovaj tjedan, vratite se za koji dan.',
+  upcomingNote: 'Fotografije stižu ovaj tjedan. Spremite ovu stranicu i vratite se sa svojim startnim brojem.',
   raceMarathon: 'Maraton · 42,195 km',
   raceHalf: 'Polumaraton · 21,1 km',
   race10k: 'Utrka · 10 km',
@@ -230,9 +230,9 @@ const en: Strings = {
   consentSuffix: '.',
   searchSubmit: 'Find my photos',
   searchBusy: 'Searching…',
-  credits: EVENT.creditsEn || 'Made by Sklop and FramePaceMedia',
-  errUpcoming: 'Photos are not published yet. Come back after the race and enter your bib number.',
-  upcomingNote: 'Photos arrive after the race. Save this page and come back with the number you wore.',
+  credits: EVENT.creditsEn || 'Sklop × FramePace',
+  errUpcoming: 'Photos are not published yet. They go online this week; please check back in a few days.',
+  upcomingNote: 'Photos arrive this week. Save this page and come back with your bib number.',
   raceMarathon: 'Marathon · 42.195 km',
   raceHalf: 'Half marathon · 21.1 km',
   race10k: 'Run · 10 km',
