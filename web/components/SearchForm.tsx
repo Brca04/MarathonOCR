@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { EVENT, EVENT_YEAR, eventDateLabel, eventTitle } from '@/lib/event';
-import { raceFromBib } from '@/lib/format';
 import { useT } from '@/components/AppContext';
 
 export type SearchSubmit = { bib: string };
@@ -24,7 +23,6 @@ export default function SearchForm({
   notice?: string;
 }) {
   const t = useT();
-  const race = raceFromBib(bib, t);
   const [agreed, setAgreed] = useState(false);
   // Set when someone presses search without ticking the box: the row is
   // highlighted and explained instead of the button just staying dead.
@@ -273,23 +271,11 @@ export default function SearchForm({
             borderTop: '1px solid var(--card-line, #dfe3ec)',
           }}
         >
-          <span data-race-label="" style={{ fontWeight: 800, fontSize: 20, letterSpacing: '-.02em', lineHeight: 1 }}>
-            {race.label}
-          </span>
+          {/* The partners' line, across the whole foot of the card. */}
           <span
-            data-race-name=""
-            style={{
-              fontFamily: 'var(--mono)',
-              fontSize: 10,
-              letterSpacing: '.1em',
-              textTransform: 'uppercase',
-              color: 'var(--card-mute, #4c5c7c)',
-            }}
+            data-card-credit=""
+            style={{ flex: 1, textAlign: 'center', fontWeight: 800, fontSize: 18, letterSpacing: '.02em', lineHeight: 1 }}
           >
-            {race.name}
-          </span>
-          {/* Phone only: the partners' line takes the place of the distances. */}
-          <span data-card-credit="" style={{ display: 'none' }}>
             {t.credits}
           </span>
         </div>
@@ -403,18 +389,6 @@ export default function SearchForm({
       </button>
       </div>
 
-      <p
-        data-credits=""
-        style={{
-          margin: 0,
-          padding: '4px 4px 0',
-          textAlign: 'center',
-          fontSize: 12,
-          color: 'var(--mute)',
-        }}
-      >
-        {t.credits}
-      </p>
     </form>
   );
 }

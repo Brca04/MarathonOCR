@@ -16,3 +16,7 @@ public/media/
 
 # Written by scripts/event-env.mjs for the event being built
 .env.production.local
+.env.development.local
+# Written by Next.js dev for AI tools
+AGENTS.md
+CLAUDE.md

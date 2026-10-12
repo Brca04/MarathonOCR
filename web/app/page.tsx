@@ -309,7 +309,6 @@ function Home() {
                 width: '100%',
               }}
             >
-              <span>{t.footerRights}</span>
               <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 20 }}>
                 <a href="/privatnost/" className="link-mute">
                   {t.footerPrivacy}
@@ -318,6 +317,7 @@ function Home() {
                   {t.footerContact}
                 </a>
               </div>
+              <span>{t.footerRights}</span>
             </footer>
           </main>
         </div>

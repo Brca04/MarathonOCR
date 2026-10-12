@@ -4,6 +4,7 @@
   "private": true,
   "description": "Bib-number race photo search. One codebase, one settings file per event (events/*.env). Next.js + Supabase, static export on Cloudflare Workers.",
   "scripts": {
+    "predev": "node scripts/event-env.mjs && node scripts/export-static.mjs --if-key",
     "dev": "next dev",
     "prebuild": "node scripts/event-env.mjs && node scripts/check-deploy-env.mjs",
     "build": "next build",
