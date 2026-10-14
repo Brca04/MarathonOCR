@@ -107,3 +107,11 @@ _transfer/
 public/data/
 public/media/
 data/answer_keys/
+
+# Portable Python for review packs (raceday.py kit), ~365 MB
+_review_kit/
+
+# Reviewer files sent back from packs (raceday.py merge reads them), and the
+# results CSVs friends export: race data, not source.
+/review_*.json
+/*.csv
