@@ -80,7 +80,7 @@ birthdate check, so those runners will not be able to find their photos.
 
 ### The bib export
 
-`review_app.py` writes `image_name,bib_numbers`. Pointing `--review` at the
+`review_desktop.py` (Export CSV) and `raceday.py publish` write `image_name,bib_numbers`. Pointing `--review` at the
 progress JSON in the same folder also imports the model's *rejected* reads at
 low confidence. That is deliberate: a truncated read like `1514 → 514` is the
 dominant OCR failure, and having it in the table is what lets the

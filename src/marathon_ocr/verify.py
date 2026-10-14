@@ -28,7 +28,7 @@ from .recognizers.base import normalise_digits
 
 __all__ = ["HaikuVerifier", "HaikuRead", "Verdict", "judge"]
 
-DEFAULT_MODEL = os.environ.get("MARATHON_HAIKU_MODEL", "claude-haiku-4-5")
+DEFAULT_MODEL = os.environ.get("MARATHON_HAIKU_MODEL", "claude-haiku-5-5")
 
 PROMPT = """This image is cropped around one runner in a race photo.
 
@@ -110,18 +110,18 @@ class HaikuVerifier:
     def read_whole(self, photo: Image.Image, found: list[str] | None = None) -> HaikuRead:
         """One look at the entire photo, to catch runners the person detector
         missed or cropped badly (cut-off torso, bib on the edge of the box)."""
-        return self.read(photo, found, prompt=WHOLE_PROMPT, max_side=1568)
+        # A crowd shot can hold 20+ bibs: leave room for the whole JSON list.
+        return self.read(photo, found, prompt=WHOLE_PROMPT, max_side=1568, max_tokens=1200)
 
     def read(self, crop: Image.Image, hint: list[str] | None = None,
-             prompt: str = PROMPT, max_side: int | None = None) -> HaikuRead:
+             prompt: str = PROMPT, max_side: int | None = None, max_tokens: int = 200) -> HaikuRead:
         self.warmup()
         hint_text = ", ".join(hint) if hint else "nothing"
         side = max_side or self.max_side
         try:
             msg = self._client.messages.create(
                 model=self.model,
-                max_tokens=200,
-                temperature=0,
+                max_tokens=max_tokens,
                 messages=[{
                     "role": "user",
                     "content": [

@@ -864,7 +864,9 @@ def cmd_pack(args) -> int:
             print(f"! {rel}: not scanned yet, left out")
             continue
         photos = [ph for ph in photos_in(b)
-                  if args.all or (sug.get(ph.name, {}).get("needs_human") and ph.name not in rev)]
+                  if args.all
+                  or (args.unreviewed and ph.name not in rev)
+                  or (sug.get(ph.name, {}).get("needs_human") and ph.name not in rev)]
         if not photos:
             continue
         inner = f"{top}/{name}" if rel == "." else f"{top}/{name}/{Path(rel).as_posix()}"
@@ -875,7 +877,8 @@ def cmd_pack(args) -> int:
                      {k: v for k, v in sug.items() if k in keep}, {k: v for k, v in rev.items() if k in keep}))
     total = sum(len(x[2]) for x in plan)
     if not total:
-        raise SystemExit("nothing to pack: no photo here still needs a person (use --all for every photo)")
+        raise SystemExit("nothing to pack: no photo here still needs a person "
+                         "(--unreviewed: every photo not reviewed yet, --all: every photo)")
     print(f"packing {total} photo(s) from {len(plan)} part(s) at {args.size}px -> {out}")
 
     def small(ph: Path) -> tuple[str, bytes]:
@@ -1139,6 +1142,8 @@ def main() -> int:
             sp.add_argument("--out", help="zip path (default <root>/_packs/review_<batch>.zip)")
             sp.add_argument("--size", type=int, default=1600, help="long side of the photo copies")
             sp.add_argument("--all", action="store_true", help="every photo, not only the ones that need a person")
+            sp.add_argument("--unreviewed", action="store_true",
+                            help="every photo nobody has reviewed yet (e.g. a new batch), sure or not")
             sp.add_argument("--no-kit", action="store_true", help="leave the portable Python out (smaller zip)")
         if name == "merge":
             sp.add_argument("--file", required=True, help="the review_<batch>.json you got back")

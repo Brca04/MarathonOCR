@@ -18,4 +18,7 @@ ultralytics>=8.3
 easyocr>=1.7
 # paddleocr>=2.7          # also needs paddlepaddle-gpu built for CUDA 12
 # transformers>=4.44      # for TrOCR
-anthropic>=0.40           # Haiku second opinion (scripts/haiku_check.py)
+anthropic>=0.40           # Haiku second opinion (raceday.py check / recheck)
+
+# Review window (review_desktop.py)
+PySide6-Essentials>=6.9

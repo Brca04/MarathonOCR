@@ -156,7 +156,7 @@ Technically, finding a runner in a photo means **reading a race bib**. That is h
  Photographers ─┼─▶ photo folder ─▶  Local GPU machine                    │
                 │                   ├─ recognition (YOLO + EasyOCR)       │
  Timing company ┼─▶ results.csv     ├─ optional Claude Haiku check ───────┼──▶ Anthropic API
-                │                   ├─ review_app.py (human)              │
+                │                   ├─ review_desktop.py (human)          │
                 │                   └─ import / export / media scripts ───┼──▶ Supabase (Postgres)
                 │                                                         │──▶ Cloudflare R2
                 └────────────────────────────┬────────────────────────────┘
@@ -208,7 +208,7 @@ Technically, finding a runner in a photo means **reading a race bib**. That is h
 |---|---|---|
 | Recognition library | Python 3, PyTorch (CUDA cu128 / MPS), Ultralytics YOLO11, EasyOCR | Detect → crop → deskew/upscale → recognise → ranked candidates |
 | Verification (optional) | Anthropic Messages API, `claude-haiku-4-5` | Second opinion on low-confidence crops; whole-photo sweep |
-| Review | Streamlit (`review_app.py`) | Human confirmation, autosave, CSV export |
+| Review | PySide6 desktop window (`review_desktop.py`) | Human confirmation, autosave, CSV export, portable packs for other PCs |
 | Ingest tooling | Node.js scripts (`web/scripts/*.mjs`), supabase-js, sharp, wrangler | Import results and bibs, upload or derive photos, export static data, fill R2 |
 | System of record | Supabase Postgres 15+ with `pg_trgm`, `fuzzystrmatch`, RLS | Events, races, runners, photos, detections, matching function |
 | Web app | Next.js 16 (static export), React 19, TypeScript | Landing, search, runner page, lightbox, legal pages, HR/EN |
@@ -253,16 +253,11 @@ The library is shared by the evaluation harness and production scripts, so **ben
 | Script | Purpose |
 |---|---|
 | `check_env.py` | Verifies the GPU stack with a real matmul. The RTX 5070 is Blackwell sm_120 and needs the cu128 PyTorch build |
-| `run.py` | CLI: photo or folder in, bibs out; `--detector whole/person/torso/bib`, `--save-boxes` |
-| `make_demo_gallery.py` | Batch run that writes review-app inputs, using `best.pt` by default |
-| `ocr_gallery_mac.py` | MPS (Apple Silicon) batch OCR using person → torso. Produced the Željava `ocr_all.jsonl` |
-| `train_bib_detector.py`, `resume_bib_training.py` | Fine-tune the single-class bib detector → `models/bib_detector/best.pt` |
+| `raceday.py` | Race-day pipeline: `organize` (names, folders), `scan` (both bib detectors + EasyOCR, tiled), `check` / `recheck` (Haiku), `pack` / `merge` (review on other PCs), `publish`, `status` |
+| `train_bib_detector.py`, `finetune_bib_detector.py` | Train the single-class bib detector → `models/bib_detector/best.pt`, fine-tune → `best_v3.pt` |
 | `extract_crops.py`, `eval_recognizers.py`, `calibrate.py`, `eval_end_to_end.py` | Evaluation harness: ground-truth crops, per-engine scores, confidence-vs-accuracy table, photo-level recall and precision |
-| `haiku_check.py` | Sends unsure reads (and optionally whole photos) to Haiku; writes `.marathon_ocr_haiku.json` |
-| `make_suggestions.py` | Turns OCR output into `.marathon_ocr_suggestions.json` for review pre-fill, keeping start-list bibs at confidence ≥ 0.5 |
-| `app.py` | Streamlit playground: drop a photo, see what the pipeline reads |
 
-### 7.3 LLM verification tier (`verify.py`, `haiku_check.py`)
+### 7.3 LLM verification tier (`verify.py`, `raceday.py check` / `recheck`)
 
 **Purpose:** spend API money only where the local model is unsure, and turn disagreement into a review priority.
 
@@ -293,12 +288,12 @@ optional: one Haiku call per photo on the whole frame (1568 px) to catch missed 
 
 **Status:** implemented and used once. Given the budget constraints (§14), the strategic direction is to use an LLM **only on small crops of the residual uncertain cases, through the Batch API with a per-event cap**, not per photo.
 
-### 7.4 Review application (`review_app.py`)
+### 7.4 Review application (`review_desktop.py`)
 
-A Streamlit desktop app the operator runs against the photo folder.
+A PySide6 desktop window run against a photographer's folder (no browser, no server). `raceday.py pack` ships it with a portable Python so a helper can review on their own PC.
 
-```bash
-streamlit run review_app.py -- --folder src/slike
+```bat
+.venv\Scripts\python review_desktop.py "C:\...\marathonZG\Vedran Metelko"
 ```
 
 | Feature | Detail |
@@ -498,9 +493,8 @@ Matching lives in **one place**, `find_runner()`, and is pre-computed for every 
 |---|---|---|---|
 | **0. Prepare** | Event config and branding | Build variables in Cloudflare; logos in `web/public/brand/` | — |
 | | Load results | `npm run import:results -- --csv results.csv --dry-run`, then without `--dry-run` | `races`, `runners` |
-| **1. Recognise** | GPU batch | `python scripts/make_demo_gallery.py …` (bib detector) or `run.py` | OCR jsonl / suggestions |
-| | Optional second opinion | `python scripts/haiku_check.py --photos … --ocr … [--dry-run]` | `.marathon_ocr_haiku.json` |
-| **2. Review** | Human pass | `streamlit run review_app.py -- --folder <photos>` | `.marathon_ocr_review.json`, `bib_export.csv` |
+| **1. Recognise** | GPU batch + Haiku | `raceday.py organize`, `scan`, `check`, `recheck` | `.marathon_ocr_suggestions.json` |
+| **2. Review** | Human pass | `review_desktop.py <folder>`, or `raceday.py pack` / `merge` for helpers | `.marathon_ocr_review.json` |
 | **3. Load** | Bibs → DB | `npm run import:bibs -- --csv bib_export.csv --review .marathon_ocr_review.json` | `photos`, `detections` |
 | | Photos | Derivatives + `npm run media:r2 -- --event <slug>` | R2 objects |
 | **4. Publish** | Static export + deploy | Push to the production branch, or retry the latest build (runs `export:static` then `deploy`) | Live site |
@@ -727,9 +721,8 @@ MarathonOCR/
 │  ├─ detectors/              person / torso / bib / whole-image detectors
 │  ├─ recognizers/            engines, cascade, Reading, normalise_digits
 │  ├─ crops.py  dataset.py  metrics.py  pipeline.py  verify.py
-├─ scripts/                   recognition, training, evaluation, Haiku, suggestions (§7.2)
-├─ review_app.py              Streamlit review tool (§7.4)
-├─ app.py                     Streamlit pipeline playground
+├─ scripts/                   raceday pipeline, training, evaluation (§7.2)
+├─ review_desktop.py          desktop review tool (§7.4)
 ├─ archive/annotations.xml    CVAT evaluation set (30 photos)
 ├─ data/answer_keys/          zeljava-2026.csv / .json (663 photos)
 ├─ docs/                      Croatian PDF documentation, pitch PPTX

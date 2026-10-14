@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """MarathonOCR review: a desktop app, no browser, no server.
 
-Same files as the old web review (review_app.py), so scan / check / recheck /
+Uses the files raceday.py writes next to the photos, so scan / check / recheck /
 publish / pack / merge all keep working:
     .marathon_ocr_suggestions.json   what the scan + Haiku found (read only)
     .marathon_ocr_review.json        what you confirmed (written on every change)
