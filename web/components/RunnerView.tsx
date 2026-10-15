@@ -73,6 +73,9 @@ export default function RunnerView({
   const mobile = profileShot(runner.bib, 'mobile', photos, cover, '50% 30%');
   // A gallery built from photos alone has no results yet: hide the empty stats.
   const hasResult = Boolean(runner.time || runner.pace || runner.place_overall);
+  // A bib seen in photos but missing from the official results has no name
+  // either: show only the photo and the gallery, no empty card.
+  const hasCard = Boolean(runner.name?.trim()) || hasResult;
 
 
   return (
@@ -144,6 +147,7 @@ export default function RunnerView({
             <button
               type="button"
               data-scroll-cue=""
+              style={hasCard ? undefined : { marginBottom: 'clamp(20px,4cqh,44px)' }}
               onClick={() => document.getElementById('runner-gallery')?.scrollIntoView({ behavior: 'smooth' })}
             >
               <span>{t.photosFound(photos.length)}</span>
@@ -152,6 +156,7 @@ export default function RunnerView({
               </svg>
             </button>
           ) : null}
+          {hasCard ? (
           <div
             data-runner-card-wrap=""
             style={{
@@ -298,6 +303,7 @@ export default function RunnerView({
               </div>
             </div>
           </div>
+          ) : null}
         </div>
       </div>
 

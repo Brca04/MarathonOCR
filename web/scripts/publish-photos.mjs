@@ -10,8 +10,12 @@
  *
  * For every photo (sub-folders included):
  *   1. two derivatives, rotated upright from EXIF:
- *        web  1600 px long edge  →  public/media/<event>/w/<token>.jpg
- *        thumb 520 px long edge  →  public/media/<event>/t/<token>.jpg
+ *        web   up to 2560 px long edge (never enlarged; a 2000 px original stays 2000 px)
+ *                                →  public/media/<event>/w2/<token>.jpg
+ *        thumb 800 px long edge  →  public/media/<event>/t2/<token>.jpg
+ *      (w/ and t/ held the first, smaller versions: 1600 px q80 and 520 px q72.
+ *      New sizes get new folders so browsers and Cloudflare cannot keep serving
+ *      the old copies they cached for a week.)
  *      <token> is an HMAC of the file name with MEDIA_SALT, so photo URLs cannot
  *      be guessed or counted; only a search reveals a runner's photos.
  *   2. upload of both to the R2 bucket the site serves /media/* from;
@@ -28,6 +32,9 @@
  *                               it falls back to `wrangler r2 object put`, one file
  *                               at a time per worker: fine for hundreds, slow for 20k.
  * Options: --concurrency 8  --bucket <name> (default: R2_BUCKET from the event file)  --skip-upload  --skip-db
+ *          --refresh   only photos that are already on the site (in the photos table):
+ *                      rebuild them at the current sizes, upload, point their rows at
+ *                      the new files. Nothing new is published.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -53,12 +60,13 @@ const skipDb = Boolean(a['skip-db']);
 const concurrency = Math.max(1, Number(a.concurrency || Math.min(8, os.cpus().length)));
 const bucket = r2Bucket(a.bucket);
 const photographer = typeof a.photographer === 'string' ? a.photographer : null;
+const refresh = Boolean(a.refresh);
 const tz = process.env.NEXT_PUBLIC_EVENT_TZ || 'Europe/Zagreb';
 const publicDir = path.resolve(__dirname, '..', 'public');
 
 const SIZES = [
-  { dir: 'w', edge: 1600, quality: 80 },
-  { dir: 't', edge: 520, quality: 72 },
+  { dir: 'w2', edge: 2560, quality: 88 },
+  { dir: 't2', edge: 800, quality: 80 },
 ];
 const EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.heic', '.tif', '.tiff']);
 
@@ -152,11 +160,29 @@ async function upload(key, file) {
 
 // --- main -------------------------------------------------------------------
 
-const files = listPhotos(dir);
+let files = listPhotos(dir);
 if (!files.length) die(`No photos in ${dir}`);
 // The name stored and hashed is the path inside --dir, so two photographers'
 // "DSC_0001.jpg" in different sub-folders stay different photos.
 const nameOf = (f) => path.relative(dir, f).split(path.sep).join('/');
+
+if (refresh) {
+  // Only what is already published: the site keeps exactly the same photos.
+  const db = admin();
+  const { event } = await ensureEvent(db, slug);
+  const live = new Set();
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await db.from('photos').select('file_name')
+      .eq('event_id', event.id).range(from, from + 999);
+    if (error) die(error.message);
+    data.forEach((r) => live.add(r.file_name));
+    if (data.length < 1000) break;
+  }
+  const before = files.length;
+  files = files.filter((f) => live.has(nameOf(f)));
+  log.step(`--refresh: ${files.length} of ${before} photos in this folder are on the site; only those are redone`);
+  if (!files.length) die('None of these photos are on the site (wrong --dir? names are the path inside --dir).');
+}
 const names = files.map(nameOf);
 const dupes = names.filter((n, i) => names.indexOf(n) !== i);
 if (dupes.length) die(`Duplicate file names: ${dupes.slice(0, 3).join(', ')}`);
