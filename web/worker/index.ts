@@ -18,7 +18,10 @@
  *   GET  /data/_*       -> never served.
  *   GET  /media/*       -> event photos from the R2 bucket (binding MEDIA),
  *                          falling back to the asset store while a bucket is
- *                          still being filled.
+ *                          still being filled. Each Cloudflare location keeps a
+ *                          copy (Cache API), so a photo is read from R2 once per
+ *                          location, not once per view. `x-media-cache: HIT|MISS`
+ *                          shows which.
  *
  * Fails open on configuration, never on abuse: without SESSION_SECRET the
  * cookie check is skipped but the per-IP limit still applies.
@@ -60,6 +63,19 @@ interface DurableObjectState {
   storage: DurableObjectStorage;
   blockConcurrencyWhile<T>(fn: () => Promise<T>): Promise<T>;
 }
+
+interface ExecutionContext {
+  waitUntil(p: Promise<unknown>): void;
+}
+
+// Cloudflare's per-location HTTP cache. Works on the custom domain; on
+// *.workers.dev it is a no-op, which is fine.
+declare const caches: {
+  default: {
+    match(req: Request): Promise<Response | undefined>;
+    put(req: Request, res: Response): Promise<void>;
+  };
+};
 
 interface Env {
   MEDIA?: R2Bucket;
@@ -136,7 +152,7 @@ async function turnstileOk(secret: string, token: unknown, ip: string): Promise<
 }
 
 export default {
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(req.url);
     const ip = req.headers.get('cf-connecting-ip') || 'unknown';
 
@@ -158,18 +174,35 @@ export default {
 
     if (url.pathname.startsWith('/media/')) {
       if (req.method !== 'GET' && req.method !== 'HEAD') return new Response(null, { status: 405 });
-      const key = decodeURIComponent(url.pathname.slice(1));
-      const obj = env.MEDIA && !key.includes('..') ? await env.MEDIA.get(key) : null;
-      if (!obj) return env.ASSETS.fetch(req);
-      const headers = new Headers();
-      obj.writeHttpMetadata(headers);
-      if (!headers.has('content-type')) headers.set('content-type', 'image/jpeg');
-      headers.set('etag', obj.httpEtag);
-      // Photo files are never rewritten in place, so browsers may keep them.
-      headers.set('cache-control', 'public, max-age=604800');
-      if (req.headers.get('if-none-match') === obj.httpEtag) return new Response(null, { status: 304, headers });
-      headers.set('content-length', String(obj.size));
-      return new Response(req.method === 'HEAD' ? null : obj.body, { headers });
+      // One cache entry per photo URL, whatever the visitor's headers.
+      const cacheKey = new Request(url.origin + url.pathname, { method: 'GET' });
+      const cache = typeof caches !== 'undefined' ? caches.default : null;
+      let res = cache ? await cache.match(cacheKey).catch(() => undefined) : undefined;
+      let state = 'HIT';
+      if (!res) {
+        state = 'MISS';
+        const key = decodeURIComponent(url.pathname.slice(1));
+        const obj = env.MEDIA && !key.includes('..') ? await env.MEDIA.get(key) : null;
+        if (!obj) return env.ASSETS.fetch(req);
+        const headers = new Headers();
+        obj.writeHttpMetadata(headers);
+        if (!headers.has('content-type')) headers.set('content-type', 'image/jpeg');
+        headers.set('etag', obj.httpEtag);
+        headers.set('content-length', String(obj.size));
+        // Photo files are never rewritten in place (new sizes get new folders),
+        // so browsers and the edge may keep them for a week.
+        headers.set('cache-control', 'public, max-age=604800, immutable');
+        res = new Response(obj.body, { headers });
+        if (cache) ctx.waitUntil(cache.put(cacheKey, res.clone()).catch(() => undefined));
+      }
+      const headers = new Headers(res.headers);
+      headers.set('x-media-cache', state);
+      const etag = headers.get('etag');
+      if (etag && req.headers.get('if-none-match') === etag) {
+        headers.delete('content-length');
+        return new Response(null, { status: 304, headers });
+      }
+      return new Response(req.method === 'HEAD' ? null : res.body, { status: 200, headers });
     }
     if (url.pathname.startsWith('/data/_')) return new Response('Not found', { status: 404 });
 

@@ -65,8 +65,8 @@ const tz = process.env.NEXT_PUBLIC_EVENT_TZ || 'Europe/Zagreb';
 const publicDir = path.resolve(__dirname, '..', 'public');
 
 const SIZES = [
-  { dir: 'w2', edge: 2560, quality: 88 },
-  { dir: 't2', edge: 800, quality: 80 },
+  { role: 'web', dir: 'w2', edge: 2560, quality: 88 },
+  { role: 'thumb', dir: 't2', edge: 800, quality: 80 },
 ];
 const EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.heic', '.tif', '.tiff']);
 
@@ -237,12 +237,12 @@ async function worker() {
           uploaded.add(rel);
           manifestOut.write(rel + '\n');
         }
-        out[s.dir] = '/' + rel;
+        out[s.role] = '/' + rel;
       }
       rows.push({
         file_name: name,
-        preview_path: out.w,
-        thumb_path: out.t,
+        preview_path: out.web,
+        thumb_path: out.thumb,
         width,
         height,
         captured_at: capturedAt(meta.exif),
@@ -262,6 +262,10 @@ async function worker() {
 await Promise.all(Array.from({ length: concurrency }, worker));
 process.stdout.write('\n');
 await new Promise((r) => manifestOut.end(r));
+
+// Never write a photo row without its image paths: that empties the gallery.
+const broken = rows.filter((r) => !r.preview_path || !r.thumb_path);
+if (broken.length) die(`${broken.length} photo(s) have no image path (e.g. ${broken[0].file_name}); database not touched.`);
 
 if (!skipDb && rows.length) {
   const db = admin();
