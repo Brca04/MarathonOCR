@@ -611,6 +611,89 @@ input:focus-visible {
 }
 
 /* ===========================================================================
+   Bib card, every screen size: the phone design. Race name and date in a
+   typewriter line, the instruction on the card, two punched holes in the
+   black band, partners in a dashed-off typewriter footer. The phone block
+   below only sizes it down.
+   =========================================================================== */
+[data-search-head] {
+  display: none !important;
+}
+[data-card-hole] {
+  display: none !important;
+}
+[data-card-head] > span:first-child {
+  font-family: var(--mono);
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+[data-card-meta] {
+  display: none !important;
+}
+[data-card-date] {
+  display: inline !important;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--card-mute, #4c5c7c);
+  white-space: nowrap;
+}
+[data-card-title] {
+  display: block !important;
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: clamp(26px, 2.4vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #0a0a0a;
+}
+[data-bib-card] {
+  padding: 18px 20px 14px !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.12);
+}
+[data-bib-band] {
+  margin: 12px 4px 0 !important;
+  padding: 18px 24px 12px !important;
+  border-radius: 6px !important;
+}
+[data-bib-band]::before,
+[data-bib-band]::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f4f6f2;
+}
+[data-bib-band]::before {
+  left: 14px;
+}
+[data-bib-band]::after {
+  right: 14px;
+}
+[data-bib-date] {
+  display: none !important;
+}
+[data-card-foot] {
+  justify-content: center !important;
+  margin-top: 14px !important;
+  padding-top: 12px !important;
+  border-top: 1px dashed var(--card-line-2, #c3cdbd) !important;
+}
+[data-card-credit] {
+  font-family: var(--mono);
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase;
+  color: #0a0a0a;
+}
+
+/* ===========================================================================
    Phone home screen (below 760px): one full-screen photograph, the bib card
    and a frosted panel with the consent and the button standing on its lower
    half, so the number field is in view the moment the page opens. The
