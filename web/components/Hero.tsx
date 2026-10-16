@@ -29,11 +29,6 @@ const bigNum: React.CSSProperties = {
  * photograph, the edition title over it, and the event counters rolling up
  * underneath.
  */
-function finishersYear(raceDate: string | null): number {
-  if (!raceDate) return new Date().getFullYear() - 1;
-  const d = new Date(raceDate);
-  return d.getTime() <= Date.now() ? d.getFullYear() : d.getFullYear() - 1;
-}
 
 type Cell = { value: string; label: string; accent?: boolean };
 
@@ -80,17 +75,16 @@ function useEventCells(): Cell[] | null {
   const recordSec = toSeconds(stats.course_record);
   // Editorial numbers (first edition, course record) only show when the event
   // has them; otherwise the strip falls back to what the gallery itself knows.
+  // Photos online, confirmed bib reads, the distance, and this year's fastest
+  // marathon time. Recognitions fall back to runners with a photo until the
+  // database returns the new count.
+  const recognitions = stats.recognitions ?? stats.tagged_bibs ?? 0;
   return [
-    stats.finishers
-      ? {
-          value: num(lang, Math.round(stats.finishers * p)),
-          // Before race day the count is last edition's; after it, this one's.
-          label: t.statFinishers(finishersYear(stats.race_date)),
-        }
-      : { value: num(lang, Math.round((stats.photos || 0) * p)), label: t.statPhotos },
-    stats.first_year
-      ? { value: String(stats.first_year) + (lang === 'hr' ? '.' : ''), label: t.statFirstEdition }
-      : { value: num(lang, Math.round((stats.tagged_bibs || 0) * p)), label: t.statBibs },
+    { value: num(lang, Math.round((stats.photos || 0) * p)), label: t.statPhotos },
+    {
+      value: num(lang, Math.round(recognitions * p)),
+      label: stats.recognitions != null ? t.statRecognitions : t.statBibs,
+    },
     { value: num(lang, (stats.distance_km ?? EVENT.raceKm ?? 42.195) * p, 3), label: t.statKm },
     stats.course_record
       ? { value: fromSeconds(recordSec * p), label: t.statRecord, accent: true }

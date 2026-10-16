@@ -61,6 +61,7 @@ export type Strings = {
   statPhotos: string;
   statBibs: string;
   statYear: string;
+  statRecognitions: string;
   scrollHint: string;
   heroSub: string;
   consentNeeded: string;
@@ -125,10 +126,11 @@ const hr: Strings = {
   statFinishers: (year) => `Završilo ${year}.`,
   statFirstEdition: 'Prvo izdanje',
   statKm: 'Kilometara',
-  statRecord: 'Rekord staze',
+  statRecord: 'Najbrže vrijeme',
   statPhotos: 'Fotografija',
   statBibs: 'Prepoznatih brojeva',
   statYear: 'Godina',
+  statRecognitions: 'Prepoznavanja',
   scrollHint: 'Pomaknite se dolje',
   heroSub: 'Službene fotografije utrke',
   consentNeeded: 'Za pretragu označite da se slažete s pravilima privatnosti.',
@@ -207,10 +209,11 @@ const en: Strings = {
   statFinishers: (year) => `Finishers ${year}`,
   statFirstEdition: 'First edition',
   statKm: 'Kilometres',
-  statRecord: 'Course record',
+  statRecord: 'Fastest time',
   statPhotos: 'Photos',
   statBibs: 'Bibs recognised',
   statYear: 'Year',
+  statRecognitions: 'Recognitions',
   scrollHint: 'Scroll down',
   heroSub: 'Official race photos',
   consentNeeded: 'Tick the box to agree to the privacy policy, then search.',

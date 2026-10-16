@@ -397,6 +397,10 @@ as $$
                        and exists (select 1 from public.detections d
                                      join public.photos p on p.id = d.photo_id
                                     where p.event_id = e.id and d.bib_text = r.bib)),
+    -- Every confirmed bib read: one per runner per photo.
+    'recognitions', (select count(*) from public.detections d
+                      join public.photos p on p.id = d.photo_id
+                     where p.event_id = e.id and d.source in ('review', 'manual')),
     'distance_km', (select max(distance_km) from public.races ra
                      where ra.event_id = e.id),
     'course_record', (select to_char(min(r.finish_time), 'FMHH24:MI:SS')

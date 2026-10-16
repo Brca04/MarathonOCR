@@ -10,6 +10,8 @@ export type EventStats = {
   finishers: number;
   photos: number;
   tagged_bibs: number;
+  /** Confirmed bib reads, one per runner per photo (older snapshots lack it). */
+  recognitions?: number;
   distance_km: number | null;
   course_record: string | null;
 };
