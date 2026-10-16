@@ -723,10 +723,31 @@ input:focus-visible {
     color: rgba(255, 255, 255, 0.78) !important;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
-  /* Phone: just the copyright line. Privacy rules stay linked from the
-     consent checkbox; /privatnost and /kontakt still work. */
+  /* Phone: one line, "© 2026. Zagrebački maraton · Kontakt". Privacy rules
+     stay linked from the consent checkbox, so that link is left out here. */
+  [data-search-grid] > [data-home-footer] {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 8px !important;
+  }
+  [data-search-grid] > [data-home-footer] > span {
+    order: -1;
+  }
   [data-search-grid] > [data-home-footer] > div {
-    display: none !important;
+    gap: 0 !important;
+  }
+  [data-search-grid] > [data-home-footer] > div::before {
+    content: '·';
+    margin-right: 8px;
+  }
+  [data-search-grid] > [data-home-footer] > div > a[href^='/privatnost'] {
+    display: none;
+  }
+  [data-search-grid] > [data-home-footer] a {
+    color: inherit !important;
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
   [data-search-grid] {
     grid-template-columns: 1fr !important;
@@ -874,8 +895,8 @@ input:focus-visible {
   /* --- frosted panel: notice, consent, button ------------------------- */
   [data-search-actions] {
     display: grid !important;
-    gap: 12px;
-    padding: 14px;
+    gap: 8px;
+    padding: 10px;
     border-radius: 6px; /* same corners as the bib card above */
     background: rgba(255, 255, 255, 0.34);
     border: 1px solid rgba(255, 255, 255, 0.45);
@@ -906,7 +927,7 @@ input:focus-visible {
     background: rgba(255, 255, 255, 0.82);
   }
   [data-search-grid] > form .btn-skew {
-    height: 54px !important;
+    height: 46px !important;
   }
   /* The partners are on the card now; the footer takes this line's place. */
 
@@ -934,7 +955,7 @@ input:focus-visible {
     font-size: 20px;
   }
   [data-search-grid] > form .btn-skew {
-    height: 50px !important;
+    height: 44px !important;
   }
   [data-search-grid] > form .btn-skew-label {
     font-size: 16px !important;
