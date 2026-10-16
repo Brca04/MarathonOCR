@@ -1080,13 +1080,16 @@ input:focus-visible {
   }
 }
 
-/* Partner links on the bib card: read as plain text, underline on hover. */
+/* Partner links on the bib card: always underlined so they read as links;
+   the line darkens on hover. */
 .card-credit-link {
   color: inherit;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(var(--paper-rgb), 0.45);
 }
 .card-credit-link:hover,
 .card-credit-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration-color: currentColor;
 }
