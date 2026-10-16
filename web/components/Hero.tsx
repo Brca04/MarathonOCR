@@ -79,12 +79,18 @@ function useEventCells(): Cell[] | null {
   // marathon time. Recognitions fall back to runners with a photo until the
   // database returns the new count.
   const recognitions = stats.recognitions ?? stats.tagged_bibs ?? 0;
+  // Big counts are shown rounded down to the hundred with a "+" (17.532 ->
+  // "17.500+"): readable at a glance and never more than the real number.
+  const atLeast = (n: number) => {
+    const floor = n >= 1000 ? Math.floor(n / 100) * 100 : n;
+    return num(lang, Math.round(floor * p)) + (floor < n && p >= 1 ? '+' : '');
+  };
   return [
-    { value: num(lang, Math.round((stats.photos || 0) * p)), label: t.statPhotos },
     {
-      value: num(lang, Math.round(recognitions * p)),
+      value: atLeast(recognitions),
       label: stats.recognitions != null ? t.statRecognitions : t.statBibs,
     },
+    { value: EVENT.statPhotos || atLeast(stats.photos || 0), label: t.statPhotos },
     { value: num(lang, (stats.distance_km ?? EVENT.raceKm ?? 42.195) * p, 3), label: t.statKm },
     stats.course_record
       ? { value: fromSeconds(recordSec * p), label: t.statRecord, accent: true }
