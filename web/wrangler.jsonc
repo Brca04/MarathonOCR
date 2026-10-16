@@ -27,6 +27,13 @@
   "durable_objects": { "bindings": [{ "name": "QUOTA", "class_name": "SessionQuota" }] },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SessionQuota"] }],
   "vars": { "BIB_QUOTA": "30" },
+  // Workers Logs, Traces and Issues (same as the dashboard; keep in sync, or a
+  // Git build turns them off again).
+  "observability": {
+    "logs": { "enabled": true, "head_sampling_rate": 1, "invocation_logs": true, "persist": true },
+    "traces": { "enabled": true, "head_sampling_rate": 1, "persist": true },
+    "issue_detection": { "enabled": true }
+  },
   // Per-location counters (Cloudflare Rate Limiting binding). Approximate by
   // design — a first layer against floods; the exact cap is QUOTA above. Periods can only
   // be 10 or 60 seconds. A runner looks up a handful of bibs; a scraper

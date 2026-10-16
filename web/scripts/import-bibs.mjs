@@ -186,12 +186,24 @@ await upsertBatched(
 );
 
 // Fetch ids back so detections can be replaced wholesale for these photos.
-const { data: stored, error } = await db
-  .from('photos')
-  .select('id,file_name')
-  .eq('event_id', event.id);
-if (error) die(`Could not read photos back: ${error.message}`);
-const idByName = new Map(stored.map((p) => [p.file_name, p.id]));
+// Paged: the API returns at most 1,000 rows per request, and an event has far
+// more photos than that. Unpaged, most photos silently got no detections.
+const idByName = new Map();
+for (let from = 0; ; from += 1000) {
+  const { data: page, error } = await db
+    .from('photos')
+    .select('id,file_name')
+    .eq('event_id', event.id)
+    .order('id')
+    .range(from, from + 999);
+  if (error) die(`Could not read photos back: ${error.message}`);
+  page.forEach((p) => idByName.set(p.file_name, p.id));
+  if (page.length < 1000) break;
+}
+const unmatched = detections.filter((d) => !idByName.has(d.fileName));
+if (unmatched.length) {
+  die(`${unmatched.length} photo(s) from the CSV are not in the database (e.g. ${unmatched[0].fileName}); nothing written.`);
+}
 
 const ids = detections.map((d) => idByName.get(d.fileName)).filter(Boolean);
 for (let i = 0; i < ids.length; i += 200) {
