@@ -44,9 +44,9 @@ export default function InfoPage({
           {title}
         </h1>
         {children}
-        <p style={{ marginTop: 48 }}>
+        <p style={{ marginTop: 48, textAlign: 'center' }}>
           <Link href="/" className="link-mute" style={{ textDecoration: 'underline', textUnderlineOffset: 3 }}>
-            {lang === 'hr' ? '← Natrag na pretragu fotografija' : '← Back to photo search'}
+            {lang === 'hr' ? 'Natrag na pretragu fotografija' : 'Back to photo search'}
           </Link>
         </p>
       </article>
