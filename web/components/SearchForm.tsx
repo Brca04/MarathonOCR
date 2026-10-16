@@ -3,6 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { EVENT, EVENT_YEAR, eventDateLabel, eventTitle } from '@/lib/event';
 import { useT } from '@/components/AppContext';
+import { ensureSession } from '@/lib/guard';
+
+// Start the bot check and session as soon as someone starts a search (first
+// digit typed or the consent box ticked), so it is ready by the time they
+// press the button instead of adding 1-3 s to the first search. Not on page
+// load: visitors who never search never run Turnstile. ensureSession() runs
+// once and is reused by the lookup itself.
+const warmSession = () => {
+  void ensureSession();
+};
 
 export type SearchSubmit = { bib: string };
 
@@ -223,7 +233,10 @@ export default function SearchForm({
             ref={bibInputRef}
             data-bib-input=""
             value={bib}
-            onChange={(e) => setBib(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            onChange={(e) => {
+              setBib(e.target.value.replace(/\D/g, '').slice(0, 6));
+              warmSession();
+            }}
             inputMode="numeric"
             enterKeyHint="search"
             autoComplete="off"
@@ -349,6 +362,7 @@ export default function SearchForm({
           onChange={(e) => {
             setAgreed(e.target.checked);
             if (e.target.checked) setNeedConsent(false);
+            warmSession();
           }}
           style={{
             marginTop: 2,
