@@ -335,15 +335,22 @@ export default function RunnerView({
         </div>
 
         {photos.length === 0 ? (
+          // Just a sad face where the gallery would be; the sentence stays for
+          // screen readers.
           <p
+            role="img"
+            aria-label={t.noPhotos(runner.bib)}
             style={{
+              margin: 0,
+              textAlign: 'center',
               color: 'var(--mute)',
-              fontSize: 15,
-              lineHeight: 1.6,
-              maxWidth: 560,
+              fontSize: 'clamp(40px,6vw,64px)',
+              fontWeight: 600,
+              lineHeight: 1,
+              letterSpacing: '.02em',
             }}
           >
-            {t.noPhotos(runner.bib)}
+            :(
           </p>
         ) : (
           <>
