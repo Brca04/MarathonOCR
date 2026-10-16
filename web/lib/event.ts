@@ -41,6 +41,8 @@ export const EVENT = {
   heroPositions: list(env(process.env.NEXT_PUBLIC_HERO_POSITION, 'center 30%')),
   /** Photographer of the hero photos, shown small on them: "Foto: Krume Ivanovski". */
   heroCredit: env(process.env.NEXT_PUBLIC_HERO_CREDIT, ''),
+  /** Fixed text for the photo counter on the hero ("10k+"); empty = the live count. */
+  statPhotos: env(process.env.NEXT_PUBLIC_STAT_PHOTOS, ''),
   /** Public address of this deployment, for link previews: "https://bibfind.eu". */
   siteUrl: env(process.env.NEXT_PUBLIC_SITE_URL, ''),
   /** 1200 x 630 picture for link previews (WhatsApp, Facebook). */
