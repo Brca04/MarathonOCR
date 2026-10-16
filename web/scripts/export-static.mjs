@@ -48,7 +48,10 @@ for (;;) {
   const { data, error } = await db.rpc('export_event', {
     p_event_slug: slug,
     p_after_bib: after,
-    p_limit: 500,
+    // Small pages: each call must finish inside the database's statement
+    // timeout, and every bib runs the fuzzy photo match. 500 timed out at
+    // ~9k photos; --page overrides.
+    p_limit: Number(a.page) || 100,
   });
   if (error) die(error.message);
   if (!data?.length) break;
