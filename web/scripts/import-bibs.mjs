@@ -90,6 +90,7 @@ const photos = [];
 const detections = []; // resolved to photo ids after the photo upsert
 let confirmedCount = 0;
 let ocrOnlyCount = 0;
+let rejectedCount = 0; // model guesses on photos a person marked "no bib"
 
 for (const row of rows) {
   const fileName = pick(row, ['image_name', 'file_name', 'filename', 'image', 'photo']);
@@ -127,12 +128,16 @@ for (const row of rows) {
   // Model candidates the reviewer removed are still worth keeping: a wrong read
   // of a real bib is exactly what edit-distance-1 matching is for. They go in at
   // a lower rank so an exact confirmed hit always outranks them.
+  // A photo a person reviewed and left empty has no bib: keep the model's
+  // guesses for the record, but as 'rejected' so search never shows it.
+  const reviewedEmpty = review[fileName]?.reviewed === true && confirmed.length === 0;
   const modelNumbers = review[fileName]?.model_numbers ?? [];
   for (const raw of modelNumbers) {
     const bib = digits(raw);
     if (!bib || bib.length < 2 || perPhoto.has(bib)) continue;
-    perPhoto.set(bib, { bib_text: bib, confidence: 0.35, rank: 1, source: 'ocr' });
-    ocrOnlyCount++;
+    perPhoto.set(bib, { bib_text: bib, confidence: 0.35, rank: 1, source: reviewedEmpty ? 'rejected' : 'ocr' });
+    if (reviewedEmpty) rejectedCount++;
+    else ocrOnlyCount++;
   }
 
   detections.push({ fileName, reads: [...perPhoto.values()] });
@@ -140,7 +145,7 @@ for (const row of rows) {
 
 log.step('Parsed');
 log.info(`${photos.length} photos`);
-log.info(`${confirmedCount} confirmed bib read(s), ${ocrOnlyCount} extra model candidate(s)`);
+log.info(`${confirmedCount} confirmed bib read(s), ${ocrOnlyCount} extra model candidate(s), ${rejectedCount} rejected (reviewed as no bib)`);
 const tagged = detections.filter((d) => d.reads.some((r) => r.source === 'review')).length;
 log.info(`${tagged} photo(s) have at least one confirmed bib, ${photos.length - tagged} have none`);
 const distinct = new Set(detections.flatMap((d) => d.reads.map((r) => r.bib_text)));

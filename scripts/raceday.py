@@ -541,7 +541,9 @@ def export(root: Path, start: set[str] | None, prefill_at: float) -> tuple[Path,
                 stats["auto"] += 1
             model = sorted({norm(h["text"]) for h in reads[p.name]["hits"] if h["conf"] >= 0.1 and norm(h["text"])})
             rows_csv.append([key, ", ".join(numbers)])
-            review_all[key] = {"numbers": numbers, "model_numbers": model}
+            # "reviewed" tells import-bibs that an empty list is a person's "no bib",
+            # so the model's guesses on that photo are stored as rejected.
+            review_all[key] = {"numbers": numbers, "model_numbers": model, "reviewed": p.name in rev}
             stats["photos"] += 1
             stats["with_bibs"] += bool(numbers)
     out_dir = root / "_publish"
