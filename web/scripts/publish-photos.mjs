@@ -79,7 +79,9 @@ function listPhotos(root) {
   const out = [];
   const walk = (d) => {
     for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-      if (e.name.startsWith('.')) continue;
+      // Hidden and working folders (.excluded, _packs, _publish, _old_data) are
+      // never published: same rule as raceday.py.
+      if (e.name.startsWith('.') || (e.isDirectory() && e.name.startsWith('_'))) continue;
       const p = path.join(d, e.name);
       if (e.isDirectory()) walk(p);
       else if (EXTS.has(path.extname(e.name).toLowerCase())) out.push(p);
